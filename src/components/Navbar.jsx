@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { IoIosSearch } from "react-icons/io";
 import { FaMicrophone } from "react-icons/fa";
 import avatar from '../assets/avatar.jpg'
-import { IoArrowBackOutline } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa6";
 import { RiVideoAddLine } from "react-icons/ri";
 import { IoNotificationsOutline } from "react-icons/io5";
 
@@ -20,6 +20,7 @@ const Navbar = () => {
         mic: false,
         create: false,
         notifications: false,
+        backArrow: false,
     })
 
     useLayoutEffect(() => {
@@ -71,23 +72,17 @@ const Navbar = () => {
         );
     }
 
-    const ShadowBg = () => {
-        return (
-            <div className='h-8 w-8 rounded-full bg-neutral-600 absolute z-0 top-0'/>
-        )
-    }
-
     return (
         <div className=' flex justify-between items-center px-8 opacity-95 sticky top-0 z-50 h-[3.5rem]'>
             {showFullSearchBar ? (
                 <div className=' w-full flex items-center justify-between gap-x-4 '>
-                    <button 
-                    className={` w-7 h-7`}
+                    <div 
+                    className={` cursor-pointer h-10 w-10 flex items-center justify-center ${hoverBG.backArrow && 'bg-neutral-700'} rounded-full`}
+                    onMouseEnter={ () => setHoverBG({...hoverBG, backArrow: true}) }
+                    onMouseLeave={ () => setHoverBG({...hoverBG, backArrow: false}) }
                     onClick={() => setShowFullSearchBar(false)}>
-                        <IoArrowBackOutline
-                            className={` w-full h-full`}
-                        />
-                    </button>
+                        <FaArrowLeft className=' w-6 h-6'/>
+                    </div>
                     <SearchInput width={'w-[100%]'} />
                 </div>
             ) : ( 

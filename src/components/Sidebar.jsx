@@ -207,6 +207,7 @@ const Sidebar = () => {
     const comparableWidth = 1312;
     const [showSideBar, setShowSideBar] = useState(window.innerWidth > comparableWidth);
     const [showPlaylist, setShowPlaylist] = useState(false)
+    const [showSubscriptions, setShowSubscriptions] = useState(false)
     
     const handleMainLinkBgColor = (arr, indx) => {
         const updated = Array(arr.length).fill(false);
@@ -231,6 +232,7 @@ const Sidebar = () => {
 
     return (
         <div className={` ${showSideBar ? 'w-[15rem]' : 'w-[5.5rem]'} mr-2 overflow-y-auto`}>
+        {/* topmost part, home shorts subscriptions */}
             <ul className={`flex flex-col ${showSideBar ? 'border-b-2 border-gray-700' : ''} pb-3`}>
                 {mainLinks.map((link, index) => (
                     <a 
@@ -254,7 +256,8 @@ const Sidebar = () => {
             </ul>
             
             {showSideBar && (
-                <>  
+                <>
+                    {/* you part */}
                     <ul className='flex flex-col border-b-2 border-gray-700 py-3'>
                         <a 
                         href='#'
@@ -318,7 +321,31 @@ const Sidebar = () => {
                             {showPlaylist ? 'Hide' : 'Show'} playlists
                         </span>
                     </ul>
+                    
+                    {/* subscriptions part */}
+                    <ul className='flex flex-col border-b-2 border-gray-700 py-3'>
+                        <p 
+                        className={` mx-3 pl-3 flex items-center`}>
+                            Subscriptions
+                        </p>
 
+                        <span 
+                        className={`hover:bg-zinc-800 rounded-lg mx-3 pl-3 py-3 text- flex items-center gap-x-3 cursor-pointer`}
+                        onClick={() => setShowSubscriptions(!showSubscriptions)}>
+                            {!showSubscriptions ? (
+                                <FaChevronDown 
+                                    className='text-sm'
+                                />
+                            ) : (
+                                <FaChevronUp 
+                                    className='text-sm'
+                                />
+                            )}
+                            {showPlaylist ? 'Hide' : 'Show'} 100 more
+                        </span>
+                    </ul>
+
+                    {/* explore part */}
                     <ul className='flex flex-col border-b-2 border-gray-700 py-3'>
                         <span className={`mx-3 pl-3 pt-3 `}>Explore</span>
                         {exploreLinks.map((link, index) => (
@@ -340,6 +367,7 @@ const Sidebar = () => {
                         ))}
                     </ul>
 
+                    {/* more from youtube */}
                     <ul className={`flex flex-col ${showSideBar ? 'border-b-2 border-gray-700' : ''} pb-3`}>
                         <span className={`mx-3 pl-3 pt-3 `}>More from YouTube</span>
                         {moreLinks.map((link, index) => (
@@ -361,6 +389,7 @@ const Sidebar = () => {
                         ))}
                     </ul>
 
+                    {/* settings report help feedback */}
                     <ul className='flex flex-col border-b-2 border-gray-700 py-3'>
                         {helpLinks.map((link, index) => (
                             <a 
@@ -381,6 +410,7 @@ const Sidebar = () => {
                         ))}
                     </ul>
 
+                    {/* 1st text links */}
                     <ul className='flex flex-wrap text-[13px] px-3 pt-6 gap-x-2 gap-y-2 '>
                         {textLinks[0].map((name, index) => (
                             <li key={name+index}>
@@ -393,6 +423,7 @@ const Sidebar = () => {
                         ))}
                     </ul>
                     
+                    {/* 2nd text links */}
                     <ul className='flex flex-wrap text-[13px] px-3 pt-9 pb-6 gap-x-2 gap-y-2 '>
                         {textLinks[1].map((name, index) => (
                             <li key={name+index}>
@@ -406,7 +437,6 @@ const Sidebar = () => {
                     </ul>
 
                     <span className="px-4 pb-6 text-sm text-zinc-400">Made by Soumya with 💝</span>
-                    <br />
                 </>
             )}
         </div>
