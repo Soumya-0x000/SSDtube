@@ -144,19 +144,19 @@ const Sidebar = () => {
     }, [])
 
     return (
-        <div className={`${showSideBar ? 'w-[15rem]' : 'w-[4.5rem]'} mr-2 overflow-y-auto`}>
+        <div className={` ${showSideBar ? 'w-[15rem]' : 'w-[5.5rem]'} mr-2 overflow-y-auto`}>
             <ul className={`flex flex-col ${showSideBar ? 'border-b-2 border-gray-700' : ''} pb-3`}>
                 {mainLinks.map((link, index) => (
                     <a 
                     href="#" 
-                    className={`hover:bg-zinc-800 rounded-lg mx-3 pl-3 py-3 ${mainLinkBgColor[index] || link.name === 'Home' ? 'bg-zinc-800' : ''}`}
+                    className={`hover:bg-zinc-800 rounded-lg mx-3 ${showSideBar && 'pl-3'} py-3 ${mainLinkBgColor[index] || link.name === 'Home' ? 'bg-zinc-800' : ''}`}
                     key={link.name+index}
                     // onClick={() => handleMainLinkBgColor(mainLinks, index)}
                     >
                         <li 
-                        className='flex items-center gap-x-5'>
+                        className={` ${!showSideBar && 'flex-col'} flex items-center gap-x-5`}>
                             {link.icon}
-                            {/* {!showSideBar && <span>{link.name}</span>} */}
+                            {!showSideBar && <span className='text-[10px] mt-1.5'>{link.name}</span>}
                             {showSideBar && (
                                 <span className='text-sm tracking-wider'>
                                     {link.name}
@@ -256,7 +256,7 @@ const Sidebar = () => {
                         ))}
                     </ul>
 
-                    <span className="px-4 pb-6 text-sm text-zinc-400">&copy; 2024 Google LLC</span>
+                    <span className="px-4 pb-6 text-sm text-zinc-400">Made by Soumya with 💝</span>
                     <br />
                 </>
             )}
