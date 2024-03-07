@@ -21,7 +21,6 @@ const Navbar = () => {
         create: false,
         notifications: false,
     })
-    console.log(hoverBG)
 
     useLayoutEffect(() => {
         const handleResize = () => {
