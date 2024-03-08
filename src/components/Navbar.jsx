@@ -6,6 +6,8 @@ import avatar from '../assets/avatar.jpg'
 import { FaArrowLeft } from "react-icons/fa6";
 import { RiVideoAddLine } from "react-icons/ri";
 import { IoNotificationsOutline } from "react-icons/io5";
+import { useDispatch, useSelector } from 'react-redux';
+import { sideBarFloat, sideBarOpen } from '../store/SidebarSlice';
 
 const Navbar = () => {
     const [searchItem, setSearchItem] = useState('');
@@ -13,7 +15,7 @@ const Navbar = () => {
     const comparableWidth = 718;
     const [showSearchBar, setShowSearchBar] = useState(window.innerWidth > comparableWidth);
     const [hideIconInMobile, setHideIconInMobile] = useState(window.innerWidth > 500);
-    const [showFullSearchBar, setShowFullSearchBar] = useState(false)
+    const [showFullSearchBar, setShowFullSearchBar] = useState(false);
     const [hoverBG, setHoverBG] = useState({
         hamBurger: false,
         search: false,
@@ -21,7 +23,11 @@ const Navbar = () => {
         create: false,
         notifications: false,
         backArrow: false,
-    })
+    });
+    const isSideBarOpen = useSelector((state) => state.sidebar.isSidebarOpen);
+    const isSidebarFloating = useSelector((state) => state.sidebar.isFloatSidebar);
+    const fullSidebarWindow = useSelector((state) => state.sidebar.isFullSidebarWindowSupport)
+    const dispatch = useDispatch();
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -72,8 +78,17 @@ const Navbar = () => {
         );
     }
 
+    const handleSidebarClick = () => {
+        dispatch(sideBarOpen(!isSideBarOpen))
+        if (fullSidebarWindow) {
+            dispatch(sideBarFloat(!isSidebarFloating))
+        } else {
+            dispatch(sideBarFloat(false))
+        }
+    }
+
     return (
-        <div className=' flex justify-between items-center px-8 opacity-95 sticky top-0 z-50 h-[3.5rem]'>
+        <div className='w-full flex justify-between items-center px-7 opacity-95 sticky top-0 z-50 h-[4rem] '>
             {showFullSearchBar ? (
                 <div className=' w-full flex items-center justify-between gap-x-4 '>
                     <div 
@@ -92,6 +107,7 @@ const Navbar = () => {
                         {/* Hamburger */}
                         <div 
                         className={`cursor-pointer w-10 h-10 relative rin flex items-center justify-center ${hoverBG.hamBurger && 'bg-neutral-700'} rounded-full`}
+                        onClick={handleSidebarClick}
                         onMouseEnter={ () => setHoverBG({...hoverBG, hamBurger: true}) }
                         onMouseLeave={ () => setHoverBG({...hoverBG, hamBurger: false}) }>
                             <div className=' h-fit flex flex-col items-center justify-center'>
@@ -143,7 +159,10 @@ const Navbar = () => {
                                         className={` cursor-pointer h-10 w-10 flex items-center justify-center ${hoverBG.search && 'bg-neutral-700'} rounded-full`}
                                         onMouseEnter={ () => setHoverBG({...hoverBG, search: true}) }
                                         onMouseLeave={ () => setHoverBG({...hoverBG, search: false}) }
-                                        onClick={() => setShowFullSearchBar(true)}>
+                                        onClick={() => (
+                                            setShowFullSearchBar(true),
+                                            setHoverBG({ ...hoverBG, search: false})
+                                        )}>
                                             <IoIosSearch className=' w-6 h-6'/>
                                         </div>
 

@@ -1,4 +1,4 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
     videos: [],
@@ -9,17 +9,16 @@ const initialState = {
     recommendedVideos: [],
 };
 
-const YoutubeSlice = createSlice({
+export const YoutubeSlice = createSlice({
     name: 'youtube',
     initialState,
-    reducers: {},
+    reducers: {
+
+    },
     extraReducers: (builder) => {
 
     },
 });
 
-export const store = configureStore({
-    reducer: {
-        youtube: YoutubeSlice.reducer,
-    }
-})
+export const {
+} = YoutubeSlice.actions;
