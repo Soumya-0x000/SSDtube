@@ -10,15 +10,31 @@ import {
 import { FaChevronRight } from "react-icons/fa6";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { MdOutlineVideoLibrary } from 'react-icons/md';
+import { useSelector } from 'react-redux';
+import LeftSideIconArea from '../navBar/LeftSideIconArea';
 
-export const DesktopSidebar = () => {
+export const DesktopSidebar = ({ sidebarVisible }) => {
     const [showPlaylist, setShowPlaylist] = useState(false);
     const [showSubscriptions, setShowSubscriptions] = useState(false);
+    const isSidebarFloating = useSelector((state) => state.sidebar.isFloatSidebar);
+    const [hoverBG, setHoverBG] = useState({
+        hamBurger: false,
+    });
+    const isFullSidebarWindow = useSelector((state) => state.sidebar.isFullSidebarWindowSupport);
 
     return (
         <div className='w-full'>
+            {isSidebarFloating && isFullSidebarWindow && (
+                <div className={`h-[3.3rem] ${sidebarVisible && 'w-[14.4rem]'} pl-7 flex items-center fixed bg-[#0f0f0f]`}>
+                    <LeftSideIconArea
+                        hoverBG={hoverBG}
+                        setHoverBG={setHoverBG}
+                    />
+                </div>
+            )}
+
             {/* topmost part, home shorts subscriptions */}
-            <ul className={`flex flex-col gap-y-3 border-b-2 border-gray-700 pb-3`}>
+            <ul className={`${isSidebarFloating && isFullSidebarWindow && 'pt-[3.3rem]'} flex flex-col gap-y-3 border-b-2 border-gray-700 pb-3`}>
                 {mainLinks.map((link, index) => (
                     <a 
                     href="#" 
@@ -179,7 +195,7 @@ export const DesktopSidebar = () => {
 
             <span className="px-4 pb-6 text-sm text-zinc-400">Made by Soumya with 💝</span>
         </div>
-    )
+    );
 }
 
 export const MobileSidebar = () => {

@@ -1,9 +1,10 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import FeedBar from '../components/feedbar/FeedBar';
-import Navbar from '../components/Navbar'
+import Navbar from '../components/navBar/Navbar'
 import MainSidebar from '../components/sideBar/MainSidebar';
 import { useSelector } from 'react-redux';
 import { DesktopSidebar } from '../components/sideBar/Sidebars';
+import './sidebarAnimation.css'
 
 const Home = () => {
     const sidebarVisibleWidth = 760;
@@ -19,30 +20,29 @@ const Home = () => {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [])
+    }, []);
+
 
     return (
         <div className=' h-screen overflow-hidden flex flex-col'>
-            <div className='h-[6vh] flex items-center '>
+            <div className='h-[3.3rem] flex items-center '>
                 <Navbar/>
             </div>
 
-            <div className='flex items-center justify-start h-[94vh] overflow-hidden '>
+            <div className={`flex items-center justify-start h-[94vh] overflow-hidden `}>
                 <div 
                 className={`max-w-[17rem] h-full flex`}>
-                    {sidebarVisible && (
-                        <MainSidebar/>
-                    )}
+                    {sidebarVisible && <MainSidebar/>}
 
                     {isFullSidebarWindow && isSidebarFloating && (
-                        <div className='absolute z-20 bg-[#0f0f0f] overflow-y-auto w-[16rem] h-[94vh]'>
-                            <DesktopSidebar/>
+                        <div className={`absolute top-0 z-20 bg-[#0f0f0f] overflow-y-auto w-[15rem] h-[100vh] ${isSidebarFloating ? 'openSidebarAnimation-div' : 'closeSidebarAnimation-div'}`}>
+                            <DesktopSidebar sidebarVisible={sidebarVisible}/>
                         </div>
                     )}
                 </div>
                 
                 <div className={`w-full h-full bg-neutral-900 rounded-lg overflow-x-auto `}>
-                    <FeedBar sidebarVisibleWidth={sidebarVisibleWidth}/>
+                    <FeedBar sidebarVisible={sidebarVisible}/>
                 </div>
             </div>
         </div>
