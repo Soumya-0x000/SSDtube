@@ -22,14 +22,15 @@ const Home = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-
     return (
         <div className=' h-screen overflow-hidden flex flex-col'>
+            {/* Navbar */}
             <div className='h-[3.3rem] flex items-center '>
                 <Navbar/>
             </div>
 
             <div className={`flex items-center justify-start h-[94vh] overflow-hidden `}>
+                {/* Sidebar */}
                 <div 
                 className={`max-w-[17rem] h-full flex`}>
                     {sidebarVisible && <MainSidebar/>}
@@ -41,6 +42,7 @@ const Home = () => {
                     )}
                 </div>
                 
+                {/* FeedBar */}
                 <div className={`w-full h-full bg-neutral-900 rounded-lg overflow-x-auto `}>
                     <FeedBar sidebarVisible={sidebarVisible}/>
                 </div>

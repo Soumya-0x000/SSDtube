@@ -19,4 +19,4 @@ const FeedBar = () => {
     );
 }
 
-export default FeedBar
+export default FeedBar;
