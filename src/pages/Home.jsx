@@ -41,7 +41,7 @@ const Home = () => {
                     )}
                 </div>
                 
-                <div className={`w-full h-full bg-neutral-900 rounded-lg overflow-x-auto`}>
+                <div className={`w-full h-full bg-neutral-900 rounded-lg overflow-x-auto `}>
                     <FeedBar sidebarVisibleWidth={sidebarVisibleWidth}/>
                 </div>
             </div>
