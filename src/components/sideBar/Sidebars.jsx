@@ -25,7 +25,7 @@ export const DesktopSidebar = ({ sidebarVisible }) => {
     return (
         <div className='w-full'>
             {isSidebarFloating && isFullSidebarWindow && (
-                <div className={`h-[3.3rem] ${sidebarVisible && 'w-[14.4rem]'} pl-7 flex items-center fixed bg-[#0f0f0f]`}>
+                <div className={`h-[3.3rem] w-[15rem] pl-7 flex items-center fixed bg-[#0f0f0f]`}>
                     <LeftSideIconArea
                         hoverBG={hoverBG}
                         setHoverBG={setHoverBG}
