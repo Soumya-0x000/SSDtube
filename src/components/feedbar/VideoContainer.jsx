@@ -44,7 +44,7 @@ const VideoContainer = () => {
             }>
 
             
-            {!loading ? ( 
+            {loading ? ( 
                 <>{renderSkeleton}</>
             ) : (
                 <>
