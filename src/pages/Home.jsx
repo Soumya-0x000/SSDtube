@@ -5,12 +5,14 @@ import MainSidebar from '../components/sideBar/MainSidebar';
 import { useSelector } from 'react-redux';
 import { DesktopSidebar } from '../components/sideBar/Sidebars';
 import './sidebarAnimation.css'
+import ButtonList from '../components/feedbar/buttonList/ButtonList';
 
 const Home = () => {
     const sidebarVisibleWidth = 760;
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth > sidebarVisibleWidth);
     const isFullSidebarWindow = useSelector((state) => state.sidebar.isFullSidebarWindowSupport);
     const isSidebarFloating = useSelector((state) => state.sidebar.isFloatSidebar);
+    const theme = useSelector((state) => state.theme.currentThemeMode)
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -32,7 +34,7 @@ const Home = () => {
             <div className={`flex items-center justify-start h-[94vh] overflow-hidden `}>
                 {/* Sidebar */}
                 <div 
-                className={`max-w-[17rem] h-full flex`}>
+                className={`max-w-[16rem] h-full flex`}>
                     {sidebarVisible && <MainSidebar/>}
 
                     {isFullSidebarWindow && isSidebarFloating && (
@@ -43,7 +45,7 @@ const Home = () => {
                 </div>
                 
                 {/* FeedBar */}
-                <div className={`w-full h-full bg-neutral-900 rounded-lg overflow-x-auto mr-1.5 `}>
+                <div className={`w-full h-full bg-neutral-900 rounded-lg overflow-x-auto mr-1.5 relative`}>
                     <FeedBar sidebarVisible={sidebarVisible}/>
                 </div>
             </div>

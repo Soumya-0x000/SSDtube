@@ -77,9 +77,9 @@ const Navbar = () => {
     return (
         <div className='w-full flex justify-between items-center px-7 opacity-95 sticky top-0'>
             {showFullSearchBar ? (
-                <div className=' w-full flex items-center justify-between gap-x-4 '>
+                <div className='w-full flex items-center justify-between gap-x-4 '>
                     <div 
-                    className={` cursor-pointer h-10 w-10 flex items-center justify-center ${hoverBG.backArrow && 'bg-neutral-700'} rounded-full`}
+                    className={`cursor-pointer h-10 w-12 flex items-center justify-center ${hoverBG.backArrow && 'bg-neutral-700'} rounded-full`}
                     onMouseEnter={ () => setHoverBG({...hoverBG, backArrow: true}) }
                     onMouseLeave={ () => setHoverBG({...hoverBG, backArrow: false}) }
                     onClick={() => setShowFullSearchBar(false)}>

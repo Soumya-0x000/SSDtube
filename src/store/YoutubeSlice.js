@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
+    isLoading: true,
     videos: [],
     currentPlaying: null,
     searchItem: "",
@@ -13,7 +14,11 @@ export const YoutubeSlice = createSlice({
     name: 'youtube',
     initialState,
     reducers: {
-
+        setHomePageVideo: function (state, action) {
+            state.videos = action.payload
+            action.payload !== undefined && `${state.isLoading = false}`
+            // console.log(action.payload)
+        }
     },
     extraReducers: (builder) => {
 
@@ -21,4 +26,5 @@ export const YoutubeSlice = createSlice({
 });
 
 export const {
+    setHomePageVideo,
 } = YoutubeSlice.actions;

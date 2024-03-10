@@ -72,7 +72,7 @@ const ButtonList = () => {
     }
     
     return (
-        <div className=" relative flex items-center px-[3.1rem]">
+        <div className="h-[3rem] z-10 bg-neutral-900 relative flex items-center px-[3.1rem]">
             <div className="absolute left-0 h-full w-10 bg-gradient-to-r from-neutral-800 to-neutral-900 transition-all flex items-center justify-center rounded-lg">
                 {showLeftArrow && (
                     <button 
