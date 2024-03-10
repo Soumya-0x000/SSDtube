@@ -32,29 +32,27 @@ const VideoContainer = () => {
 
     return (
         <div className='h-full w-full pt-[3.7rem] overflow-y-auto px-12 sm:px-3'>
-            <div 
-            className={`
-                grid grid-cols-1 gap-5 
-                sm:grid-cols-2 
-                md:grid-cols-2 
-                clg:grid-cols-3 
-                2xl:grid-cols-4 
-                ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'} 
-                w-full h-full overflow-hidden`
-            }>
-
-            
-            {loading ? ( 
-                <>{renderSkeleton}</>
+            {loading ? (
+                <div 
+                className={`
+                    grid grid-cols-1 gap-5 
+                    sm:grid-cols-2 
+                    md:grid-cols-2 
+                    clg:grid-cols-3 
+                    2xl:grid-cols-4 
+                    ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'} 
+                    w-full h-full overflow-hidden`
+                }>
+                    {renderSkeleton}
+                </div>
             ) : (
                 <>
                     <div>Data has been fetched....</div>
                     <Spinner/> 
                 </>
             )}
-            </div>
         </div>
     )
 }
 
-export default VideoContainer;
+export default VideoContainer
