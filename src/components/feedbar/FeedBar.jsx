@@ -1,10 +1,10 @@
 import Spinner from '../loading/Spinner';
 import ButtonList from './buttonList/ButtonList'
-import VideoContainer from './VideoContainer'
+import VideoContainer from './vidContainer/VideoContainer'
 
 const FeedBar = () => {
     return (
-        <div className=''>  
+        <>  
             {/* button list */}
             <div className=' absolute w-full px-2'>
                 <ButtonList/>
@@ -14,7 +14,7 @@ const FeedBar = () => {
             <div className={`h-full w-full absolute`}>
                 <VideoContainer/>            
             </div>
-        </div>
+        </>
     );
 }
 

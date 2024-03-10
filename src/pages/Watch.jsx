@@ -1,8 +1,10 @@
 import React from 'react'
+import { useParams } from 'react-router-dom'
 
 const Watch = () => {
+    const { id } = useParams(); 
     return (
-        <div>Watch</div>
+        <div>{id}</div>
     )
 }
 

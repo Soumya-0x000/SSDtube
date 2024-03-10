@@ -19,3 +19,13 @@ export const getVideoInfo = async (id) => {
         console.error();
     }
 };
+
+export const getChannelInfo = async (id) => {
+    const GET_CHANNEL_INFO = `${BASE_URL}/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${id}&key=${YOUTUBE_API_KEY}`;
+    try {
+        const channelData = await axios.get(GET_CHANNEL_INFO);
+        return channelData;
+    } catch (error) {
+        console.error(error);
+    }
+};

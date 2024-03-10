@@ -1,0 +1,3 @@
+.videoContainer::-webkit-scrollbar {
+    display: none;
+}
