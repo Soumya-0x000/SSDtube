@@ -19,7 +19,6 @@ export const YoutubeSlice = createSlice({
         setHomePageVideo: function (state, action) {
             state.videos = action.payload
             action.payload !== undefined && state.videos.length > 0 && `${state.isLoading = false}`
-            // console.log(action.payload)
         },
         setNxtPageToken: function (state, action) {
             state.nextPageToken = action.payload;

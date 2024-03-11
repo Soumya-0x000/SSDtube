@@ -29,3 +29,14 @@ export const getChannelInfo = async (id) => {
         console.error(error);
     }
 };
+
+// export const getNextPageVideo = async (nxtPgToken) => {
+//     const NEXT_PAGE_DATA = `${BASE_URL}/search?pageToken=${nxtPgToken}&key=${YOUTUBE_API_KEY}`
+//     try {
+//         const nxtPgData = await  axios.get(NEXT_PAGE_DATA);
+//         console.log(nxtPgData)
+//         // return nxtPgData.data;
+//     } catch (error) {
+//         console.error(error);
+//     }
+// };

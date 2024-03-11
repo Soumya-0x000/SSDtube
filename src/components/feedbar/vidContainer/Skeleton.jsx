@@ -9,7 +9,7 @@ const Skeleton = () => {
                 <div className=' min-w-9 h-9 bg-slate-600 rounded-full'/>
                 
                 <div className='flex flex-col gap-y-2 w-full'>
-                    <div className='w-[88%]  h-5 bg-slate-600 rounded-sm'/>
+                    <div className='w-[88%] h-5 bg-slate-600 rounded-sm'/>
                     <div className=' w-[70%] pr-6 h-4 bg-slate-600 rounded-sm'/>
                 </div>
             </div>

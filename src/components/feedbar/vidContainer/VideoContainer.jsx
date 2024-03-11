@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { getChannelInfo, getYoutubeData } from '../../../store/Hooks';
 import { useDispatch, useSelector } from "react-redux";
 import { countTotalResults, setHomePageVideo, setNxtPageToken } from "../../../store/YoutubeSlice";
@@ -12,11 +12,11 @@ const VideoContainer = () => {
     const receivedVideo = useSelector((state) => state.youtube.videos);
     const totalResultCount = useSelector((state) => state.youtube.totalResults);
     const loading = useSelector((state) => state.youtube.isLoading);
-    // const nxtPageToken = useSelector((state) => state.youtube.nextPageToken);
     const isSidebarOpen = useSelector((state) => state.sidebar.isSidebarOpen);
+    const nxtPgToken = useSelector((state) => state.youtube.nextPageToken);
     const dispatch = useDispatch();
-    const skeletonNumbers = 15;
-    const [ytIcons, setYTicon] = useState('')
+    const skeletonNumbers = 16;
+    console.log(nxtPgToken)
 
     const renderSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <Skeleton key={indx}/>
@@ -25,20 +25,14 @@ const VideoContainer = () => {
     const fetchYoutubeVideos = async () => {
         const videoData = await getYoutubeData();
         const videos = videoData?.data.items;
-        console.log(videoData?.data?.items)
         dispatch(countTotalResults(videoData?.data?.pageInfo?.totalResults))
         dispatch(setHomePageVideo(videos));
         dispatch(setNxtPageToken(videoData?.data.nextPageToken));
-        fetchChannelInfo();
     };
-
-    const fetchChannelInfo = async (id) => {
-        const channelData = await getChannelInfo(id);
-        console.log(channelData);
-    }
 
     useEffect(() => {
         fetchYoutubeVideos();
+        // getNextPageVideo(nxtPgToken)
     }, []);
 
     return (
@@ -58,6 +52,7 @@ const VideoContainer = () => {
                 </div>
             ) : (
                 <InfiniteScroll 
+                // next={() => }
                 className={`
                     grid grid-cols-1 gap-5 
                     sm:grid-cols-2 
@@ -69,13 +64,18 @@ const VideoContainer = () => {
                 }
                 dataLength={receivedVideo.length}
                 loader={<Spinner/>}
-                // next={() => }
                 hasMore={receivedVideo?.length <= totalResultCount}>
-                    <VideoCard/>
+                    {receivedVideo.map((item, indx) => (
+                        <VideoCard
+                            item={item}
+                            key={indx}
+                            indx={indx}
+                        />
+                    ))}
                 </InfiniteScroll>
             )}
         </div>
     )
 }
 
-export default VideoContainer
+export default VideoContainer;
