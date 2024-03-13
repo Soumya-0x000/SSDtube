@@ -1,12 +1,23 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getChannelInfo } from '../store/Hooks';
-import { setChannelData } from '../store/ChannelSlice';
+import { getChannelInfo, getPlayLists } from '../../utils/Hooks';
+import { setChannelData } from '../../store/ChannelSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { convertViews } from '../utils/constant';
+import { convertViews } from '../../utils/constant';
 import { LuDot } from "react-icons/lu";
 import { FaChevronRight } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
+import PlayLists from './PlayLists';
+
+const channelNavBar = [
+    {text: 'Home',},
+    {text: 'Videos',},
+    {text: 'Shorts',},
+    {text: 'Live',},
+    {text: 'Podcasts',},
+    {text: 'Playlists',},
+    {text: 'Community',},
+]
 
 const Channel = () => {
     const {id} = useParams();
@@ -16,6 +27,9 @@ const Channel = () => {
     const comparableWidth = [702, 480]
     const [showLogo, setShowLogo] = useState(window.innerWidth > comparableWidth[0]);
     const [statisticsAlignment, setStatisticsAlignment] = useState(window.innerWidth > comparableWidth[1]);
+    const [nxtPgToken, setNxtPageToken] = useState('');
+    const [pageCounter, setPageCounter] = useState(0);
+    const [playListContents, setPlayListContents] = useState([]);
     const bannerImg = "https://th.bing.com/th/id/R.0baf5d926ccc430f3f5b6d2784f66719?rik=0n2Q89M1ZGp06g&riu=http%3a%2f%2fwallpaperswide.com%2fdownload%2frazer_gaming_background-wallpaper-3840x1200.jpg&ehk=FZeOVqMwjUIfg3Ft8RjvdfEtXJE5MDRw1HCb%2fvNV3YM%3d&risl=&pid=ImgRaw&r=0";
 
     useLayoutEffect(() => {
@@ -48,13 +62,23 @@ const Channel = () => {
         }));
     };
 
+    const handlePlaylists = async (channelId) => {
+        const playListData = await getPlayLists(channelId);
+        const nextPageToken = playListData?.data?.nextPageToken;
+        const playListItems = playListData?.data?.items;
+        setPlayListContents(playListItems)
+        setNxtPageToken(nextPageToken);
+    };
+
     useEffect(() => {
-        handleChannelData(id)
+        handleChannelData(id);
+        handlePlaylists(id, nxtPgToken);
     }, [])
 
     return (
-        <div className='flex items-center justify-center '>
-            <div className='max-w-[1500px] space-y-4'>
+        <div className='flex flex-col items-center justify-center '>
+            <div className='max-w-[1500px] space-y-6'>
+                <div className=' space-y-4'>
                 {/* cover img */}
                 <div className=' max-w-[1500px] max-h-[14rem] rounded-lg overflow-hidden '>
                     <img src={bannerImg} className=' w-full h-auto ' />
@@ -70,7 +94,7 @@ const Channel = () => {
                     )}
 
                     {/* info */}
-                    <div className=' flex flex-col gap-y-2 relative '>
+                    <div className=' flex flex-col gap-y-2 '>
                         {/* title */}
                         <div className='flex items-center gap-x-2 text-2xl xl:text-5xl font-bold'>
                             {channelContent.title}
@@ -83,7 +107,7 @@ const Channel = () => {
 
                         {/* statistics */}
                         <div className=' text-gray-400 space-y-3'>
-                            <div className={` flex  ${statisticsAlignment ? ' flex-row' : 'flex-col gap-y-1'} gap-x-1 `}>
+                            <div className={` flex items-center ${statisticsAlignment ? ' flex-row' : 'flex-col gap-y-1'} gap-x-1 `}>
                                 <p>{channelContent.customUrl}</p>
                                 {statisticsAlignment && (
                                     <LuDot/>
@@ -118,7 +142,7 @@ const Channel = () => {
                                 )}
                             </div>
                             
-                            <div>{convertViews(channelContent.viewCount)} views</div>
+                            <div>{convertViews(channelContent.viewCount)} Total views</div>
 
                             <button className=' bg-white text-black px-5 py-2 rounded-full active:scale-95 transition-all'>
                                 Subscribe
@@ -126,7 +150,7 @@ const Channel = () => {
                         </div>
                         
                         {!statisticsAlignment && (
-                            <div className=' absolute right-0 top-1'>
+                            <div className=' absolute right-0 top-5 '>
                                 <div className=' h-[6rem] min-w-[6rem] bg-cover bg-center rounded-full overflow-hidden'>
                                     <img src={channelContent.url} className=' h-full w-full'/>
                                 </div>
@@ -134,9 +158,32 @@ const Channel = () => {
                         )}
                     </div>
                 </div>
+                </div>
+
+                <div className=' w-full border-b-2 border-b-gray-600 pb-3'>
+                    <div className='flex items-center justify-between max-w-[50rem] '>
+                    {channelNavBar.map((item, indx) => (
+                        <div key={item.text+indx}>
+                            {item.text}
+                        </div>
+                    ))}
+                    </div>
+                </div>
+                
+                <p>Created playlists</p>
+                
+                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-y-9'>
+                    {playListContents.map((item, indx) => (
+                        <PlayLists
+                            itemData = {item} 
+                            index = {indx}
+                            key={indx}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
 }
 
-export default Channel
+export default Channel;

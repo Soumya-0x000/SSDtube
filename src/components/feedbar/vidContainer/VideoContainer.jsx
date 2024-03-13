@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { getChannelInfo, getYoutubeData } from '../../../store/Hooks';
+import { getChannelInfo, getYoutubeData } from '../../../utils/Hooks';
 import { useDispatch, useSelector } from "react-redux";
 import { countTotalResults, setHomePageVideo, setNxtPageToken } from "../../../store/YoutubeSlice";
 import Skeleton from './Skeleton';
@@ -30,7 +30,7 @@ const VideoContainer = () => {
     };
 
     useEffect(() => {
-        fetchYoutubeVideos();
+        // fetchYoutubeVideos();
         // getNextPageVideo(nxtPgToken)
     }, []);
 

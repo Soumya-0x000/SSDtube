@@ -9,8 +9,11 @@ export default {
       screens: {
         'csm': '630px',  
         'clg': '1180px', 
-        'xl': '1280px', 
         '3xl': '1700px',
+        'plstScMd': '700',
+        'plstScLg': '970',
+        'plstScXl': '1187',
+        'plstSc2Xl': '1400',
       },
     },
   },

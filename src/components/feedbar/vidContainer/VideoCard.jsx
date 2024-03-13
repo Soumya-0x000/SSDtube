@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Img from '../../lazyLoadImage/Img';
 import { Link } from 'react-router-dom';
 import { GoDotFill } from "react-icons/go";
-import { getChannelInfo } from '../../../store/Hooks';
+import { getChannelInfo } from '../../../utils/Hooks';
 import { convertViews, handleDayCount } from '../../../utils/constant';
 
 const VideoCard = ({item, indx}) => {

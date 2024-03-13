@@ -3,7 +3,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Search from './pages/Search'
 import Watch from './pages/Watch'
-import Channel from './pages/Channel'
+import Channel from './pages/channel/Channel'
 import Navbar from './components/navBar/Navbar'
 
 const App = () => {
