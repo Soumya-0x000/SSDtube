@@ -1,11 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import FeedBar from '../components/feedbar/FeedBar';
 import Navbar from '../components/navBar/Navbar'
 import MainSidebar from '../components/sideBar/MainSidebar';
 import { useSelector } from 'react-redux';
 import { DesktopSidebar } from '../components/sideBar/Sidebars';
 import './sidebarAnimation.css'
-import ButtonList from '../components/feedbar/buttonList/ButtonList';
 
 const Home = () => {
     const sidebarVisibleWidth = 760;

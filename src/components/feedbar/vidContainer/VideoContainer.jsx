@@ -16,7 +16,6 @@ const VideoContainer = () => {
     const nxtPgToken = useSelector((state) => state.youtube.nextPageToken);
     const dispatch = useDispatch();
     const skeletonNumbers = 16;
-    console.log(nxtPgToken)
 
     const renderSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <Skeleton key={indx}/>
@@ -31,7 +30,7 @@ const VideoContainer = () => {
     };
 
     useEffect(() => {
-        fetchYoutubeVideos();
+        // fetchYoutubeVideos();
         // getNextPageVideo(nxtPgToken)
     }, []);
 

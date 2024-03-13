@@ -3,6 +3,8 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Search from './pages/Search'
 import Watch from './pages/Watch'
+import Channel from './pages/Channel'
+import Navbar from './components/navBar/Navbar'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -17,12 +19,21 @@ const App = () => {
         {
             path: '/watch/:id',
             element: <Watch/>
-        }
+        },
+        {
+            path: '/channel/:id',
+            element: <Channel/>
+        },
     ])
 
     return (
-        <RouterProvider router={router}/>
+        <>
+            {/* <div className='h-[3.3rem] flex items-center '>
+                <Navbar/>
+            </div> */}
+            <RouterProvider router={router}/>
+        </>
     )
 }
 
-export default App
+export default App;
