@@ -30,7 +30,7 @@ const VideoContainer = () => {
     };
 
     useEffect(() => {
-        // fetchYoutubeVideos();
+        fetchYoutubeVideos();
         // getNextPageVideo(nxtPgToken)
     }, []);
 
