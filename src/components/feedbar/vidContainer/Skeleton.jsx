@@ -2,7 +2,7 @@ import React from 'react'
 
 const Skeleton = () => {
     return (
-        <div className=' flex flex-col gap-y-2 min-w-[7rem] ml-1 mb-1 animate-pulse'>
+        <div className=' flex flex-col gap-y-2 w-full h-[14.4rem] ml-1 mb-1 animate-pulse'>
             <div className=' h-[12.5rem] sm:h-[13rem] w-full bg-slate-600 rounded-md'/>
 
             <div className='flex gap-x-2'>

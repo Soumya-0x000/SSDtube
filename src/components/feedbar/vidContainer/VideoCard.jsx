@@ -36,7 +36,7 @@ const VideoCard = ({item, indx}) => {
                     <div 
                     className=' w-9 h-9 rounded-full overflow-hidden bg-cover bg-center z-20 shadow-2xl shadow-red-200'>
                         <Img
-                            className="object-contain bg-cover, bg-center"
+                            className="object-contain bg-cover bg-center"
                             src={logoURL}
                         />
                     </div>

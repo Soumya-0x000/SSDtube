@@ -8,6 +8,8 @@ const initialState = {
     viewCount: 0, 
     url: '',
     customUrl: '',
+    creationTime: '',
+    isLoaded: false,
 };
 
 export const ChannelSlice = createSlice({
@@ -22,7 +24,8 @@ export const ChannelSlice = createSlice({
                 videoCount, 
                 viewCount, 
                 url,
-                customUrl
+                customUrl,
+                creationTime
             } = action.payload;
             state.title = title;
             state.description = description;
@@ -31,6 +34,8 @@ export const ChannelSlice = createSlice({
             state.viewCount = viewCount;
             state.url = url;
             state.customUrl = customUrl;
+            state.creationTime = creationTime;
+            state.title !== '' && `${state.isLoaded=true}`;
         }
     }
 });
