@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { getYoutubeData } from '../../../utils/Hooks';
 import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant.js'
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +21,7 @@ const VideoContainer = () => {
         total: 0,
         current: 0,
     });
+    const scrollRef = useRef(null);
 
     const renderSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <Skeleton key={indx}/>
@@ -39,7 +40,6 @@ const VideoContainer = () => {
     };
 
     const getNextPageVideo = async () => {
-        console.log('more data')
         const NEXT_PAGE_DATA = `${BASE_URL}/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=30&pageToken=${nxtPgToken}&regionCode=US&key=${YOUTUBE_API_KEY}`;
         try {
             const nxtPgData = await axios.get(NEXT_PAGE_DATA);
@@ -55,8 +55,22 @@ const VideoContainer = () => {
         }
     };
 
+    const handleScroll = async() => {
+        if (resultCount.current <= resultCount.total) {
+            const scrollContainer = scrollRef.current;
+            if (!scrollContainer) return;
+            
+            const { clientHeight, scrollHeight, scrollTop } = scrollContainer;
+            const scrollThreshold = 30;
+            
+            if (scrollTop+clientHeight >= scrollHeight-scrollThreshold) {
+                await getNextPageVideo()
+            }
+        }
+    };
+
     useEffect(() => {
-        fetchYoutubeVideos();
+        // fetchYoutubeVideos();
     }, []);
 
     return (
@@ -75,8 +89,8 @@ const VideoContainer = () => {
                     {renderSkeleton}
                 </div>
             ) : (
-                <InfiniteScroll 
-                next={getNextPageVideo}
+                <div 
+                ref={scrollRef}
                 className={`
                     grid grid-cols-1 gap-5 
                     sm:grid-cols-2 
@@ -84,11 +98,9 @@ const VideoContainer = () => {
                     clg:grid-cols-3 
                     c2xl:grid-cols-4 
                     ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'}
-                    w-full h-full overflow-hidden
+                    w-full h-full overflow-auto
                 `}
-                dataLength={homePgVids.length}
-                loader={<Spinner/>}
-                hasMore={resultCount.current <= resultCount.total}>
+                onScroll={handleScroll}>
                     {homePgVids.map((item, indx) => (
                         <VideoCard
                             item={item}
@@ -96,7 +108,7 @@ const VideoContainer = () => {
                             indx={indx}
                         />
                     ))}
-                </InfiniteScroll>
+                </div>
             )}
         </div>
     )

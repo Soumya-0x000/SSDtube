@@ -9,10 +9,10 @@ import { FaChevronRight } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
 import PlayLists from './PlayLists';
 import PlayListSkeleton from './PlayListSkeleton';
-import { extractColors } from 'extract-colors';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../../components/loading/Spinner';
 import axios from 'axios';
+import ChannelTopBarSkeleton from './ChannelTopbarSkeleton';
 
 const channelNavBar = [
     {text: 'Home',},
@@ -40,6 +40,7 @@ const Channel = () => {
     });
     const [nxtPgToken, setNxtPageToken] = useState('');
     const [playListContents, setPlayListContents] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(false);
     const bannerImg = "https://th.bing.com/th/id/R.0baf5d926ccc430f3f5b6d2784f66719?rik=0n2Q89M1ZGp06g&riu=http%3a%2f%2fwallpaperswide.com%2fdownload%2frazer_gaming_background-wallpaper-3840x1200.jpg&ehk=FZeOVqMwjUIfg3Ft8RjvdfEtXJE5MDRw1HCb%2fvNV3YM%3d&risl=&pid=ImgRaw&r=0";
     const skeletonNumbers = 18;
 
@@ -59,8 +60,9 @@ const Channel = () => {
 
     const handleChannelData = async (channelId) => {
         const channelData = await getChannelInfo(channelId);
-        const status = channelData?.status;
-        status === 200 ? setPlayListDataStatus(true) : setPlayListDataStatus(false);
+        setIsLoaded(channelData?.status === 200)
+        console.log(channelData)
+
         const title = channelData?.data?.items[0]?.snippet?.localized?.title;
         const description = channelData?.data?.items[0]?.snippet?.localized?.description;
         const subscribers = channelData?.data?.items[0]?.statistics?.subscriberCount;
@@ -78,6 +80,7 @@ const Channel = () => {
 
     const handlePlaylists = async (channelId) => {
         const playListData = await getPlayLists(channelId);
+        playListData?.status === 200 ? setPlayListDataStatus(true) : setPlayListDataStatus(false);
 
         const nextPageToken = playListData?.data?.nextPageToken;
         setNxtPageToken(nextPageToken);
@@ -108,8 +111,8 @@ const Channel = () => {
     };
 
     useEffect(() => {
-        handleChannelData(id);
-        handlePlaylists(id, nxtPgToken);
+        // handleChannelData(id);
+        // handlePlaylists(id, nxtPgToken);
     }, []);
     
     const renderPlayListSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
@@ -127,82 +130,88 @@ const Channel = () => {
                     </div>
                     
                     {/* content */}
-                    <div className='px-6 sm:px-3 flex items-center gap-x-8 relative '>
-                        {/* logo */}
-                        {showLogo && (
-                            <div className=' h-[11rem] min-w-[11rem] bg-cover bg-center rounded-full overflow-hidden '>
-                                <img src={channelContent.url} className=' h-full w-full'/>
-                            </div>
-                        )}
-
-                        {/* info */}
-                        <div className=' flex flex-col gap-y-2 '>
-                            {/* title */}
-                            <div className='flex items-center gap-x-2 text-2xl xl:text-5xl font-bold'>
-                                {channelContent.title}
-                                <div className=' h-4 w-4'>
-                                    <svg viewBox="0 0 24 24" width="100%" height="100%" focusable="false" style={{ display: 'block' }}>
-                                        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.1L7 11.8l2.8 2.7L17 7.4l1.4 1.4-8.6 8.5z" fill='gray'></path>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            {/* statistics */}
-                            <div className=' text-gray-400 space-y-3'>
-                                <div className={` flex items-center ${statisticsAlignment ? ' flex-row' : 'flex-col gap-y-1'} gap-x-1 `}>
-                                    <p>{channelContent.customUrl}</p>
-                                    {statisticsAlignment && (
-                                        <LuDot/>
-                                    )}
-                                    <p>{convertViews(channelContent.subscribers)} subscribers</p> 
-                                    {statisticsAlignment && (
-                                        <LuDot/>
-                                    )}
-                                    <p>{channelContent.videoCount} videos</p>
-                                </div>
-
-                                <div className=' flex items-center '>
-                                    <div className='line-clamp-1 max-w-[40rem]'>
-                                        {channelContent.description}
-                                    </div>
-
-                                    <button onClick={() => setShowDescription(!showDescription)}>
-                                        <FaChevronRight/>
-                                    </button>
-
-                                    {showDescription && (
-                                        <div className=' absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-slate-800 text-slate-200 text-justify rounded-lg flex flex-col'>
-                                            <div className='p-10 relative'>
-                                                
-                                                <button className=' absolute right-0 top-0 p-2 text-xl'
-                                                onClick={()=>setShowDescription(false)} >
-                                                    <RxCross1/>
-                                                </button>
-                                                {channelContent.description}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className='flex gap-x-7'>
-                                    <p>Created {handleDayCount(channelContent?.creationTime)}</p>
-                                    <p>{convertViews(channelContent.viewCount)} Total views</p>
-                                </div>
-
-                                <button className=' bg-white text-black px-5 py-2 rounded-full active:scale-95 transition-all'>
-                                    Subscribe
-                                </button>
-                            </div>
-                            
-                            {!statisticsAlignment && (
-                                <div className=' absolute right-0 top-5 '>
-                                    <div className=' h-[6rem] min-w-[6rem] bg-cover bg-center rounded-full overflow-hidden'>
-                                        <img src={channelContent.url} className=' h-full w-full'/>
-                                    </div>
+                    {isLoaded ? (
+                        <div className='px-6 sm:px-3 flex items-center gap-x-8 relative '>
+                            {/* logo */}
+                            {showLogo && (
+                                <div className=' h-[11rem] min-w-[11rem] bg-cover bg-center rounded-full overflow-hidden '>
+                                    <img src={channelContent.url} className=' h-full w-full'/>
                                 </div>
                             )}
+                            
+                            {/* info */}
+                            <div className=' flex flex-col gap-y-2 '>
+                                {/* title */}
+                                <div className='flex items-center gap-x-2 text-2xl xl:text-5xl font-bold'>
+                                    {channelContent.title}
+                                    <div className=' h-4 w-4'>
+                                        <svg viewBox="0 0 24 24" width="100%" height="100%" focusable="false" style={{ display: 'block' }}>
+                                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.1L7 11.8l2.8 2.7L17 7.4l1.4 1.4-8.6 8.5z" fill='gray'></path>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                {/* statistics */}
+                                <div className=' text-gray-400 space-y-3'>
+                                    <div className={` flex items-center ${statisticsAlignment ? ' flex-row' : 'flex-col gap-y-1'} gap-x-1 `}>
+                                        <p>{channelContent.customUrl}</p>
+                                        {statisticsAlignment && (
+                                            <LuDot/>
+                                        )}
+                                        <p>{convertViews(channelContent.subscribers)} subscribers</p> 
+                                        {statisticsAlignment && (
+                                            <LuDot/>
+                                        )}
+                                        <p>{channelContent.videoCount} videos</p>
+                                    </div>
+
+                                    <div className=' flex items-center '>
+                                        <div className='line-clamp-1 max-w-[40rem]'>
+                                            {channelContent.description}
+                                        </div>
+
+                                        <button onClick={() => setShowDescription(!showDescription)}>
+                                            <FaChevronRight/>
+                                        </button>
+
+                                        {showDescription && (
+                                            <div className=' absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-slate-800 text-slate-200 text-justify rounded-lg flex flex-col'>
+                                                <div className='p-10 relative'>
+                                                    
+                                                    <button className=' absolute right-0 top-0 p-2 text-xl'
+                                                    onClick={()=>setShowDescription(false)} >
+                                                        <RxCross1/>
+                                                    </button>
+                                                    {channelContent.description}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className='flex gap-x-7'>
+                                        <p>Created {handleDayCount(channelContent?.creationTime)}</p>
+                                        <p>{convertViews(channelContent.viewCount)} Total views</p>
+                                    </div>
+
+                                    <button className=' bg-white text-black px-5 py-2 rounded-full active:scale-95 transition-all'>
+                                        Subscribe
+                                    </button>
+                                </div>
+                                
+                                {!statisticsAlignment && (
+                                    <div className=' absolute right-0 top-5 '>
+                                        <div className=' h-[6rem] min-w-[6rem] bg-cover bg-center rounded-full overflow-hidden'>
+                                            <img src={channelContent.url} className=' h-full w-full'/>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <ChannelTopBarSkeleton
+                            statisticsAlignment={statisticsAlignment}
+                        />
+                    )}
                 </div>
                 
                 {/* channel navbar */}
@@ -221,7 +230,7 @@ const Channel = () => {
                     <>
                         {channelContent.isLoaded && <p>Created playlists</p>}
                         <InfiniteScroll 
-                        className='grid place-items-center grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-9 gap-x-2'
+                        className='pt-2 grid place-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-9 gap-x-2'
                         dataLength={playListContents.length}
                         loader={<Spinner/>}
                         next={fetchMorePlayLists}
