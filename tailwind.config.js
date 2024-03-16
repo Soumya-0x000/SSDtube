@@ -7,8 +7,9 @@ export default {
   theme: {
     extend: {
       screens: {
-        'csm': '630px',  
-        'clg': '1180px', 
+        'csm': '630px',
+        'cmd': '1100px',  
+        'clg': '1280px', 
         'c2xl': '1570px',
         '3xl': '1700px',
         // 'xsm': '550px',

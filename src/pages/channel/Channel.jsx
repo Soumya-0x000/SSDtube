@@ -7,8 +7,8 @@ import { BASE_URL, YOUTUBE_API_KEY, convertViews, handleDayCount } from '../../u
 import { LuDot } from "react-icons/lu";
 import { FaChevronRight } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
-import PlayLists from './PlayLists';
-import PlayListSkeleton from './PlayListSkeleton';
+import PlayLists from './playlist/PlayLists';
+import PlayListSkeleton from './playlist/PlayListSkeleton';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../../components/loading/Spinner';
 import axios from 'axios';
@@ -61,7 +61,6 @@ const Channel = () => {
     const handleChannelData = async (channelId) => {
         const channelData = await getChannelInfo(channelId);
         setIsLoaded(channelData?.status === 200)
-        console.log(channelData)
 
         const title = channelData?.data?.items[0]?.snippet?.localized?.title;
         const description = channelData?.data?.items[0]?.snippet?.localized?.description;
@@ -81,7 +80,6 @@ const Channel = () => {
     const handlePlaylists = async (channelId) => {
         const playListData = await getPlayLists(channelId);
         playListData?.status === 200 ? setPlayListDataStatus(true) : setPlayListDataStatus(false);
-
         const nextPageToken = playListData?.data?.nextPageToken;
         setNxtPageToken(nextPageToken);
         const playListItems = playListData?.data?.items;
@@ -98,8 +96,8 @@ const Channel = () => {
 
         try {
             const loadMoreData = await axios.get(MORE_PLAYLISTS);
-            setNxtPageToken(loadMoreData?.data?.nextPageToken);
             const playListItems = loadMoreData?.data?.items;
+            setNxtPageToken(loadMoreData?.data?.nextPageToken);
             setPlayListContents(prevResults => [...prevResults, ...playListItems]);
             setResultCount(prevResultCount => ({
                 total: loadMoreData?.data?.pageInfo?.totalResults, 
@@ -110,15 +108,27 @@ const Channel = () => {
         }
     };
 
+    const handleChannelSection = async() => {
+        const CHANNEL_SECTION = `${BASE_URL}/channelSections?part=snippet%2CcontentDetails&channelId=${id}&key=${YOUTUBE_API_KEY}`;
+
+        try {
+            const channelSection = await axios.get(CHANNEL_SECTION);
+            console.log(channelSection?.data?.items)
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
-        // handleChannelData(id);
-        // handlePlaylists(id, nxtPgToken);
+        handleChannelData(id);
+        handlePlaylists(id);
+        // handleChannelSection()
     }, []);
     
     const renderPlayListSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <PlayListSkeleton key={indx}/>
     ));
-    console.log(playListContents)
+
     return (
         <div className='flex flex-col items-center justify-center '>
             <div className='max-w-[1500px] space-y-6 '>
@@ -140,7 +150,7 @@ const Channel = () => {
                             )}
                             
                             {/* info */}
-                            <div className=' flex flex-col gap-y-2 '>
+                            <div className=' flex flex-col gap-y-2  '>
                                 {/* title */}
                                 <div className='flex items-center gap-x-2 text-2xl xl:text-5xl font-bold'>
                                     {channelContent.title}
@@ -152,8 +162,8 @@ const Channel = () => {
                                 </div>
 
                                 {/* statistics */}
-                                <div className=' text-gray-400 space-y-3'>
-                                    <div className={` flex items-center ${statisticsAlignment ? ' flex-row' : 'flex-col gap-y-1'} gap-x-1 `}>
+                                <div className=' text-gray-400 space-y-3 '>
+                                    <div className={` flex  ${statisticsAlignment ? 'items-center flex-row' : 'flex-col gap-y-1'} gap-x-1 `}>
                                         <p>{channelContent.customUrl}</p>
                                         {statisticsAlignment && (
                                             <LuDot/>
@@ -199,7 +209,7 @@ const Channel = () => {
                                 </div>
                                 
                                 {!statisticsAlignment && (
-                                    <div className=' absolute right-0 top-5 '>
+                                    <div className=' absolute right-6 top-5 -z-10 '>
                                         <div className=' h-[6rem] min-w-[6rem] bg-cover bg-center rounded-full overflow-hidden'>
                                             <img src={channelContent.url} className=' h-full w-full'/>
                                         </div>
@@ -237,11 +247,12 @@ const Channel = () => {
                         hasMore={resultCount.current <= resultCount.total}>
                             {channelContent.isLoaded ? (
                                 <>
-                                    {playListContents.map((item, indx) => (
+                                    {playListContents.map((item, indx, orgArr) => (
                                         <PlayLists
                                             itemData = {item} 
                                             index = {indx}
                                             key={indx}
+                                            orgArr={orgArr}
                                         />
                                     ))}
                                 </>

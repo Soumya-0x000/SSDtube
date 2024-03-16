@@ -68,7 +68,9 @@ const VideoContainer = () => {
     }, [homePgVids]);
 
     return (
-        <div ref={scrollRef} className=' h-full w-full pt-[3.7rem] overflow-y-auto px-2 sm:px-3 videoContainer'>
+        <div 
+        className=' h-full pt-[3.7rem] overflow-y-auto px-2 sm:pl-2 videoContainer'
+        ref={scrollRef} >
             {loading ? (
                 <div 
                 className={`
@@ -85,14 +87,14 @@ const VideoContainer = () => {
             ) : (
                 <InfiniteScroll
                 dataLength={currentVideos.length} 
-                className={`
-                    grid grid-cols-1 gap-5 
+                className={` w-full
+                    grid grid-cols-1 gap-x-3 gap-y-5 
                     sm:grid-cols-2 
-                    md:grid-cols-2 
-                    clg:grid-cols-3 
-                    c2xl:grid-cols-4 
+                    cmd:grid-cols-3 
+                    clg:grid-cols-4 
+                    c2xl:grid-cols-4 c2xl:gap-x-5
                     ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'}
-                    w-full h-full overflow-auto
+                    overflow-auto place-content-center
                 `}
                 hasMore={resultCount.current !== resultCount.total ? true : false }
                 loader={<Spinner/>}

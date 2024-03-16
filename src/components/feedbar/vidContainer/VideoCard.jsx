@@ -19,7 +19,7 @@ const VideoCard = ({item, indx}) => {
     }, [])
 
     return (
-        <div className=' flex flex-col gap-y-2 mb-1 '
+        <div className='cmd:max-w-[18rem flex flex-col gap-y-2 mb-1 '
         key={indx}>
             <Link to={`/watch/${item?.id}`}>
                 <div className=' max-h-[15rem] overflow-hidden rounded-md object-cover object-center'>

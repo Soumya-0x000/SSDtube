@@ -1,12 +1,29 @@
-import React from 'react'
-import Img from '../../components/lazyLoadImage/Img';
+import React, { useState } from 'react'
+import Img from '../../../components/lazyLoadImage/Img';
 import { CgPlayList } from "react-icons/cg";
-import { handleDayCount } from '../../utils/constant';
+import { handleDayCount } from '../../../utils/constant';
 import { Link } from 'react-router-dom';
+import { FaPlay } from "react-icons/fa";
 
-const PlayLists = ({itemData, index}) => {
+const PlayLists = ({itemData, indx, orgArr}) => {
+    const [showPlayAll, setShowPlayAll] = useState(new Array(orgArr.length).fill(false));
+
+    const handleMouseEntry = () => {
+        const updatedArr = [...showPlayAll];
+        updatedArr[indx] = true;
+        setShowPlayAll(updatedArr);
+    };
+
+    const handleMouseLeave = () => {
+        const updatedArr = [...showPlayAll];
+        updatedArr[indx] = false;
+        setShowPlayAll(updatedArr);
+    };
+
     return (
-        <Link>
+        <Link to={`/playlist/${itemData?.id}`}
+        onMouseEnter={handleMouseEntry}
+        onMouseLeave={handleMouseLeave}>
             <div className='w-[19rem] sm:max-w-[17rem] md:max-w-[15rem] h-[10rem] sm:max-h-[12rem] rounded-lg relative '>
                 <Img
                     className={` h-full w-full rounded-lg `}
@@ -37,6 +54,15 @@ const PlayLists = ({itemData, index}) => {
                         backdropFilter: blur,
                     }}
                 />
+
+                {showPlayAll[indx] && (
+                    <div className=' absolute top-0 left-0 rounded-md bg-black w-full h-full bg-opacity-75 flex items-center justify-center text-xl'>
+                        <div className=' absolute flex items-center justify-center gap-x-3 '>
+                            <FaPlay/>
+                            <p>Play All</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className=' space-y-2 mt-2'>

@@ -5,6 +5,7 @@ import Search from './pages/Search'
 import Watch from './pages/Watch'
 import Channel from './pages/channel/Channel'
 import Navbar from './components/navBar/Navbar'
+import FullPlayListItems from './pages/channel/playlist/FullPlayListItems'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -23,6 +24,10 @@ const App = () => {
         {
             path: '/channel/:id',
             element: <Channel/>
+        },
+        {
+            path: '/playlist/:id',
+            element: <FullPlayListItems/>
         },
     ])
 
