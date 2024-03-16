@@ -19,10 +19,10 @@ const VideoCard = ({item, indx}) => {
     }, [])
 
     return (
-        <div className=' flex flex-col gap-y-2 ml-1 mb-1 '
+        <div className=' flex flex-col gap-y-2 mb-1 '
         key={indx}>
             <Link to={`/watch/${item?.id}`}>
-                <div className=' max-h-[15rem] overflow-hidden rounded-md'>
+                <div className=' max-h-[15rem] overflow-hidden rounded-md object-cover object-center'>
                     <Img
                         className={` h-full w-full`}
                         src={item?.snippet?.thumbnails?.maxres?.url || item?.snippet?.thumbnails?.medium?.url}

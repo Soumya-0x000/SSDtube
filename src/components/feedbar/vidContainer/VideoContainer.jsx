@@ -11,6 +11,7 @@ import './videoContainer.css'
 import axios from 'axios';
 
 const VideoContainer = () => {
+    const currentVideos = useSelector((state) => state.youtube.videos);
     const loading = useSelector((state) => state.youtube.isLoading);
     const isSidebarOpen = useSelector((state) => state.sidebar.isSidebarOpen);
     const nxtPgToken = useSelector((state) => state.youtube.nextPageToken);
@@ -22,6 +23,7 @@ const VideoContainer = () => {
         current: 0,
     });
     const scrollRef = useRef(null);
+    const [currentHeight, setCurrentHeight] = useState(650);
 
     const renderSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <Skeleton key={indx}/>
@@ -48,33 +50,25 @@ const VideoContainer = () => {
                 total: nxtPgData?.data?.pageInfo?.totalResults, 
                 current: prevResultCount.current + nxtPgData?.data?.pageInfo?.resultsPerPage
             }));
-            setHomePgVids(prevVids => [...prevVids, ...nxtPgVideos])
+            const updatedVideos = [...homePgVids, ...nxtPgVideos];
+            dispatch(setHomePageVideo(updatedVideos));
+            setHomePgVids(updatedVideos)
             dispatch(setNxtPageToken(nxtPgData?.data?.nextPageToken));
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleScroll = async() => {
-        if (resultCount.current <= resultCount.total) {
-            const scrollContainer = scrollRef.current;
-            if (!scrollContainer) return;
-            
-            const { clientHeight, scrollHeight, scrollTop } = scrollContainer;
-            const scrollThreshold = 30;
-            
-            if (scrollTop+clientHeight >= scrollHeight-scrollThreshold) {
-                await getNextPageVideo()
-            }
-        }
-    };
-
     useEffect(() => {
-        // fetchYoutubeVideos();
+        fetchYoutubeVideos();
     }, []);
 
+    useEffect(() => {
+        scrollRef.current && setCurrentHeight(scrollRef.current.clientHeight)
+    }, [homePgVids]);
+
     return (
-        <div className='h-full w-full pt-[3.7rem] overflow-y-auto px-2 sm:px-3 videoContainer'>
+        <div ref={scrollRef} className=' h-full w-full pt-[3.7rem] overflow-y-auto px-2 sm:px-3 videoContainer'>
             {loading ? (
                 <div 
                 className={`
@@ -89,8 +83,8 @@ const VideoContainer = () => {
                     {renderSkeleton}
                 </div>
             ) : (
-                <div 
-                ref={scrollRef}
+                <InfiniteScroll
+                dataLength={currentVideos.length} 
                 className={`
                     grid grid-cols-1 gap-5 
                     sm:grid-cols-2 
@@ -100,15 +94,18 @@ const VideoContainer = () => {
                     ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'}
                     w-full h-full overflow-auto
                 `}
-                onScroll={handleScroll}>
-                    {homePgVids.map((item, indx) => (
+                hasMore={resultCount.current !== resultCount.total ? true : false }
+                loader={<Spinner/>}
+                height={currentHeight}
+                next={getNextPageVideo}>
+                    {currentVideos.map((item, indx) => (
                         <VideoCard
                             item={item}
                             key={indx}
                             indx={indx}
                         />
                     ))}
-                </div>
+                </InfiniteScroll>
             )}
         </div>
     )

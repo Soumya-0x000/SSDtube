@@ -118,7 +118,7 @@ const Channel = () => {
     const renderPlayListSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <PlayListSkeleton key={indx}/>
     ));
-    
+    console.log(playListContents)
     return (
         <div className='flex flex-col items-center justify-center '>
             <div className='max-w-[1500px] space-y-6 '>
