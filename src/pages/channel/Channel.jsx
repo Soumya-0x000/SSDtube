@@ -13,6 +13,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../../components/loading/Spinner';
 import axios from 'axios';
 import ChannelTopBarSkeleton from './ChannelTopbarSkeleton';
+import { MdOutlineSort } from "react-icons/md";
+import { setChannelName } from '../../store/PlayListSlice';
 
 const channelNavBar = [
     {text: 'Home',},
@@ -41,6 +43,13 @@ const Channel = () => {
     const [nxtPgToken, setNxtPageToken] = useState('');
     const [playListContents, setPlayListContents] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [showSortOption, setShowSortOption] = useState(false);
+    const [activeSortOption, setActiveSortOption] = useState({
+        newestFirst: false,
+        oldestFirst: false,
+        most: false,
+        least: false,
+    })
     const bannerImg = "https://th.bing.com/th/id/R.0baf5d926ccc430f3f5b6d2784f66719?rik=0n2Q89M1ZGp06g&riu=http%3a%2f%2fwallpaperswide.com%2fdownload%2frazer_gaming_background-wallpaper-3840x1200.jpg&ehk=FZeOVqMwjUIfg3Ft8RjvdfEtXJE5MDRw1HCb%2fvNV3YM%3d&risl=&pid=ImgRaw&r=0";
     const skeletonNumbers = 18;
 
@@ -75,6 +84,7 @@ const Channel = () => {
         dispatch(setChannelData({
             title, description,  subscribers, videoCount, viewCount, url, customUrl, creationTime
         }));
+        dispatch(setChannelName(title));
     };
 
     const handlePlaylists = async (channelId) => {
@@ -120,18 +130,49 @@ const Channel = () => {
     };
 
     useEffect(() => {
-        handleChannelData(id);
-        handlePlaylists(id);
-        handleChannelSection()
+        // handleChannelData(id);
+        // handlePlaylists(id);
+        // handleChannelSection()
     }, []);
     
     const renderPlayListSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <PlayListSkeleton key={indx}/>
     ));
 
+    const handleSelectedSortType = (e) => {
+        console.log(playListContents)
+        if (e === 'newest date') {
+            const newestFirstSort = [...playListContents].sort((a, b) => {
+                const dateA = new Date(a.snippet.publishedAt);
+                const dateB = new Date(b.snippet.publishedAt);
+                return dateB - dateA;
+            });
+            setPlayListContents(newestFirstSort);
+            setActiveSortOption({
+                newestFirst: true,
+                oldestFirst: false
+            })
+        } else if (e === 'last video') {
+            const newestFirstSort = [...playListContents].sort((a, b) => {
+                const dateA = new Date(a.snippet.publishedAt);
+                const dateB = new Date(b.snippet.publishedAt);
+                return dateA - dateB;
+            });
+            setPlayListContents(newestFirstSort);
+            setActiveSortOption({
+                newestFirst: false,
+                oldestFirst: true
+            })
+        } else if (e === 'most video') {
+
+        } else if (e === 'least video') {
+
+        }
+    };
+
     return (
-        <div className='flex flex-col items-center justify-center '>
-            <div className='max-w-[1500px] space-y-6 '>
+        <div className='flex flex-col items-center px-7'>
+            <div className='max-w-[1500px] space-y-4 '>
                 {/* title description */}
                 <div className=' space-y-4'>
                     {/* cover img */}
@@ -141,7 +182,7 @@ const Channel = () => {
                     
                     {/* content */}
                     {isLoaded ? (
-                        <div className='px-6 sm:px-3 flex items-center gap-x-8 relative '>
+                        <div className=' flex items-center gap-x-8 relative '>
                             {/* logo */}
                             {showLogo && (
                                 <div className=' h-[11rem] min-w-[11rem] bg-cover bg-center rounded-full overflow-hidden '>
@@ -225,24 +266,56 @@ const Channel = () => {
                 </div>
                 
                 {/* channel navbar */}
-                <div className=' w-full border-b-2 border-b-gray-600 pb-3'>
+                <div className='sticky top-0 z-10 bg-[#0f0f0f] w-full border-b-2 border-b-gray-600 pb-3'>
                     <div className='flex items-center justify-between max-w-[50rem] '>
-                    {channelNavBar.map((item, indx) => (
-                        <div key={item.text+indx}>
-                            {item.text}
-                        </div>
-                    ))}
+                        {channelNavBar.map((item, indx) => (
+                            <div key={item.text+indx}>
+                                {item.text}
+                            </div>
+                        ))}
                     </div>
                 </div>
 
                 {/* playlist */}
                 {playListDataStatus ? (
                     <>
-                        {channelContent.isLoaded && <p>Created playlists</p>}
+                        {channelContent.isLoaded && (
+                            <div className='text-[.9rem] w-full flex items-center justify-between'>
+                                <p>Created playlists</p>
+                                <button className={`flex items-center gap-x-2 hover:bg-slate-800 ${showSortOption && 'bg-slate-800'} rounded-lg  px-3 py-1 relative`}
+                                onClick={() => setShowSortOption(!showSortOption)}>
+                                    <MdOutlineSort className=' text-2xl' />
+                                    <p>Sort By</p>
+                                    {showSortOption && (
+                                        <div className={`z-20 absolute top-10 right-0 bg-neutral-800 rounded-lg overflow-hidden flex flex-col items-center justify-between w-[12rem] text-[1rem]`}>
+                                            <button className={`w-full ${activeSortOption.newestFirst && ' bg-slate-600'} hover:bg-gray-700 active:scale-105 transition-all py-3`}
+                                            onClick={() => handleSelectedSortType('newest date')} >
+                                                Date added (newest)
+                                            </button>
+
+                                            <button className={`w-full ${activeSortOption.oldestFirst && ' bg-slate-600'} hover:bg-gray-700 active:scale-105 transition-all py-3`}
+                                            onClick={() => handleSelectedSortType('last video')} >
+                                                Last video added
+                                            </button>
+
+                                            <button className={`w-full ${activeSortOption.most && ' bg-slate-600'} hover:bg-gray-700 active:scale-105 transition-all py-3`}
+                                            onClick={() => handleSelectedSortType('most video')} >
+                                                Most Video
+                                            </button>
+
+                                            <button className={`w-full ${activeSortOption.least && ' bg-slate-600'} hover:bg-gray-700 active:scale-105 transition-all py-3`}
+                                            onClick={() => handleSelectedSortType('least video')} >
+                                                Least Video
+                                            </button>
+                                        </div>
+                                    )}
+                                </button>
+                            </div>
+                        )}
+
                         <InfiniteScroll 
                         className='pt-2 grid place-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-9 gap-x-2'
                         dataLength={playListContents.length}
-                        loader={<Spinner/>}
                         next={fetchMorePlayLists}
                         hasMore={resultCount.current <= resultCount.total}>
                             {channelContent.isLoaded ? (

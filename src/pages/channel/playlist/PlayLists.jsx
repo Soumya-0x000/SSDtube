@@ -24,7 +24,7 @@ const PlayLists = ({itemData, indx, orgArr}) => {
         <Link to={`/playlist/${itemData?.id}`}
         onMouseEnter={handleMouseEntry}
         onMouseLeave={handleMouseLeave}>
-            <div className='w-[19rem] sm:max-w-[17rem] md:max-w-[15rem] h-[10rem] sm:max-h-[12rem] rounded-lg relative '>
+            <div className='max- w-[20rem] sm:max-w-[17rem] md:max-w-[15rem] h-[11rem] sm:h-[9rem] rounded-lg relative '>
                 <Img
                     className={` h-full w-full rounded-lg `}
                     src={
@@ -42,7 +42,7 @@ const PlayLists = ({itemData, indx, orgArr}) => {
                 </div>
 
                 <div 
-                    className='absolute left-1/2 -translate-x-1/2 -top-[.5rem] w-[90%] h-[4%] rounded-t-xl bg-center '
+                    className='absolute left-1/2 -translate-x-1/2 -top-[.5rem] w-[94%] h-[4%] rounded-t-xl bg-center '
                     style={{
                         backgroundImage: `url(${
                             itemData?.snippet?.thumbnails?.maxres?.url

@@ -44,7 +44,7 @@ const VideoContainer = () => {
     const getNextPageVideo = async () => {
         const NEXT_PAGE_DATA = `${BASE_URL}/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=30&pageToken=${nxtPgToken}&regionCode=US&key=${YOUTUBE_API_KEY}`;
         try {
-            const nxtPgData = await axios.get(NEXT_PAGE_DATA);
+            // const nxtPgData = await axios.get(NEXT_PAGE_DATA);
             const nxtPgVideos = nxtPgData?.data.items;
             setResultCount(prevResultCount => ({
                 total: nxtPgData?.data?.pageInfo?.totalResults, 
@@ -60,7 +60,7 @@ const VideoContainer = () => {
     };
 
     useEffect(() => {
-        fetchYoutubeVideos();
+        // fetchYoutubeVideos();
     }, []);
 
     useEffect(() => {
@@ -73,14 +73,13 @@ const VideoContainer = () => {
         ref={scrollRef} >
             {loading ? (
                 <div 
-                className={`
-                    grid grid-cols-1 gap-5 
+                className={`w-full
+                    grid grid-cols-1 gap-x-3 gap-y-5 
                     sm:grid-cols-2 
-                    md:grid-cols-2 
-                    clg:grid-cols-3 
-                    c2xl:grid-cols-4 
-                    ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'} 
-                    w-full h-full overflow-hidden place-items-center`
+                    cmd:grid-cols-3 
+                    clg:grid-cols-4 
+                    c2xl:grid-cols-4 c2xl:gap-x-5
+                    ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'}`
                 }>
                     {renderSkeleton}
                 </div>
@@ -94,7 +93,6 @@ const VideoContainer = () => {
                     clg:grid-cols-4 
                     c2xl:grid-cols-4 c2xl:gap-x-5
                     ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'}
-                    place-items-center
                 `}
                 hasMore={resultCount.current !== resultCount.total ? true : false }
                 loader={<Spinner/>}
