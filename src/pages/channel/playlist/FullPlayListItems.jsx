@@ -21,7 +21,7 @@ const FullPlayListItems = () => {
     };
 
     useEffect(() => {
-        // fetchFullPlayList(id);
+        fetchFullPlayList(id);
     }, [])
 
     return (

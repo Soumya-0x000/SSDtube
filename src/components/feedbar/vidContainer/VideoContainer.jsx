@@ -44,7 +44,7 @@ const VideoContainer = () => {
     const getNextPageVideo = async () => {
         const NEXT_PAGE_DATA = `${BASE_URL}/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=30&pageToken=${nxtPgToken}&regionCode=US&key=${YOUTUBE_API_KEY}`;
         try {
-            // const nxtPgData = await axios.get(NEXT_PAGE_DATA);
+            const nxtPgData = await axios.get(NEXT_PAGE_DATA);
             const nxtPgVideos = nxtPgData?.data.items;
             setResultCount(prevResultCount => ({
                 total: nxtPgData?.data?.pageInfo?.totalResults, 
@@ -60,7 +60,7 @@ const VideoContainer = () => {
     };
 
     useEffect(() => {
-        // fetchYoutubeVideos();
+        fetchYoutubeVideos();
     }, []);
 
     useEffect(() => {

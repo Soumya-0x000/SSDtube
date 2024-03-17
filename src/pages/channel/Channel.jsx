@@ -130,8 +130,8 @@ const Channel = () => {
     };
 
     useEffect(() => {
-        // handleChannelData(id);
-        // handlePlaylists(id);
+        handleChannelData(id);
+        handlePlaylists(id);
         // handleChannelSection()
     }, []);
     
