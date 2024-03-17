@@ -94,7 +94,7 @@ const VideoContainer = () => {
                     clg:grid-cols-4 
                     c2xl:grid-cols-4 c2xl:gap-x-5
                     ${!isSidebarOpen && ' 3xl:grid-cols-5 3xl:gap-x-3'}
-                    overflow-auto place-content-center
+                    place-items-center
                 `}
                 hasMore={resultCount.current !== resultCount.total ? true : false }
                 loader={<Spinner/>}

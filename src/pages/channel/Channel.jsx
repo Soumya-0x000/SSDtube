@@ -122,7 +122,7 @@ const Channel = () => {
     useEffect(() => {
         handleChannelData(id);
         handlePlaylists(id);
-        // handleChannelSection()
+        handleChannelSection()
     }, []);
     
     const renderPlayListSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
