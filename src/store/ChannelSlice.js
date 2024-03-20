@@ -10,6 +10,7 @@ const initialState = {
     customUrl: '',
     creationTime: '',
     isLoaded: false,
+    channelId: '',
 };
 
 export const ChannelSlice = createSlice({
@@ -25,7 +26,8 @@ export const ChannelSlice = createSlice({
                 viewCount, 
                 url,
                 customUrl,
-                creationTime
+                creationTime,
+                isLoaded
             } = action.payload;
             state.title = title;
             state.description = description;
@@ -36,10 +38,13 @@ export const ChannelSlice = createSlice({
             state.customUrl = customUrl;
             state.creationTime = creationTime;
             state.title !== '' && `${state.isLoaded=true}`;
+        },
+        setChannelId: function (state, action) {
+            state.channelId = action.payload
         }
     }
 });
 
 export const {
-    setChannelData
+    setChannelData, setChannelId
 } = ChannelSlice.actions;

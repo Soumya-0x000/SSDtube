@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Img from '../../../components/lazyLoadImage/Img';
 import { CgPlayList } from "react-icons/cg";
 import { handleDayCount } from '../../../utils/constant';
 import { Link } from 'react-router-dom';
 import { FaPlay } from "react-icons/fa";
+import { useDispatch } from 'react-redux';
+import { setPlaylistName } from '../../../store/PlayListSlice';
+import { setChannelId } from '../../../store/ChannelSlice';
 
-const PlayLists = ({itemData, indx, orgArr}) => {
+const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
     const [showPlayAll, setShowPlayAll] = useState(new Array(orgArr.length).fill(false));
+    const dispatch = useDispatch();
 
     const handleMouseEntry = () => {
         const updatedArr = [...showPlayAll];
@@ -18,12 +22,17 @@ const PlayLists = ({itemData, indx, orgArr}) => {
         const updatedArr = [...showPlayAll];
         updatedArr[indx] = false;
         setShowPlayAll(updatedArr);
-    };
+    }; 
+
+    useEffect(() => {
+        dispatch(setChannelId(channelID))
+    }, [])
 
     return (
         <Link to={`/playlist/${itemData?.id}`}
         onMouseEnter={handleMouseEntry}
-        onMouseLeave={handleMouseLeave}>
+        onMouseLeave={handleMouseLeave}
+        onClick={() => dispatch(setPlaylistName(itemData.snippet.title))}> 
             <div className='max- w-[20rem] sm:max-w-[17rem] md:max-w-[15rem] h-[11rem] sm:h-[9rem] rounded-lg relative '>
                 <Img
                     className={` h-full w-full rounded-lg `}
@@ -78,4 +87,4 @@ const PlayLists = ({itemData, indx, orgArr}) => {
     )
 }
 
-export default PlayLists;
+export default PlayListCard;

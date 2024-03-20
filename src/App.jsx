@@ -5,7 +5,8 @@ import Search from './pages/Search'
 import Watch from './pages/Watch'
 import Channel from './pages/channel/Channel'
 import Navbar from './components/navBar/Navbar'
-import FullPlayListItems from './pages/channel/playlist/FullPlayListItems'
+import PlayListItems from './pages/channel/playlist/PlayListItems'
+import DedicatedPlaylist from './pages/channel/playlist/DedicatedPlaylist'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -27,15 +28,19 @@ const App = () => {
         },
         {
             path: '/playlist/:id',
-            element: <FullPlayListItems/>
+            element: <PlayListItems/>
         },
+        {
+            path: '/dedicatedPlaylist',
+            element: <DedicatedPlaylist/>
+        }
     ])
 
     return (
         <>
-            {/* <div className='h-[3.3rem] flex items-center '>
-                <Navbar/>
-            </div> */}
+            {/* <div className='h-[3.3rem] flex items-center '> */}
+                {/* <Navbar/> */}
+            {/* </div> */}
             <RouterProvider router={router}/>
         </>
     )
