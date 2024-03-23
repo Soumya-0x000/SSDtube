@@ -12,7 +12,6 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 const PlayListItems = () => {
     const {id} = useParams();
-    console.log(id)
     const {
         playListTitle, 
         playListData, 
@@ -30,12 +29,24 @@ const PlayListItems = () => {
     });
     const [dataToRender, setDataToRender] = useState([]);
     
+    const getViews = async(videoID) => {
+        const VIEWS = `${BASE_URL}/videos?part=statistics&id=${videoID}&key=${YOUTUBE_API_KEY}`;
+
+        try {
+            const videoViews = await axios.get(VIEWS);
+            return videoViews?.data?.items[0]?.statistics?.viewCount
+        } catch (error) {
+            console.error('error', error);
+            return 0
+        }
+    };
+
     const fetchFullPlayList = async(playListId) => {
         const PLAY_LIST_DATA_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=${playListId}&key=${YOUTUBE_API_KEY}`;
         
         try {
             const getFullPlayList = await axios.get(PLAY_LIST_DATA_URL);
-            console.log(getFullPlayList)
+            // console.log(getFullPlayList)
             const vdoItems = getFullPlayList?.data?.items;
             const channelName = vdoItems[0]?.snippet?.channelTitle
             const totalCount = getFullPlayList?.data?.pageInfo?.totalResults;
@@ -44,9 +55,10 @@ const PlayListItems = () => {
                 current: vdoItems.length,
             })
             const nextPgToken = getFullPlayList?.data?.nextPageToken;
-            let mainData = [];
-            vdoItems.map((item, indx) => {
+            
+            const mainData = await Promise.all(vdoItems.map(async(item, indx) => {
                 const videoId = item?.contentDetails?.videoId;
+                const views = await getViews(videoId)
                 const publishedAt = item?.contentDetails?.videoPublishedAt;
                 const description = item?.snippet?.description;
                 const title = item?.snippet?.title;
@@ -55,8 +67,8 @@ const PlayListItems = () => {
                                 || item?.snippet?.thumbnails?.medium?.url
                                 || item?.snippet?.thumbnails?.standard?.url
                                 || item?.snippet?.thumbnails?.default?.url
-                mainData.push({videoId, publishedAt, description, title, thumbnail});                
-            });
+                return {videoId, publishedAt, description, title, thumbnail, views}                
+            }));
             setDataToRender(mainData);
             dispatch(setPlayListData(mainData));
             dispatch(setChannelName(channelName));
@@ -75,9 +87,9 @@ const PlayListItems = () => {
                 const getNxtPgData = await axios.get(NXT_PG_URL);
                 const vdoItems = getNxtPgData?.data?.items;
                 const nextPgToken = getNxtPgData?.data?.nextPageToken;
-                let moreItems = [];
-                vdoItems.map((item, indx) => {
+                const moreItems = await Promise.all(vdoItems.map(async (item, indx) => {
                     const videoId = item?.contentDetails?.videoId;
+                    const views = await getViews(videoId)
                     const publishedAt = item?.contentDetails?.videoPublishedAt;
                     const description = item?.snippet?.description;
                     const title = item?.snippet?.title;
@@ -86,8 +98,8 @@ const PlayListItems = () => {
                                     || item?.snippet?.thumbnails?.medium?.url
                                     || item?.snippet?.thumbnails?.standard?.url
                                     || item?.snippet?.thumbnails?.default?.url
-                    moreItems.push({videoId, publishedAt, description, title, thumbnail});                  
-                });
+                    return {videoId, publishedAt, description, title, thumbnail, views};                  
+                }));
                 setDataToRender(prevData => [...prevData, ...moreItems]);
                 dispatch(setNextPgToken(nextPgToken));
             } catch (error) {
@@ -97,6 +109,7 @@ const PlayListItems = () => {
     }
     
     useEffect(() => {
+        // console.log(dataToRender)
         dispatch(setPlayListData(dataToRender))
     }, [dataToRender])
 

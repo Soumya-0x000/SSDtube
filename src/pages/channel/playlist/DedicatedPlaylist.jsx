@@ -1,15 +1,19 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../../components/lazyLoadImage/Img';
 import { FaPlay } from 'react-icons/fa';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RxTriangleRight } from "react-icons/rx";
-import { TfiControlShuffle, TfiShare } from "react-icons/tfi";
+import { TfiControlShuffle } from "react-icons/tfi";
 import { MdPlaylistAdd } from "react-icons/md";
 import { RiShareForwardLine } from "react-icons/ri";
 import { LiaDownloadSolid } from "react-icons/lia";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { handleDayCount } from '../../../utils/constant';
+import { BsDot, BsThreeDotsVertical } from "react-icons/bs";
+import { convertViews, handleDayCount } from '../../../utils/constant';
+import axios from 'axios';
+import { setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
+import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
@@ -27,13 +31,14 @@ const DedicatedPlaylist = () => {
         channelName, 
         playListBannerUrl,
         totalItemCount,
+        nxtPgToken
     } = useSelector(state => state.playlist);
-    console.log(playListData)
     const [showPlayAll, setShowPlayAll] = useState(false);
-    const navigate = useNavigate();
     const channelID = useSelector(state => state.channel.channelId);
     const comparableHeight = 585;
     const [showBanner, setShowBanner] = useState(window.innerHeight >= comparableHeight);
+    const dispatch = useDispatch();
+    const [dataToRender, setDataToRender] = useState(playListData);
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -46,7 +51,7 @@ const DedicatedPlaylist = () => {
 
     const PlayListAreaSideBar = () => {
         return(
-            <div className=' lg:h-full flex flex-col px-[2rem] md:px-[4rem] lg:px-5 py-6 relative lg:rounded-xl overflow-hidden space-y-6 '>
+            <div className='lg:fixed lg:h-full flex flex-col px-[2rem] md:px-[4rem] lg:px-5 py-6 relative lg:rounded-xl overflow-hidden space-y-6 '>
                 <div className=' h-[22rem] md:h-[16rem] '>
                     <>
                         <div 
@@ -142,43 +147,105 @@ const DedicatedPlaylist = () => {
         )
     };
 
-    const PlayListItems = () => {
-        return (
-            <div className=' w-[]'>
-                {playListData.map((data, index) => (
-                    <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
-                    key={data?.videoId+index}>
-                        <div className=' text-[.8rem] text-gray-400 flex items-center'>
-                            {index+1}
-                        </div>
+    const getViews = async(videoID) => {
+        const VIEWS = `${BASE_URL}/videos?part=statistics&id=${videoID}&key=${YOUTUBE_API_KEY}`;
 
-                        <div className='min-w-[9rem] lg:min-w-[12rem] h-[5rem] lg:h-[7rem] rounded-lg overflow-hidden'>
-                            <Img
-                                src={data?.thumbnail}
-                                className={` w-full h-full`}
-                            />
-                        </div>
-
-                        <div className=' space-y-5'>
-                            <div className='line-clamp-1 w-full'>{data?.title}</div>
-                            <div className=' flex gap-x-5'>
-                                <p className='text-gray-400 text-[.8rem]'>{channelName}</p>
-                                <p className='text-gray-400 text-[.8rem]'>{handleDayCount(data?.publishedAt)}</p>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        )
+        try {
+            const videoViews = await axios.get(VIEWS);
+            return videoViews?.data?.items[0]?.statistics?.viewCount
+        } catch (error) {
+            console.error('error', error);
+            return 0
+        }
     };
 
+    const fetchNxtPgData = async() => {
+        const NXT_PG_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&pageToken=${nxtPgToken}&playlistId=${id}&key=${YOUTUBE_API_KEY}`;
+
+        if (playListData.length <= totalItemCount) {
+            try {
+                const getNxtPgData = await axios.get(NXT_PG_URL);
+                const vdoItems = getNxtPgData?.data?.items;
+                const nextPgToken = getNxtPgData?.data?.nextPageToken;
+
+                const moreItems = await Promise.all(vdoItems.map(async(item, indx) => {
+                    const videoId = item?.contentDetails?.videoId;
+                    const views = await getViews(videoId)
+                    const publishedAt = item?.contentDetails?.videoPublishedAt;
+                    const description = item?.snippet?.description;
+                    const title = item?.snippet?.title;
+                    const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                    || item?.snippet?.thumbnails?.high?.url
+                                    || item?.snippet?.thumbnails?.medium?.url
+                                    || item?.snippet?.thumbnails?.standard?.url
+                                    || item?.snippet?.thumbnails?.default?.url
+                    return {videoId, publishedAt, description, title, thumbnail, views}
+                }));
+                setDataToRender(prevData => [...prevData, ...moreItems]);
+                dispatch(setNextPgToken(nextPgToken));
+            } catch (error) {
+                console.error('error', error);
+            }
+        };
+    }
+
+    useEffect(() => {
+        dispatch(setPlayListData(dataToRender))
+    }, [dataToRender])
+
     return (
-        <div className=' h-screen lg:py-2 lg:pl-2 flex flex-col lg:flex-row gap-x-3 overflow-y-auto'>
-            <div className=''>
+        <div 
+        className=' h-screen lg:py-2 lg:pl-2 flex flex-col lg:flex-row gap-x-3 w-full'>
+            <div className='lg:min-w-[23rem] lg:max-w-[23rem] ' >
                 <PlayListAreaSideBar/>
             </div>
-            <div className=' w-full h-full lg:overflow-y-auto '>
-                <PlayListItems/>
+
+            <div className='flex-1 overflow-y-aut '>
+                <InfiniteScroll 
+                className=''
+                next={fetchNxtPgData}
+                dataLength={playListData.length}
+                hasMore={playListData.length <= totalItemCount}>
+                    {playListData.map((data, index) => (
+                        <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
+                        key={data?.videoId}>
+                            {/* index */}
+                            <div className=' text-[.8rem] text-gray-400 flex items-center'>
+                                {index+1}
+                            </div>
+
+                            {/* image */}
+                            <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden'>
+                                <Img
+                                    src={data?.thumbnail}
+                                    className={` w-full h-full`}
+                                />
+                            </div>
+
+                            {/* content */}
+                            <div className=' space-y-3 lg:space-y-5 mt-2'>
+                                <div className='line-clamp-1 w-full lg:text-md'>{data?.title}</div>
+                                <div className=' flex items-center gap-x-1'>
+                                    <p className='text-gray-400 text-[.8rem] line-clamp-1'>
+                                        {channelName}
+                                    </p>
+
+                                    <BsDot/>
+
+                                    <p className='text-gray-400 text-[.8rem] line-clamp-1'>
+                                        {convertViews(data?.views)} views
+                                    </p>
+
+                                    <BsDot/>
+
+                                    <p className='text-gray-400 text-[.8rem] line-clamp-1'>
+                                        {handleDayCount(data?.publishedAt)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </InfiniteScroll>
             </div>
         </div>
     );
