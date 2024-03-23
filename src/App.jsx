@@ -31,7 +31,7 @@ const App = () => {
             element: <PlayListItems/>
         },
         {
-            path: '/dedicatedPlaylist',
+            path: '/dedicatedPlaylist/:id',
             element: <DedicatedPlaylist/>
         }
     ])

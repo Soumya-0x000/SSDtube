@@ -5,7 +5,7 @@ import { handleDayCount } from '../../../utils/constant';
 import { Link } from 'react-router-dom';
 import { FaPlay } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
-import { setPlaylistName } from '../../../store/PlayListSlice';
+import { setBannerUrl, setPlaylistID, setPlaylistName } from '../../../store/PlayListSlice';
 import { setChannelId } from '../../../store/ChannelSlice';
 
 const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
@@ -28,11 +28,22 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
         dispatch(setChannelId(channelID))
     }, [])
 
+    const handleCLick = () => {
+        dispatch(setPlaylistName(itemData.snippet.title))
+        dispatch(setBannerUrl(itemData?.snippet?.thumbnails?.maxres?.url
+            || itemData?.snippet?.thumbnails?.high?.url
+            || itemData?.snippet?.thumbnails?.medium?.url
+            || itemData?.snippet?.thumbnails?.default?.url
+            || itemData?.snippet?.thumbnails?.standard?.url
+        ));
+        dispatch(setPlaylistID(itemData?.id))
+    };
+
     return (
         <Link to={`/playlist/${itemData?.id}`}
         onMouseEnter={handleMouseEntry}
         onMouseLeave={handleMouseLeave}
-        onClick={() => dispatch(setPlaylistName(itemData.snippet.title))}> 
+        onClick={handleCLick}> 
             <div className='max- w-[20rem] sm:max-w-[17rem] md:max-w-[15rem] h-[11rem] sm:h-[9rem] rounded-lg relative '>
                 <Img
                     className={` h-full w-full rounded-lg `}
@@ -60,6 +71,7 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
                             || itemData?.snippet?.thumbnails?.default?.url
                             || itemData?.snippet?.thumbnails?.standard?.url
                         })`,
+                        filter:'blur(80px)',
                         backdropFilter: blur,
                     }}
                 />

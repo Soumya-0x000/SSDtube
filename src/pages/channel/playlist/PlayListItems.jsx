@@ -12,6 +12,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 const PlayListItems = () => {
     const {id} = useParams();
+    console.log(id)
     const {
         playListTitle, 
         playListData, 
@@ -34,12 +35,8 @@ const PlayListItems = () => {
         
         try {
             const getFullPlayList = await axios.get(PLAY_LIST_DATA_URL);
+            console.log(getFullPlayList)
             const vdoItems = getFullPlayList?.data?.items;
-            const bannerUrl = vdoItems[0]?.snippet?.thumbnails?.maxres?.url
-                            || vdoItems[0]?.snippet?.thumbnails?.high?.url
-                            || vdoItems[0]?.snippet?.thumbnails?.medium?.url
-                            || vdoItems[0]?.snippet?.thumbnails?.standard?.url
-                            || vdoItems[0]?.snippet?.thumbnails?.default?.url
             const channelName = vdoItems[0]?.snippet?.channelTitle
             const totalCount = getFullPlayList?.data?.pageInfo?.totalResults;
             setResultCount({
@@ -61,7 +58,6 @@ const PlayListItems = () => {
                 mainData.push({videoId, publishedAt, description, title, thumbnail});                
             });
             setDataToRender(mainData);
-            dispatch(setBannerUrl(bannerUrl))
             dispatch(setPlayListData(mainData));
             dispatch(setChannelName(channelName));
             dispatch(setCounting({totalCount, currentCount: currentVdoCount}));
@@ -109,7 +105,7 @@ const PlayListItems = () => {
     }, []);
 
     return (
-        <div className=' px-5 '>
+        <div className=' px-5'>
             <div className=' rounded-xl overflow-hidden border'>
                 <div className='space-y-2 bg-neutral-800 px-3 py-3'>
                     {/* Upper part */}
@@ -117,8 +113,7 @@ const PlayListItems = () => {
                         <div className='text-[.84rem] space-y-1'>
                             <Link 
                             className='text-[1.3rem] font-bold'
-                            to={`/dedicatedPlaylist`}>
-                                <p className='text-[1.3rem] font-bold'>Hermitcraft VI</p>
+                            to={`/dedicatedPlaylist/${id}`}>
                                 {playListTitle}
                             </Link>
                             <p><Link to={`/channel/${channelID}`}>{channelName}</Link> - {currentItemsCount}/{totalItemCount}</p>
@@ -145,18 +140,20 @@ const PlayListItems = () => {
                     {playListData.map((data, index) => (
                         <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3'
                         key={data?.videoId+index}>
-                            <div className=' text-[.8rem] text-gray-400 flex items-center'>{index+1}</div>
+                            <div className=' text-[.8rem] text-gray-400 flex items-center'>
+                                {index+1}
+                            </div>
 
-                            <div className=' w-[7rem] h-[4rem] rounded-lg overflow-hidden'>
+                            <div className=' min-w-[7rem] h-[4rem] rounded-lg overflow-hidden'>
                                 <Img
                                     src={data?.thumbnail}
                                     className={` w-full h-full`}
                                 />
                             </div>
 
-                            <div className=' space-y-1 '>
+                            <div className=' space-y-2 '>
                                 <div className='line-clamp-1 w-full'>{data?.title}</div>
-                                <p className=' text-gray-400 text-[.8rem]'>{data?.channelTitle}</p>
+                                <p className='text-gray-400 text-[.8rem]'>{channelName}</p>
                             </div>
                         </div>
                     ))}
