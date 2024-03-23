@@ -51,7 +51,7 @@ const DedicatedPlaylist = () => {
 
     const PlayListAreaSideBar = () => {
         return(
-            <div className='lg:fixed lg:h-full flex flex-col px-[2rem] md:px-[4rem] lg:px-5 py-6 relative lg:rounded-xl overflow-hidden space-y-6 '>
+            <div className='lg:min-w-[23rem] lg:max-w-[23rem] lg:fixed lg:h-full flex flex-col px-[2rem] md:px-[4rem] lg:px-5 py-6 relative lg:rounded-xl overflow-hidden space-y-6 '>
                 <div className=' h-[22rem] md:h-[16rem] '>
                     <>
                         <div 
@@ -72,7 +72,7 @@ const DedicatedPlaylist = () => {
                     <div className=' flex flex-col md:flex-row lg:flex-col gap-x-10 gap-y-3 md:gap-y-7'>
                         {/* Image  */}
                         {showBanner && (
-                            <Link className='cursor-pointer w-[20rem] md:min-w-[24rem] lg:min-w-fit md:h-[13rem] rounded-xl overflow-hidden relative left-1/2 md:left-auto -translate-x-1/2 md:-translate-x-0 '
+                            <Link className='cursor-pointer w-[20rem] md:min-w-[24rem] lg:min-w-fit rounded-xl overflow-hidden relative left-1/2 md:left-auto -translate-x-1/2 md:-translate-x-0 '
                             style={{
                                 boxShadow: '0px 0px 37px -3px rgba(0,0,0,0.67)',
                                 WebkitBoxShadow: '0px 0px 37px -3px rgba(0,0,0,0.67)',
@@ -200,7 +200,7 @@ const DedicatedPlaylist = () => {
                 <PlayListAreaSideBar/>
             </div>
 
-            <div className='flex-1 overflow-y-aut '>
+            <div className='lg:ml-[2rem w-full '>
                 <InfiniteScroll 
                 className=''
                 next={fetchNxtPgData}
