@@ -21,7 +21,7 @@ export const getVideoInfo = async (id) => {
 };
 
 export const getChannelInfo = async (id) => {
-    const GET_CHANNEL_INFO = `${BASE_URL}/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${id}&key=${YOUTUBE_API_KEY}`;
+    const GET_CHANNEL_INFO = `${BASE_URL}/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${id}&maxResults=50&key=${YOUTUBE_API_KEY}`;
     try {
         const channelData = await axios.get(GET_CHANNEL_INFO);
         return channelData;
@@ -35,6 +35,17 @@ export const getPlayLists = async (id, nextPgToken) => {
     try {
         const playlists = await axios.get(PLAYLISTS);
         return playlists;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getRecommendedVideos = async (channelID) => {
+    const RECOMMENDED_VIDEOS = `${BASE_URL}/activities?part=snippet%2CcontentDetails&channelId=${channelID}&maxResults=20&key=${YOUTUBE_API_KEY}`;
+
+    try {
+        const recommendedVideos = await axios.get(RECOMMENDED_VIDEOS);
+        return recommendedVideos;
     } catch (error) {
         console.error(error);
     }

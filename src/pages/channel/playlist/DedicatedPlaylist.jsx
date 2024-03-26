@@ -15,7 +15,7 @@ import { setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
 import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-const iconTray = [
+export const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
     {icon: <RiShareForwardLine/>, fontSize: 'text-[24px]'},
     {icon: <LiaDownloadSolid/>, fontSize: 'text-[26px]'},
@@ -86,7 +86,7 @@ const DedicatedPlaylist = () => {
                                     )}
                                     
                                     {/* data */}
-                                    <div className='font-bold lg:mt-2 text-gray-300 md:max-w-[27rem] relative tracking-wide'>
+                                    <div className='font-bold lg:mt-2 text-white md:max-w-[27rem] relative tracking-wide'>
                                         <p className=' w-full h-7 bg-slate-600 rounded-md animate-pulse'/>
                                         
                                         <div className=' flex flex-row md:flex-col justify-between'>
@@ -145,7 +145,7 @@ const DedicatedPlaylist = () => {
                                     )}
                                     
                                     {/* data */}
-                                    <div className='font-bold lg:mt-2 text-gray-300 md:max-w-[27rem] relative tracking-wide'>
+                                    <div className='font-bold lg:mt-2 text-white md:max-w-[27rem] relative tracking-wide'>
                                         <p className='text-2xl lg:text-3xl line-clamp-1 lg:line-clamp-none '>
                                             {playListTitle}
                                         </p>

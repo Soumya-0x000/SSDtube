@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY, generateRandomID } from '../../../utils/constant';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBannerUrl, setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
@@ -10,6 +10,7 @@ import { SlOptionsVertical } from "react-icons/sl";
 import Img from '../../../components/lazyLoadImage/Img';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { IoIosArrowDown } from "react-icons/io";
+import { data } from 'autoprefixer';
 
 const PlayListItems = () => {
     const {id} = useParams();
@@ -46,7 +47,7 @@ const PlayListItems = () => {
 
     const fetchFullPlayList = async(playListId) => {
         const PLAY_LIST_DATA_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=${playListId}&key=${YOUTUBE_API_KEY}`;
-        
+
         try {
             const getFullPlayList = await axios.get(PLAY_LIST_DATA_URL);
             // console.log(getFullPlayList)
@@ -109,26 +110,38 @@ const PlayListItems = () => {
                 console.error(error);
             }
         };
-    }
+    };
+
+    const handleVdoPlayingCount = (currentCount) => {
+        setCurrentVdoCount(currentCount)
+        // dispatch(setCounting({totalCount: resultCount.total, currentCount: currentVdoCount}))
+        console.log(currentCount)
+    };
     
     useEffect(() => {
         dispatch(setPlayListData(dataToRender))
     }, [dataToRender])
 
     useEffect(() => {
+        if (dataToRender.length > 0) {
+            console.log(dataToRender)
+            return
+        };
         fetchFullPlayList(id);
+
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 400);
+        },400);
 
         return () => clearTimeout(timer)
     }, []);
 
     return (
-        <div className=' px-5'>
+        <div className=' px-5 '>
             <div className=' rounded-xl overflow-hidden border'>
                 {isLoading ? (
                     <>
+                        {/* nav part */}
                         <div className='space-y-2 bg-neutral-800 px-3 py-3'>
                             {/* Upper part */}
                             <div className='relative flex items-center justify-between'>
@@ -150,14 +163,15 @@ const PlayListItems = () => {
                             </div>
                         </div>
 
+                        {/* data part */}
                         <div
                         className={` ${hideVids ? 'hidden' : 'block'} max-h-[26rem] overflow-y-auto mt-2`}>
                             {[...Array(6)].map((data, index) => (
                                 <div className='py-1.5 hover:bg-neutral-700 pl-2 flex gap-x-3'
-                                key={data?.videoId+index}>
+                                key={generateRandomID()}>
                                     <div className=' bg-slate-600 flex items-center'/>
 
-                                    <div className=' min-w-[7rem] h-[4rem] bg-slate-600 animate-pulse rounded-lg overflow-hidden'/>
+                                    <div className='  w-[7rem] h-[4rem] bg-slate-600 animate-pulse rounded-lg overflow-hidden'/>
 
                                     <div className=' space-y-2 '>
                                         <div className=' min-w-[15rem] h-[.8rem] bg-slate-600 animate-pulse rounded-lg overflow-hidden'/>
@@ -206,13 +220,14 @@ const PlayListItems = () => {
                         hasMore={playListData.length <= resultCount.total}>
                             {playListData.map((data, index) => (
                                 <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3'
-                                key={data?.videoId+index}
-                                to={`/watch/${data?.videoId}`}>
+                                key={generateRandomID()}
+                                to={`/watch/${data?.videoId}`}
+                                onClick={() => handleVdoPlayingCount(index+1)}>
                                     <div className=' text-[.8rem] text-gray-400 flex items-center'>
                                         {index+1}
                                     </div>
 
-                                    <div className=' min-w-[7rem] h-[4rem] rounded-lg overflow-hidden'>
+                                    <div className='  w-[7rem] h-[4rem] rounded-lg overflow-hidden'>
                                         <Img
                                             src={data?.thumbnail}
                                             className={` w-full h-full`}

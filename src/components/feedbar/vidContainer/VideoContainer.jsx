@@ -9,6 +9,7 @@ import Spinner from '../../loading/Spinner'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import './videoContainer.css'
 import axios from 'axios';
+import { setVidIdArr } from '../../../store/WatchSlice.js';
 
 const VideoContainer = () => {
     const currentVideos = useSelector((state) => state.youtube.videos);
@@ -24,40 +25,63 @@ const VideoContainer = () => {
     });
     const scrollRef = useRef(null);
     const [currentHeight, setCurrentHeight] = useState(650);
+    const [videoIDs, setVideoIDs] = useState([]);
+    const [vdoContents, setVideoContents] = useState({
+        
+    });
 
     const renderSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <Skeleton key={indx}/>
     ));
 
     const fetchYoutubeVideos = async () => {
-        const videoData = await getYoutubeData();
-        const videos = videoData?.data.items;
-        setResultCount({
-            total: videoData?.data?.pageInfo?.totalResults,
-            current: videoData?.data?.pageInfo?.resultsPerPage,
-        })
-        dispatch(setHomePageVideo(videos));
-        setHomePgVids(videos);
-        dispatch(setNxtPageToken(videoData?.data?.nextPageToken));
+        try {
+            const videoData = await getYoutubeData();
+            const videos = videoData?.data.items;
+            
+            const ids = videos.map(vdo => vdo.id);
+            setVideoIDs(ids);
+            dispatch(setVidIdArr(ids)); 
+            
+            videos.map(vdoData => vdoData)
+            setResultCount({
+                total: videoData?.data?.pageInfo?.totalResults,
+                current: videoData?.data?.pageInfo?.resultsPerPage,
+            });
+
+            dispatch(setHomePageVideo(videos));
+            setHomePgVids(videos);
+            dispatch(setNxtPageToken(videoData?.data?.nextPageToken));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const getNextPageVideo = async () => {
         const NEXT_PAGE_DATA = `${BASE_URL}/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=30&pageToken=${nxtPgToken}&regionCode=US&key=${YOUTUBE_API_KEY}`;
+        
         try {
             const nxtPgData = await axios.get(NEXT_PAGE_DATA);
             const nxtPgVideos = nxtPgData?.data.items;
+
+            const nxtPGids = nxtPgVideos.map(vdo => vdo.id);
+            setVideoIDs(prevIDs => [...prevIDs, ...nxtPGids]);
+            dispatch(setVidIdArr(videoIDs));
+            
             setResultCount(prevResultCount => ({
                 total: nxtPgData?.data?.pageInfo?.totalResults, 
                 current: prevResultCount.current + nxtPgData?.data?.pageInfo?.resultsPerPage
             }));
+            
             const updatedVideos = [...homePgVids, ...nxtPgVideos];
             dispatch(setHomePageVideo(updatedVideos));
-            setHomePgVids(updatedVideos)
+            setHomePgVids(updatedVideos);
             dispatch(setNxtPageToken(nxtPgData?.data?.nextPageToken));
         } catch (error) {
             console.error(error);
         }
     };
+
 
     useEffect(() => {
         fetchYoutubeVideos();
@@ -96,8 +120,8 @@ const VideoContainer = () => {
                 `}
                 hasMore={resultCount.current !== resultCount.total ? true : false }
                 loader={<Spinner/>}
-                height={currentHeight}
-                next={getNextPageVideo}>
+                next={getNextPageVideo}
+                height={currentHeight}>
                     {currentVideos.map((item, indx) => (
                         <VideoCard
                             item={item}

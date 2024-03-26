@@ -3,7 +3,7 @@ import './Loading.css';
 
 const Loading = () => {
     return (
-        <div className="container">
+        <div className="container bg-green-400 ">
             <div className="loader"></div>
             <div className="loader"></div>
             <div className="loader"></div>

@@ -11,7 +11,6 @@ const Home = () => {
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth > sidebarVisibleWidth);
     const isFullSidebarWindow = useSelector((state) => state.sidebar.isFullSidebarWindowSupport);
     const isSidebarFloating = useSelector((state) => state.sidebar.isFloatSidebar);
-    const theme = useSelector((state) => state.theme.currentThemeMode)
 
     useLayoutEffect(() => {
         const handleResize = () => {
