@@ -1,5 +1,6 @@
 import axios from "axios";
 import { YOUTUBE_VIDEO_API, BASE_URL, YOUTUBE_API_KEY } from "./constant";
+import { useLayoutEffect, useState } from "react";
 
 export const getYoutubeData = async () => {
     try {
@@ -49,4 +50,25 @@ export const getRecommendedVideos = async (channelID) => {
     } catch (error) {
         console.error(error);
     }
+};
+
+export const useWindowDimensions = () => {
+    const [windowDimensions, setWindowDimensions] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+  
+    useLayoutEffect(() => {
+        const handleResize = () => {
+            setWindowDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+    
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+  
+    return windowDimensions;
 };

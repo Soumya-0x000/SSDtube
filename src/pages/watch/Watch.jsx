@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import ReactPlayer from 'react-player/lazy';
 import { useParams } from 'react-router-dom'
-import { getChannelInfo, getRecommendedVideos, getVideoInfo } from '../../utils/Hooks';
+import { getChannelInfo, getRecommendedVideos, getVideoInfo, useWindowDimensions } from '../../utils/Hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNxtPgToken, setRecommendedVdo, setVidIdArr, setWatchData } from '../../store/WatchSlice';
 import axios from 'axios';
@@ -11,17 +11,26 @@ import RecommendedCard from './RecommendedCard';
 import Loading from '../../components/loading/Loading';
 import Img from '../../components/lazyLoadImage/Img';
 import { LuThumbsUp, LuThumbsDown  } from "react-icons/lu";
-import { iconTray } from '../channel/playlist/DedicatedPlaylist';
+import { MdPlaylistAdd } from 'react-icons/md';
+import { RiShareForwardLine } from 'react-icons/ri';
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import { RiScissorsFill } from "react-icons/ri";
+import { LiaDownloadSolid } from "react-icons/lia";
+import { RiFlagLine } from "react-icons/ri";
 
-const watchPgIconTray = iconTray.map((item, indx) => ({
-    ...item,
-    text: ['Share', 'Download', 'Save', ''][indx]
-}));
+const orgIconTray = [
+    { icon: <RiShareForwardLine />, fontSize: 'text-[21px]', text: 'Share' },
+    { icon: <LiaDownloadSolid />, fontSize: 'text-[22px]', text: 'Download' },
+    { icon: <RiScissorsFill />, fontSize: 'text-[20px]', text: 'Clip' },
+    { icon: <MdPlaylistAdd />, fontSize: 'text-[23px]', text: 'Save' },
+];
 
 const Watch = () => {
-    const { id } = useParams(); 
-    const dispatch = useDispatch();
+    const { id } = useParams();
+    const {width} = useWindowDimensions();
     const {vdoData, vdoIDarr, channelID, recommendedVdoData, nxtPgToken} = useSelector(state => state.watch);
+    const dispatch = useDispatch();
+
     const [recommendedItems, setRecommendedItems] = useState([]);
     const [resultCount, setResultCount] = useState({
         total: 0,
@@ -33,6 +42,14 @@ const Watch = () => {
         channelTitle: '',
         subscribers: 0
     });
+    const [iconTrayLgScreen, setIconTrayLgScreen] = useState([...orgIconTray]);
+    // const [iconTrayLessLgScreen, setIconTrayLessLgScreen] = useState([...orgIconTray]);
+    const [optionsLgScrn, setOptionsLgScrn] = useState([
+        { icon: <RiFlagLine />, fontSize: 'text-[23px]', text: 'Report' },
+    ]);
+
+    const [isOptionsLgScrnOpen, setIsOptionsLgScrnOpen] = useState(false);
+    const [isOptionsLessLgScrnOpen, setIsOptionsLessLgScrnOpen] = useState(false);
     const [logoURL, setLogoURL] = useState('');
     
     const getVdoInfo = async (vdoID) => {
@@ -43,7 +60,7 @@ const Watch = () => {
 
         const channelData = await getChannelInfo(channelID);
         const channelContent = channelData?.data?.items[0]
-        console.log(vdoContent)
+        // console.log(vdoContent)
         const channelLogoUrl = channelContent?.snippet?.thumbnails?.medium?.url
                             || channelContent?.snippet?.thumbnails?.high?.url
                             || channelContent?.snippet?.thumbnails?.default?.url
@@ -127,13 +144,130 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        getVdoInfo(id)
-        fetchRecommendedVideos(channelID);
+        // getVdoInfo(id)
+        // fetchRecommendedVideos(channelID);
     }, []);
 
+    useEffect(() => {
+        if (width < 1150) {
+            const downloadIndex = iconTrayLgScreen.findIndex(item => item.text === 'Share');
+            if (downloadIndex !== -1) {
+                const removedItem = iconTrayLgScreen.splice(downloadIndex, 1);
+                setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+            }
+        } else {
+            const downloadIndex = optionsLgScrn.findIndex(item => item.text === 'Share');
+            if (downloadIndex !== -1) {
+                const removedItem = optionsLgScrn.splice(downloadIndex, 1);
+                (prevIconTray => [...prevIconTray, removedItem[0]]);
+            }
+        }
+
+        if (width < 1275) {
+            const downloadIndex = iconTrayLgScreen.findIndex(item => item.text === 'Download');
+            if (downloadIndex !== -1) {
+                const removedItem = iconTrayLgScreen.splice(downloadIndex, 1);
+                setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+            }
+        } else {
+            const downloadIndex = optionsLgScrn.findIndex(item => item.text === 'Download');
+            if (downloadIndex !== -1) {
+                const removedItem = optionsLgScrn.splice(downloadIndex, 1);
+                (prevIconTray => [...prevIconTray, removedItem[0]]);
+            }
+        }
+    
+        if (width < 1450) {
+            const clipIndex = iconTrayLgScreen.findIndex(item => item.text === 'Clip');
+            if (clipIndex !== -1) {
+                const removedItem = iconTrayLgScreen.splice(clipIndex, 1);
+                setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+            }
+        } else {
+            const clipIndex = optionsLgScrn.findIndex(item => item.text === 'Clip');
+            if (clipIndex !== -1) {
+                const removedItem = optionsLgScrn.splice(clipIndex, 1);
+                (prevIconTray => [...prevIconTray, removedItem[0]]);
+            }
+        }
+    
+        if (width < 1600) {
+            const saveIndex = iconTrayLgScreen.findIndex(item => item.text === 'Save');
+            if (saveIndex !== -1) {
+                const removedItem = iconTrayLgScreen.splice(saveIndex, 1);
+                setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+            }
+        } else {
+            const saveIndex = optionsLgScrn.findIndex(item => item.text === 'Save');
+            if (saveIndex !== -1) {
+                const removedItem = optionsLgScrn.splice(saveIndex, 1);
+                (prevIconTray => [...prevIconTray, removedItem[0]]);
+            }
+        }
+    
+        const reportIndex = optionsLgScrn.findIndex(item => item.text === 'Report');
+        if (reportIndex === -1) {
+            setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, { icon: <RiFlagLine />, fontSize: 'text-[23px]', text: 'Report' }]);
+        }
+    }, [width, iconTrayLgScreen, optionsLgScrn]);
+    
+    // useEffect(() => {
+    //     if (width < 1275) {
+    //         const downloadIndex = iconTrayLgScreen.findIndex(item => item.text === 'Download');
+    //         if (downloadIndex !== -1) {
+    //             const removedItem = iconTrayLgScreen.splice(downloadIndex, 1);
+    //             setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+    //         }
+    //     } else {
+    //         const downloadIndex = optionsLgScrn.findIndex(item => item.text === 'Download');
+    //         if (downloadIndex !== -1) {
+    //             const removedItem = optionsLgScrn.splice(downloadIndex, 1);
+    //             (prevIconTray => [...prevIconTray, removedItem[0]]);
+    //         }
+    //     }
+    
+    //     if (width < 1450) {
+    //         const clipIndex = iconTrayLgScreen.findIndex(item => item.text === 'Clip');
+    //         if (clipIndex !== -1) {
+    //             const removedItem = iconTrayLgScreen.splice(clipIndex, 1);
+    //             setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+    //         }
+    //     } else {
+    //         const clipIndex = optionsLgScrn.findIndex(item => item.text === 'Clip');
+    //         if (clipIndex !== -1) {
+    //             const removedItem = optionsLgScrn.splice(clipIndex, 1);
+    //             (prevIconTray => [...prevIconTray, removedItem[0]]);
+    //         }
+    //     }
+    
+    //     if (width < 1600) {
+    //         const saveIndex = iconTrayLgScreen.findIndex(item => item.text === 'Save');
+    //         if (saveIndex !== -1) {
+    //             const removedItem = iconTrayLgScreen.splice(saveIndex, 1);
+    //             setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, removedItem[0]]);
+    //         }
+    //     } else {
+    //         const saveIndex = optionsLgScrn.findIndex(item => item.text === 'Save');
+    //         if (saveIndex !== -1) {
+    //             const removedItem = optionsLgScrn.splice(saveIndex, 1);
+    //             (prevIconTray => [...prevIconTray, removedItem[0]]);
+    //         }
+    //     }
+    
+    //     const reportIndex = optionsLgScrn.findIndex(item => item.text === 'Report');
+    //     if (reportIndex === -1) {
+    //         setOptionsLgScrn(prevOptionsLgScrn => [...prevOptionsLgScrn, { icon: <RiFlagLine />, fontSize: 'text-[23px]', text: 'Report' }]);
+    //     }
+    // }, [width, iconTrayLgScreen, optionsLgScrn]);
+
+    const handleOptionClick = () => {
+        setIsOptionsLgScrnOpen(!isOptionsLgScrnOpen);
+    };
+
     return (
-        <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt -2 flex flex-col lg:flex-row  lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
-            <div className=' w-full h-full lg:w-[68%] rounded-lg xl:rounded-xl overflow-hidden flex flex-col items-start'>
+        <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt-2 flex flex-col gap-y-4 lg:flex-row  lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
+            {/* video part */}
+            <div className=' w-full h-full lg:w-[68%] rounded-lg xl:rounded-xl flex flex-col items-start'>
                 {/* player */}
                 <div className=' w-full aspect-video rounded-lg xl:rounded-xl overflow-hidden'>
                     <div className=' w-full h-full'>
@@ -164,11 +298,14 @@ const Watch = () => {
                 </div>
 
                 {/* details */}
-                <div className=' mt-3 w-full'>
-                    <p className='text-[1.4rem] xl:text-2xl font-bold'>{vdoData?.snippet?.title}</p>
+                <div className=' mt-3 w-full space-y-1 '>
+                    {/* title */}
+                    <p className='text-[1.4rem] xl:text-2xl font-bold line-clamp-1'>{vdoData?.snippet?.title}</p>
 
-                    <div className='flex flex-col sm:flex-row items-center w-full justify-between'>
-                        <div className=' flex items-center gap-x-3 mt-2 w-fit '>
+                    {/* functionalities */}
+                    <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-y-3 watchController:gap-y-0 w-full '>
+                        {/* title & author */}
+                        <div className=' flex items-center gap-x-3 w-[18rem '>
                             <div className=' w-10 h-10 rounded-full overflow-hidden'>
                                 <Img
                                     className={` w-full h-full`}
@@ -176,63 +313,95 @@ const Watch = () => {
                                 />
                             </div>
 
-                            <div>
+                            <div className=''>
                                 <div className='text-[.94rem] font-bold flex items-center gap-x-1'>
-                                    {essentialVdoItems.channelTitle}
+                                    <p className=' line-clamp-1 max-w-[13rem] text-sm'>
+                                        {essentialVdoItems.channelTitle}
+                                    </p>
                                     {essentialVdoItems.subscribers > 100000 && (
-                                        <div className=' h-4 w-4'>
+                                        <div className=' min-h-4 min-w-4 max-h-4 max-w-4'>
                                             <svg viewBox="0 0 24 24" width="100%" height="100%" focusable="false" style={{ display: 'block' }}>
                                                 <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.1L7 11.8l2.8 2.7L17 7.4l1.4 1.4-8.6 8.5z" fill='gray'></path>
                                             </svg>
                                         </div>
                                     )}
                                 </div>
-                                <p className=' text-gray-400 text-sm'>{convertViews(essentialVdoItems.subscribers)} subscribers</p>
+
+                                <p className=' text-gray-400 text-sm line-clamp-1'>
+                                    {convertViews(essentialVdoItems.subscribers)} subscribers
+                                </p>
                             </div>
 
-                            <button className='ml-8 bg-white text-black w-[7rem] h-[2.4rem] rounded-full active:scale-110 transition-all'>
+                            <button className='2xl:ml-1 bg-white text-black w-[7rem] h-[2.4rem] rounded-full active:scale-110 transition-all'>
                                 Subscribe
                             </button>
                         </div>
 
-                        <div className=' flex items-center gap-x-3 '>
+                        {/* operating buttons */}
+                        <div className=' flex items-center gap-x-[.5rem]'>
+                            {/* left side */}
                             <div className=' flex items-center justify-center bg-neutral-700 rounded-full h-[2.5rem] px-4'>
-                                <span className='hover:bg-gray-70 pr-4 flex items-center gap-x-2 border-r'>
+                                <span className='hover:bg-gray-70 pr-4 flex items-center gap-x-2 border-r cursor-pointer'>
                                     <LuThumbsUp className=' text-lg'/>
                                     <p className=' text-sm'>
                                         {convertViews(essentialVdoItems.like)}
                                     </p>
                                 </span>
 
-                                <span className=' flex pl-3 items-center gap-x-2'>
+                                <span className=' flex pl-3 items-center gap-x-2 cursor-pointer'>
                                     <LuThumbsDown className=' text-lg'/>
                                 </span>
                             </div>
                             
-                            {watchPgIconTray.map((item, indx, arr) => (
-                                <button className={` flex items-center gap-x-1.5 h-[2.5rem] rounded-full px-3 bg-neutral-700 hover:bg-gray-700`}>
-                                    <p className={`text-md ${item.fontSize} ${indx === arr.length-1 && 'rotate-90'}`}>
+                            {/* buttons */}
+                            {iconTrayLgScreen.map((item, indx) => (
+                                <button 
+                                className={` flex items-center gap-x-1 h-[2.4rem] rounded-full px-3 bg-neutral-700 hover:bg-gray-700`}
+                                key={item.text+indx}>
+                                    <p className={` ${item.fontSize}`}>
                                         {item.icon}
                                     </p>
-
-                                    {item.text.trim() !== '' && 
-                                        <p className='text-md  pr-2'>{item.text}</p>
-                                    }
+                                    <p className='text-[14px] pr-2'>{item.text}</p>
                                 </button>
                             ))}
+                            
+                            {/* three dot option menu */}
+                            <div 
+                            className=' relative flex items-center justify-center w-[2.4rem] h-[2.4rem] rounded-full  bg-neutral-700 hover:bg-gray-700 cursor-pointer '
+                            onClick={handleOptionClick}>
+                                <BsThreeDotsVertical className=' text-[22px] rotate-90' />
+
+                                {isOptionsLgScrnOpen && (
+                                    <div className='bg-neutral-800 absolute top-12 right-0 w-[10rem] rounded-lg overflow-hidden py-2 z-10'>
+                                        {optionsLgScrn.map((item, indx) => (
+                                            <button 
+                                            className={`w-full flex items-center gap-x-3 h-[2.4rem] bg-neutral-700 hover:bg-neutral-600`}
+                                            key={item.text+indx}>
+                                                <p className={`text-md ${item.fontSize} pl-3`}>
+                                                    {item.icon}
+                                                </p>
+                                                <p className='text-[15px]  pr-2'>
+                                                    {item.text}
+                                                </p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            {/* recommended video part */}
             <div className=' rounded-lg w-full overflow-y-auto lg:w-[32%] lg:min-w-[25rem]'>
                 <InfiniteScroll 
-                className=' h-full flex flex-col gap-y-2'
+                className=' h-full flex flex-col gap-y-2 '
                 loader={<>
                     {[...Array(9)].map((_, indx) => (
-                        <div key={indx} className=' h-full w-ful lg:min-w-[26rem] lg:max-w-[33rem]'>
+                        <div key={indx} className=' h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
                             <div className=' flex gap-x-3'>
-                                <div className='w-[11rem] lg:w-[14rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
+                                <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
 
                                 <div className=' mt-1 lg:mt-3 w-[27rem] h-full'>
                                     <p className=' bg-slate-600 w-full h-6 rounded-[3px] animate-pulse'/>

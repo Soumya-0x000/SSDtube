@@ -7,9 +7,9 @@ import { BsDot } from "react-icons/bs";
 const RecommendedCard = ({item, index}) => {
     // console.log(item?.snippet?.type)
     return (
-        <div className='hover:bg-neutral-700 cursor-pointer rounded-lg '>
+        <div className='hover:bg-neutral-700 cursor-pointer rounded-lg flex items-center justify-start'>
             <div className=' flex gap-x-3'>
-                <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden '>
+                <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden'>
                     <Img
                         className={` h-full w-full`}
                         src={
@@ -23,7 +23,7 @@ const RecommendedCard = ({item, index}) => {
                 </div>
 
                 <div className=' mt-1 lg:mt-3'>
-                    <p className=' line-clamp-1 lg:line-clamp-2 lg:text-[14px] xl:text-md'>
+                    <p className=' line-clamp-1 lg:line-clamp-1 lg:text-[14px] xl:text-md'>
                         {item?.snippet?.title}
                     </p>
 

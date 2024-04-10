@@ -15,7 +15,7 @@ import { setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
 import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export const iconTray = [
+const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
     {icon: <RiShareForwardLine/>, fontSize: 'text-[24px]'},
     {icon: <LiaDownloadSolid/>, fontSize: 'text-[26px]'},

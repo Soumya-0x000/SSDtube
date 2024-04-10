@@ -17,6 +17,7 @@ export default {
         // 'plstScLg': '970',
         // 'plstScXl': '1187',
         // 'plstSc2Xl': '1400',
+        'watchController': '1120',
       },
     },
   },
