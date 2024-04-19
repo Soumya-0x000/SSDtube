@@ -144,8 +144,8 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        // getVdoInfo(id)
-        // fetchRecommendedVideos(channelID);
+        getVdoInfo(id)
+        fetchRecommendedVideos(channelID);
     }, []);
 
     useEffect(() => {
