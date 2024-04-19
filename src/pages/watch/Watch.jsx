@@ -5,7 +5,7 @@ import { getChannelInfo, getRecommendedVideos, getVideoInfo, useWindowDimensions
 import { useDispatch, useSelector } from 'react-redux';
 import { setNxtPgToken, setRecommendedVdo, setVidIdArr, setWatchData } from '../../store/WatchSlice';
 import axios from 'axios';
-import { BASE_URL, YOUTUBE_API_KEY, convertViews } from '../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY, convertViews, handleDayCount } from '../../utils/constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import RecommendedCard from './RecommendedCard';
 import Loading from '../../components/loading/Loading';
@@ -52,7 +52,7 @@ const Watch = () => {
     const [isOptionsLessLgScrnOpen, setIsOptionsLessLgScrnOpen] = useState(false);
     const [logoURL, setLogoURL] = useState('');
     
-    const getVdoInfo = async (vdoID) => {
+    const fetchVdoInfo = async (vdoID) => {
         const vdoInfo = await getVideoInfo(vdoID);
         const vdoContent = vdoInfo.data.items[0];
         const { likeCount, commentCount } = vdoContent?.statistics;
@@ -60,7 +60,7 @@ const Watch = () => {
 
         const channelData = await getChannelInfo(channelID);
         const channelContent = channelData?.data?.items[0]
-        // console.log(vdoContent)
+        console.log(vdoContent)
         const channelLogoUrl = channelContent?.snippet?.thumbnails?.medium?.url
                             || channelContent?.snippet?.thumbnails?.high?.url
                             || channelContent?.snippet?.thumbnails?.default?.url
@@ -144,7 +144,7 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        getVdoInfo(id)
+        fetchVdoInfo(id)
         fetchRecommendedVideos(channelID);
     }, []);
 
@@ -264,6 +264,20 @@ const Watch = () => {
         setIsOptionsLgScrnOpen(!isOptionsLgScrnOpen);
     };
 
+    function parseDescription(description) {
+        // Regex to match URLs
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+        // Replace URLs with anchor tags
+        return description.split('\n').map((line, index) => (
+            <p key={index}>
+                {line.split(urlRegex).map((part, i) => (
+                    i % 2 === 0 ? part : <a key={i} href={part} target="_blank" rel="noopener noreferrer">{part}</a>
+                ))}
+            </p>
+        ));
+    }
+
     return (
         <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt-2 flex flex-col gap-y-4 lg:flex-row  lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
             {/* video part */}
@@ -302,7 +316,7 @@ const Watch = () => {
                     {/* title */}
                     <p className='text-[1.4rem] xl:text-2xl font-bold line-clamp-1'>{vdoData?.snippet?.title}</p>
 
-                    {/* functionalities */}
+                    {/* functionalities (yet to be done) */} 
                     <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-y-3 watchController:gap-y-0 w-full '>
                         {/* title & author */}
                         <div className=' flex items-center gap-x-3 w-[18rem '>
@@ -388,6 +402,22 @@ const Watch = () => {
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
+
+                    <div className=' bg-neutral-800 rounded-md p-3'>
+                        <div className='flex items-center gap-x-4'>
+                            <div>
+                                {vdoData?.statistics?.viewCount} views
+                            </div>
+
+                            <div>
+                                {handleDayCount(vdoData?.snippet?.publishedAt)}
+                            </div>
+                        </div>
+
+                        <div className=' whitespace-pre-line text-[15px]'>
+                            {parseDescription(vdoData?.snippet?.description)}
                         </div>
                     </div>
                 </div>
