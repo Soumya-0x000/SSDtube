@@ -5,7 +5,7 @@ import { GoDotFill } from "react-icons/go";
 import { getChannelInfo } from '../../../utils/Hooks';
 import { convertViews, handleDayCount } from '../../../utils/constant';
 import { useDispatch } from 'react-redux';
-import { setChannelId } from '../../../store/WatchSlice';
+import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/WatchSlice';
 
 const VideoCard = ({item, indx}) => {
     const [logoURL, setLogoURL] = useState('');
@@ -28,13 +28,14 @@ const VideoCard = ({item, indx}) => {
 
     const handleClick = async (id) => {
         dispatch(setChannelId(item?.snippet?.channelId))
+        dispatch(setCurrentlyPlayingVdoId(id));
     };
     
     return (
         <div className='cmd:max-w-[18rem flex flex-col gap-y-2 mb-1 '
         key={indx}>
             <Link to={`/watch/${item?.id}`}
-            onClick={handleClick}>
+            onClick={() => handleClick(item?.id)}>
                 <div className=' max-h-[15rem] overflow-hidden rounded-md object-cover object-center'>
                     <Img
                         className={` h-full w-full`}

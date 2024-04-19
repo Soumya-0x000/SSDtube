@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+    currentlyPlayingVdoId: '',
     vdoData: '',
     vdoIDarr: [],
     channelID: '',
@@ -28,10 +29,14 @@ export const WatchSlice = createSlice({
         setNxtPgToken: function (state, action) {
             state.nxtPgToken = action.payload;
         },
+        setCurrentlyPlayingVdoId: function(state, action) {
+            state.currentlyPlayingVdoId = action.payload
+        }
     }
 })
 
 export const {
+    setCurrentlyPlayingVdoId,
     setWatchData,
     setVidIdArr,
     setChannelId,

@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
-import ReactPlayer from 'react-player/lazy';
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getChannelInfo, getRecommendedVideos, getVideoInfo, useWindowDimensions } from '../../utils/Hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNxtPgToken, setRecommendedVdo, setVidIdArr, setWatchData } from '../../store/WatchSlice';
@@ -17,6 +16,7 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { RiScissorsFill } from "react-icons/ri";
 import { LiaDownloadSolid } from "react-icons/lia";
 import { RiFlagLine } from "react-icons/ri";
+import Player from './Player';
 
 const orgIconTray = [
     { icon: <RiShareForwardLine />, fontSize: 'text-[21px]', text: 'Share' },
@@ -28,8 +28,16 @@ const orgIconTray = [
 const Watch = () => {
     const { id } = useParams();
     const {width} = useWindowDimensions();
-    const {vdoData, vdoIDarr, channelID, recommendedVdoData, nxtPgToken} = useSelector(state => state.watch);
+    const {
+        currentlyPlayingVdoId,
+        vdoData, 
+        vdoIDarr, 
+        channelID, 
+        recommendedVdoData, 
+        nxtPgToken
+    } = useSelector(state => state.watch);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [recommendedItems, setRecommendedItems] = useState([]);
     const [resultCount, setResultCount] = useState({
@@ -51,6 +59,9 @@ const Watch = () => {
     const [isOptionsLgScrnOpen, setIsOptionsLgScrnOpen] = useState(false);
     const [isOptionsLessLgScrnOpen, setIsOptionsLessLgScrnOpen] = useState(false);
     const [logoURL, setLogoURL] = useState('');
+
+    const [truncateText, setTruncateText] = useState(true);
+    const [showMoreBtn , setShowMoreBtn] = useState(false);
     
     const fetchVdoInfo = async (vdoID) => {
         const vdoInfo = await getVideoInfo(vdoID);
@@ -60,7 +71,7 @@ const Watch = () => {
 
         const channelData = await getChannelInfo(channelID);
         const channelContent = channelData?.data?.items[0]
-        console.log(vdoContent)
+        // console.log(vdoContent)
         const channelLogoUrl = channelContent?.snippet?.thumbnails?.medium?.url
                             || channelContent?.snippet?.thumbnails?.high?.url
                             || channelContent?.snippet?.thumbnails?.default?.url
@@ -79,22 +90,18 @@ const Watch = () => {
     const fetchRecommendedVideos = async (channelId) => {
         const recommendedVideos = await getRecommendedVideos(channelId);
         const recommendedVdoItems = recommendedVideos?.data?.items;
-       
+        
         const updatedRecommendedVdoItems = await Promise.all(recommendedVdoItems.map(async(item) => {
             try {
-                // if (item?.snippet?.type === 'upload') {
-                    const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
-                    const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
-                    // console.log(item)
-                    return {...item, viewCount}
-                // } else if (item?.snippet?.type === 'playlistItem') {
-                //     return
-                // }
+                const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
+                const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
+                // console.log(item)
+                return {...item, viewCount}
             } catch (error) {
                 console.error(error);
                 return item;
-            }}
-        ));
+            }
+        }));
 
         setRecommendedItems(updatedRecommendedVdoItems);
         dispatch(setRecommendedVdo(updatedRecommendedVdoItems));
@@ -110,11 +117,12 @@ const Watch = () => {
     };
 
     const fetchNextPageRecommendedVdo = async () => {
-        const NEXT_RECOMMENDED_VIDEOS = `${BASE_URL}/activities?part=snippet%2CcontentDetails&channelId=${channelID}&maxResults=50&pageToken=${nxtPgToken}&key=${YOUTUBE_API_KEY}`;
-
+        const NEXT_RECOMMENDED_VIDEOS = `${BASE_URL}/activities?part=snippet%2CcontentDetails&channelId=${channelID}&maxResults=20&pageToken=${nxtPgToken}&key=${YOUTUBE_API_KEY}`;
+        
         try {
             const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
             const nextRecommendedVdoItems = nextData?.data?.items;
+            console.log(nextRecommendedVdoItems)
        
             const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
                 try {
@@ -144,8 +152,8 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        fetchVdoInfo(id)
-        fetchRecommendedVideos(channelID);
+        // fetchVdoInfo(id)
+        // fetchRecommendedVideos(channelID);
     }, []);
 
     useEffect(() => {
@@ -264,19 +272,38 @@ const Watch = () => {
         setIsOptionsLgScrnOpen(!isOptionsLgScrnOpen);
     };
 
-    function parseDescription(description) {
-        // Regex to match URLs
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
+    function extractLinks(text) {
+        if (!text) return null;
     
-        // Replace URLs with anchor tags
-        return description.split('\n').map((line, index) => (
-            <p key={index}>
-                {line.split(urlRegex).map((part, i) => (
-                    i % 2 === 0 ? part : <a key={i} href={part} target="_blank" rel="noopener noreferrer">{part}</a>
-                ))}
-            </p>
-        ));
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const matches = text.match(urlRegex);
+    
+        if (!matches) return text;
+        
+        return (
+            <>
+                {text.split(urlRegex).map((part, index) => {
+                    if (matches.includes(part)) {
+                        return (
+                            <a className=' text-blue-400 underline' key={index} href={part} target="_blank" rel="noopener noreferrer">
+                                {part}
+                            </a>
+                        );
+                    } else {
+                        return <span key={index}>{part}</span>;
+                    }
+                })}
+            </>
+        );
     }
+    
+    const handleTextTruncate = () => {
+        setTruncateText(prevVal => !prevVal)
+    };
+
+    const handleRedirect = () => {
+        navigate(`/channel/${channelID}`)
+    };
 
     return (
         <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt-2 flex flex-col gap-y-4 lg:flex-row  lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
@@ -285,42 +312,23 @@ const Watch = () => {
                 {/* player */}
                 <div className=' w-full aspect-video rounded-lg xl:rounded-xl overflow-hidden'>
                     <div className=' w-full h-full'>
-                        <ReactPlayer
-                            url={`https://www.youtube.com/watch?v=${id}`}
-                            controls
-                            width='100%'
-                            height='100%'
-                            playing
-                            pip = {true}
-                            stopOnUnmount={false}
-                            loop={false}  
-                            light={true}
-                            config={{
-                                youtube: {
-                                    playerVars: {
-                                        autoplay: 1, 
-                                        controls: 1, 
-                                        modestbranding: 1, 
-                                        fs: 1, 
-                                        rel: 1, 
-                                        loop: 0 
-                                    }
-                                }
-                            }}
-                        />
+                        <Player id={currentlyPlayingVdoId} />
                     </div>
                 </div>
 
                 {/* details */}
-                <div className=' mt-3 w-full space-y-1 '>
+                <div className=' mt-3 w-full space-y-3 '>
                     {/* title */}
-                    <p className='text-[1.4rem] xl:text-2xl font-bold line-clamp-1'>{vdoData?.snippet?.title}</p>
+                    <p className='text-[1.4rem] xl:text-2xl font-bold line-clamp-1'>
+                        {vdoData?.snippet?.title}
+                    </p>
 
                     {/* functionalities (yet to be done) */} 
-                    <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-y-3 watchController:gap-y-0 w-full '>
+                    <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-y-3 watchController:gap-y-0 w-full'>
                         {/* title & author */}
                         <div className=' flex items-center gap-x-3 w-[18rem '>
-                            <div className=' w-10 h-10 rounded-full overflow-hidden'>
+                            <div className=' w-10 h-10 rounded-full overflow-hidden cursor-pointer'
+                            onClick={handleRedirect}>
                                 <Img
                                     className={` w-full h-full`}
                                     src={logoURL}
@@ -328,10 +336,12 @@ const Watch = () => {
                             </div>
 
                             <div className=''>
-                                <div className='text-[.94rem] font-bold flex items-center gap-x-1'>
-                                    <p className=' line-clamp-1 max-w-[13rem] text-sm'>
+                                <div className='text-[.94rem] font-bold flex items-center gap-x-1 cursor-pointer'>
+                                    <p className=' line-clamp-1 max-w-[13rem] text-sm'
+                                    onClick={handleRedirect}>
                                         {essentialVdoItems.channelTitle}
                                     </p>
+
                                     {essentialVdoItems.subscribers > 100000 && (
                                         <div className=' min-h-4 min-w-4 max-h-4 max-w-4'>
                                             <svg viewBox="0 0 24 24" width="100%" height="100%" focusable="false" style={{ display: 'block' }}>
@@ -375,7 +385,9 @@ const Watch = () => {
                                     <p className={` ${item.fontSize}`}>
                                         {item.icon}
                                     </p>
-                                    <p className='text-[14px] pr-2'>{item.text}</p>
+                                    <p className='text-[14px] pr-2'>
+                                        {item.text}
+                                    </p>
                                 </button>
                             ))}
                             
@@ -405,7 +417,8 @@ const Watch = () => {
                         </div>
                     </div>
 
-                    <div className=' bg-neutral-800 rounded-md p-3'>
+                    {/* video description */}
+                    <div className='relative bg-neutral-800 rounded-md p-3 space-y-2'>
                         <div className='flex items-center gap-x-4'>
                             <div>
                                 {vdoData?.statistics?.viewCount} views
@@ -416,8 +429,15 @@ const Watch = () => {
                             </div>
                         </div>
 
-                        <div className=' whitespace-pre-line text-[15px]'>
-                            {parseDescription(vdoData?.snippet?.description)}
+                        <div className={` whitespace-pre-line text-[14px]`}>
+                            <div className={`${truncateText ? 'line-clamp-3' : ''} `}>
+                                {extractLinks(vdoData?.snippet?.description)}
+                            </div>
+
+                            <div className=' absolute text-[13px] right-1 bottom-[13px] text-white cursor-pointer w-12 flex items-center justify-end bg-neutral-800'
+                            onClick={handleTextTruncate}>
+                                {truncateText ? '...more' : 'less'}
+                            </div>
                         </div>
                     </div>
                 </div>

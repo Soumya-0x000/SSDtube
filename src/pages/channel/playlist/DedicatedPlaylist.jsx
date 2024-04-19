@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../../components/lazyLoadImage/Img';
-import { FaPlay } from 'react-icons/fa';
+import { MdOutlineErrorOutline } from "react-icons/md";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RxTriangleRight } from "react-icons/rx";
 import { TfiControlShuffle } from "react-icons/tfi";
@@ -312,10 +312,18 @@ const DedicatedPlaylist = () => {
 
                                     {/* image */}
                                     <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden'>
-                                        <Img
-                                            src={data?.thumbnail}
-                                            className={` w-full h-full`}
-                                        />
+                                        {data?.title === 'Private video' ? (
+                                            <div className=' h-full w-full bg-slate-600 animate-pulse flex items-center justify-center'>
+                                                <MdOutlineErrorOutline
+                                                    className=' text-5xl'
+                                                />
+                                            </div>
+                                        ) : (
+                                            <Img
+                                                src={data?.thumbnail}
+                                                className={` w-full h-full`}
+                                            />
+                                        )}
                                     </div>
 
                                     {/* content */}

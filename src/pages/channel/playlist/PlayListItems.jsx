@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setBannerUrl, setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
 import { RxCross1, RxShuffle } from "react-icons/rx";
 import { RxLoop } from "react-icons/rx";
+import { MdOutlineErrorOutline } from "react-icons/md";
 import { SlOptionsVertical } from "react-icons/sl";
 import Img from '../../../components/lazyLoadImage/Img';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -223,17 +224,28 @@ const PlayListItems = () => {
                                 key={generateRandomID()}
                                 to={`/watch/${data?.videoId}`}
                                 onClick={() => handleVdoPlayingCount(index+1)}>
+                                    {/* index */}
                                     <div className=' text-[.8rem] text-gray-400 flex items-center'>
                                         {index+1}
                                     </div>
 
-                                    <div className='  w-[7rem] h-[4rem] rounded-lg overflow-hidden'>
-                                        <Img
-                                            src={data?.thumbnail}
-                                            className={` w-full h-full`}
-                                        />
+                                    {/* image */}
+                                    <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden'>
+                                        {data?.title === 'Private video' ? (
+                                            <div className=' h-full w-full bg-slate-600 animate-pulse flex items-center justify-center'>
+                                                <MdOutlineErrorOutline
+                                                    className=' text-5xl'
+                                                />
+                                            </div>
+                                        ) : (
+                                            <Img
+                                                src={data?.thumbnail}
+                                                className={` w-full h-full`}
+                                            />
+                                        )}
                                     </div>
 
+                                    {/* content */}
                                     <div className=' space-y-2 '>
                                         <div className='line-clamp-1 w-full'>{data?.title}</div>
                                         <p className='text-gray-400 text-[.8rem]'>{channelName}</p>
