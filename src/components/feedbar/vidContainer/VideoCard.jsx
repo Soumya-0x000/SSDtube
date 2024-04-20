@@ -5,7 +5,7 @@ import { GoDotFill } from "react-icons/go";
 import { getChannelInfo } from '../../../utils/Hooks';
 import { convertViews, handleDayCount } from '../../../utils/constant';
 import { useDispatch } from 'react-redux';
-import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/WatchSlice';
+import { setChannelId, setCurrentlyPlayingVdoId, setIsPlaylistRendered } from '../../../store/WatchSlice';
 
 const VideoCard = ({item, indx}) => {
     const [logoURL, setLogoURL] = useState('');
@@ -13,7 +13,7 @@ const VideoCard = ({item, indx}) => {
     const [subscriberCount, setSubscriberCount] = useState(0);
 
     const handleLogoURL = async (id) => {
-        const channelData = await getChannelInfo(id);
+        const { channelData } = await getChannelInfo(id);
         const channelLogoUrl = channelData?.data?.items[0]?.snippet?.thumbnails?.medium?.url
                             || channelData?.data?.items[0]?.snippet?.thumbnails?.high?.url
                             || channelData?.data?.items[0]?.snippet?.thumbnails?.default?.url
@@ -29,6 +29,7 @@ const VideoCard = ({item, indx}) => {
     const handleClick = async (id) => {
         dispatch(setChannelId(item?.snippet?.channelId))
         dispatch(setCurrentlyPlayingVdoId(id));
+        dispatch(setIsPlaylistRendered(false));
     };
     
     return (

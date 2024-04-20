@@ -7,6 +7,8 @@ import { FaPlay } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
 import { setBannerUrl, setPlaylistID, setPlaylistName } from '../../../store/PlayListSlice';
 import { setChannelId } from '../../../store/ChannelSlice';
+import { setChannelId as setChannelID } from '../../../store/WatchSlice';
+import { setIsPlaylistRendered } from '../../../store/WatchSlice';
 
 const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
     const [showPlayAll, setShowPlayAll] = useState(new Array(orgArr.length).fill(false));
@@ -26,6 +28,7 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
 
     useEffect(() => {
         dispatch(setChannelId(channelID))
+        dispatch(setChannelID(channelID))
     }, [])
 
     const handleCLick = () => {
@@ -37,10 +40,11 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
             || itemData?.snippet?.thumbnails?.standard?.url
         ));
         dispatch(setPlaylistID(itemData?.id))
+        dispatch(setIsPlaylistRendered(true));
+        // console.log(itemData)
     };
-
     return (
-        <Link to={`/playlist/${itemData?.id}`}
+        <Link to={`/watch/${itemData?.id}`}
         onMouseEnter={handleMouseEntry}
         onMouseLeave={handleMouseLeave}
         onClick={handleCLick}> 

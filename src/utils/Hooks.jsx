@@ -23,9 +23,12 @@ export const getVideoInfo = async (id) => {
 
 export const getChannelInfo = async (id) => {
     const GET_CHANNEL_INFO = `${BASE_URL}/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${id}&maxResults=50&key=${YOUTUBE_API_KEY}`;
+    const GET_BANNER_INFO = `https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&id=${id}&key=${YOUTUBE_API_KEY}`;
+
     try {
         const channelData = await axios.get(GET_CHANNEL_INFO);
-        return channelData;
+        const channelBannerData = await axios.get(GET_BANNER_INFO);
+        return {channelData, channelBannerData};
     } catch (error) {
         console.error(error);
     }

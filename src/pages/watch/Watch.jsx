@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getChannelInfo, getRecommendedVideos, getVideoInfo, useWindowDimensions } from '../../utils/Hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { setNxtPgToken, setRecommendedVdo, setVidIdArr, setWatchData } from '../../store/WatchSlice';
+import { setEssentialVdoItems, setIsPlaylistRendered, setNxtPgToken, setRecommendedVdo, setVidIdArr, setWatchData } from '../../store/WatchSlice';
 import axios from 'axios';
 import { BASE_URL, YOUTUBE_API_KEY, convertViews, handleDayCount } from '../../utils/constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -17,6 +17,7 @@ import { RiScissorsFill } from "react-icons/ri";
 import { LiaDownloadSolid } from "react-icons/lia";
 import { RiFlagLine } from "react-icons/ri";
 import Player from './Player';
+import PlayListItems from '../channel/playlist/PlayListItems';
 
 const orgIconTray = [
     { icon: <RiShareForwardLine />, fontSize: 'text-[21px]', text: 'Share' },
@@ -25,30 +26,28 @@ const orgIconTray = [
     { icon: <MdPlaylistAdd />, fontSize: 'text-[23px]', text: 'Save' },
 ];
 
+const itemType = ['upload', 'playlistItem'];
+
 const Watch = () => {
     const { id } = useParams();
     const {width} = useWindowDimensions();
     const {
         currentlyPlayingVdoId,
         vdoData, 
-        vdoIDarr, 
         channelID, 
-        recommendedVdoData, 
-        nxtPgToken
+        nxtPgToken,
+        isPlaylistRendered,
+        essentialVdoItems
     } = useSelector(state => state.watch);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [recommendedItems, setRecommendedItems] = useState([]);
+    const [isRecommendedVdoFetched, setIsRecommendedVdoFetched] = useState(false);
     const [resultCount, setResultCount] = useState({
         total: 0,
         current: 0,
-    });
-    const [essentialVdoItems, setEssentialVdoItems] = useState({
-        like: 0,
-        comment: 0,
-        channelTitle: '',
-        subscribers: 0
     });
     const [iconTrayLgScreen, setIconTrayLgScreen] = useState([...orgIconTray]);
     // const [iconTrayLessLgScreen, setIconTrayLessLgScreen] = useState([...orgIconTray]);
@@ -61,17 +60,29 @@ const Watch = () => {
     const [logoURL, setLogoURL] = useState('');
 
     const [truncateText, setTruncateText] = useState(true);
-    const [showMoreBtn , setShowMoreBtn] = useState(false);
+    const [snippetType, setSnippetType] = useState(itemType[0]);
+    const [showMore , setShowMore] = useState({
+        btnVisibility: false,
+        btnFunctionality: window.innerWidth < 1024
+    });
     
+    useLayoutEffect(() => {
+        const handleResize = () => {
+            setShowMore(window.innerWidth < 1024);
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const fetchVdoInfo = async (vdoID) => {
         const vdoInfo = await getVideoInfo(vdoID);
-        const vdoContent = vdoInfo.data.items[0];
-        const { likeCount, commentCount } = vdoContent?.statistics;
-        dispatch(setWatchData(vdoContent))
-
-        const channelData = await getChannelInfo(channelID);
+        const likeCount = vdoInfo?.data.items[0]?.statistics?.likeCount;
+        const commentCount = vdoInfo?.data.items[0]?.statistics?.commentCount;
+        dispatch(setWatchData(vdoInfo?.data.items[0]));
+        
+        const { channelData }= await getChannelInfo(channelID);
         const channelContent = channelData?.data?.items[0]
-        // console.log(vdoContent)
         const channelLogoUrl = channelContent?.snippet?.thumbnails?.medium?.url
                             || channelContent?.snippet?.thumbnails?.high?.url
                             || channelContent?.snippet?.thumbnails?.default?.url
@@ -79,12 +90,12 @@ const Watch = () => {
         const subscriberCount = channelContent?.statistics?.subscriberCount;
         
         setLogoURL(channelLogoUrl);
-        setEssentialVdoItems({
+        dispatch(setEssentialVdoItems({
             like: likeCount, 
             comment: commentCount, 
             channelTitle: title, 
             subscribers: subscriberCount
-        })
+        }))
     }
     
     const fetchRecommendedVideos = async (channelId) => {
@@ -105,6 +116,7 @@ const Watch = () => {
 
         setRecommendedItems(updatedRecommendedVdoItems);
         dispatch(setRecommendedVdo(updatedRecommendedVdoItems));
+        setIsRecommendedVdoFetched(true);
 
         setResultCount({
             total: recommendedVideos?.data?.pageInfo?.totalResults,
@@ -119,42 +131,47 @@ const Watch = () => {
     const fetchNextPageRecommendedVdo = async () => {
         const NEXT_RECOMMENDED_VIDEOS = `${BASE_URL}/activities?part=snippet%2CcontentDetails&channelId=${channelID}&maxResults=20&pageToken=${nxtPgToken}&key=${YOUTUBE_API_KEY}`;
         
-        try {
-            const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
-            const nextRecommendedVdoItems = nextData?.data?.items;
-            console.log(nextRecommendedVdoItems)
-       
-            const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
-                try {
-                    const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
-                    const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
-                    return {...item, viewCount}
-                } catch (error) {
-                    console.error(error);
-                    return item;
-                }}
-            ));
+        if (isRecommendedVdoFetched) {
+            try {
+                const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
+                const nextRecommendedVdoItems = nextData?.data?.items;
+        
+                const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
+                    try {
+                        const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
+                        const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
+                        return {...item, viewCount}
+                    } catch (error) {
+                        console.error(error);
+                        return item;
+                    }}
+                ));
 
-            setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
-            // dispatch(setRecommendedVdo(recommendedItems));
+                setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
+                // dispatch(setRecommendedVdo(recommendedItems));
 
-            setResultCount(prevResultCount => ({
-                ...prevResultCount,
-                current: prevResultCount.current + nextRecommendedVdoItems.length
-            }));
+                setResultCount(prevResultCount => ({
+                    ...prevResultCount,
+                    current: prevResultCount.current + nextRecommendedVdoItems.length
+                }));
 
-            if (nextData?.data?.nextPageToken) {
-                dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
+                if (nextData?.data?.nextPageToken) {
+                    dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
+                }
+            } catch (error) {
+                console.error(error);
             }
-        } catch (error) {
-            console.error(error);
-        }
+        };
     };
 
     useEffect(() => {
-        fetchVdoInfo(id)
+        fetchVdoInfo(id);
         fetchRecommendedVideos(channelID);
     }, []);
+
+    useEffect(() => {
+        fetchVdoInfo(currentlyPlayingVdoId);
+    }, [currentlyPlayingVdoId]);
 
     useEffect(() => {
         if (width < 1150) {
@@ -445,11 +462,15 @@ const Watch = () => {
 
             {/* recommended video part */}
             <div className=' rounded-lg w-full overflow-y-auto lg:w-[32%] lg:min-w-[25rem]'>
+                {isPlaylistRendered && (
+                    <PlayListItems/>
+                )}
+
                 <InfiniteScroll 
-                className=' h-full flex flex-col gap-y-2 '
+                className=' h-full flex flex-col gap-y-2 pt-3 border-t-2 border-t-slate-600'
                 loader={<>
                     {[...Array(9)].map((_, indx) => (
-                        <div key={indx} className=' h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
+                        <div key={indx} className='hidden lg:block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
                             <div className=' flex gap-x-3'>
                                 <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
 
@@ -475,9 +496,17 @@ const Watch = () => {
                             key={item.etag+index}
                             item={item}
                             index={index}
+                            snippetType={snippetType}
                         />
                     ))}
                 </InfiniteScroll>
+
+                {resultCount.current <= resultCount.total &&
+                    <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'
+                    onClick={() => setShowMoreBtn(true)}>
+                        Show more
+                    </button>
+                }
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    playListId: '',
+    playListID: '',
     channelName: '',
     playListTitle: '',
     totalItemCount: 0,
@@ -38,7 +38,7 @@ export const PlayListSlice = createSlice({
             state.playListBannerUrl = action.payload;
         },
         setPlaylistID: function(state, action) {
-            state.playListId = action.payload
+            state.playListID = action.payload
         },
         setPlayListDescription: function(state, action) {
             state.playListDescription = action.payload

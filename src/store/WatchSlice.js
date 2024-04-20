@@ -2,11 +2,19 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     currentlyPlayingVdoId: '',
+    currentPlaylistId: '',
     vdoData: '',
     vdoIDarr: [],
     channelID: '',
     recommendedVdoData: [],
     nxtPgToken: '',
+    isPlaylistRendered: false,
+    essentialVdoItems: {
+        like: 0,
+        comment: 0,
+        channelTitle: '',
+        subscribers: 0
+    }
 };
 
 export const WatchSlice = createSlice({
@@ -31,7 +39,16 @@ export const WatchSlice = createSlice({
         },
         setCurrentlyPlayingVdoId: function(state, action) {
             state.currentlyPlayingVdoId = action.payload
-        }
+        },
+        setCurrentPlaylistId: function(state, action) {
+            state.currentPlaylistId = action.payload;
+        },
+        setIsPlaylistRendered: function(state, action) {
+            state.isPlaylistRendered = action.payload;
+        },
+        setEssentialVdoItems: function(state, action) {
+            state.essentialVdoItems = action.payload
+        },
     }
 })
 
@@ -42,4 +59,7 @@ export const {
     setChannelId,
     setRecommendedVdo,
     setNxtPgToken,
+    // setCurrentPlaylistId,
+    setIsPlaylistRendered,
+    setEssentialVdoItems,
 } = WatchSlice.actions;

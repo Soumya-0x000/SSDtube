@@ -14,6 +14,7 @@ import axios from 'axios';
 import { setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
 import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import Spinner from '../../../components/loading/Spinner';
 
 const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
@@ -263,15 +264,15 @@ const DedicatedPlaylist = () => {
                 <PlayListAreaSideBar/>
             </div>
 
-            <div className='space-y-1 lg:ml-[2rem w-full '>
+            <div className='space-y-1 lg:ml-[2rem w-full'>
                 <InfiniteScroll 
                 className=''
                 next={fetchNxtPgData}
                 dataLength={playListData.length}
                 hasMore={playListData.length <= totalItemCount}
-                loader={<spinner/>}>
+                loader={<Spinner/>}>
                     {playListData.map((data, index) => (
-                        <> 
+                        <React.Fragment key={data?.videoId + index}> 
                             {isLoading ? (
                                 <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
                                 key={data?.videoId}>
@@ -351,7 +352,7 @@ const DedicatedPlaylist = () => {
                                     </div>
                                 </Link> 
                             )}
-                        </>
+                        </React.Fragment>
                     ))}
                 </InfiniteScroll>
             </div>

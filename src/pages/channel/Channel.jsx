@@ -33,7 +33,10 @@ const Channel = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [navOption, setNavOption] = useState(new Array(channelNavBar.length).fill(false));
     const [selectedNavOption, setSelectedNavOption] = useState('');
-    const bannerImg = "https://th.bing.com/th/id/R.0baf5d926ccc430f3f5b6d2784f66719?rik=0n2Q89M1ZGp06g&riu=http%3a%2f%2fwallpaperswide.com%2fdownload%2frazer_gaming_background-wallpaper-3840x1200.jpg&ehk=FZeOVqMwjUIfg3Ft8RjvdfEtXJE5MDRw1HCb%2fvNV3YM%3d&risl=&pid=ImgRaw&r=0";
+    const [bannerImage, setBannerImage] = useState({
+        loaded: false,
+        channelCoverImg: '',
+    });
     const defaultNavOption = 'Playlists';
 
     useLayoutEffect(() => {
@@ -51,19 +54,28 @@ const Channel = () => {
     }, []);
 
     const handleChannelData = async (channelId) => {
-        const channelData = await getChannelInfo(channelId);
+        const { channelData, channelBannerData } = await getChannelInfo(channelId);
         setIsLoaded(channelData?.status === 200)
+        
+        if (channelBannerData?.status === 200) {
+            const channelCoverImg = channelBannerData?.data?.items[0]?.brandingSettings?.image?.bannerExternalUrl;
+            setBannerImage({
+                loaded: true,
+                channelCoverImg
+            });
+        }
 
-        const title = channelData?.data?.items[0]?.snippet?.localized?.title;
-        const description = channelData?.data?.items[0]?.snippet?.localized?.description;
-        const subscribers = channelData?.data?.items[0]?.statistics?.subscriberCount;
-        const videoCount = channelData?.data?.items[0]?.statistics?.videoCount;
-        const viewCount = channelData?.data?.items[0]?.statistics?.viewCount;
-        const url = channelData?.data?.items[0]?.snippet?.thumbnails?.high?.url 
-                    || channelData?.data?.items[0]?.snippet?.thumbnails?.medium?.url 
-                    || channelData?.data?.items[0]?.snippet?.thumbnails?.default?.url;
-        const customUrl = channelData?.data?.items[0]?.snippet?.customUrl;
-        const creationTime = channelData?.data?.items[0]?.snippet?.publishedAt;
+        const primaryPart = channelData?.data?.items[0];
+        const title = primaryPart?.snippet?.localized?.title;
+        const description = primaryPart?.snippet?.localized?.description;
+        const subscribers = primaryPart?.statistics?.subscriberCount;
+        const videoCount = primaryPart?.statistics?.videoCount;
+        const viewCount = primaryPart?.statistics?.viewCount;
+        const url = primaryPart?.snippet?.thumbnails?.high?.url 
+                    || primaryPart?.snippet?.thumbnails?.medium?.url 
+                    || primaryPart?.snippet?.thumbnails?.default?.url;
+        const customUrl = primaryPart?.snippet?.customUrl;
+        const creationTime = primaryPart?.snippet?.publishedAt;
         dispatch(setChannelData({
             title, description,  subscribers, videoCount, viewCount, url, customUrl, creationTime
         }));
@@ -100,8 +112,12 @@ const Channel = () => {
                 {/* title description */}
                 <div className=' space-y-4'>
                     {/* cover img */}
-                    <div className=' max-w-[1500px] max-h-[14rem] rounded-lg overflow-hidden '>
-                        <img src={bannerImg} className=' w-full h-auto ' />
+                    <div className=' max-w-[1500px] max-h-[14rem] rounded-lg overflow-hidden flex items-center justify-center'>
+                        {bannerImage.loaded ? (
+                            <img src={bannerImage.channelCoverImg} className=' w-full h-auto ' />
+                        ) : (
+                            <div className='min-h-[20rem] min-w-[60%] h-full w-full bg-slate-800 animate-pulse'/>
+                        )}
                     </div>
                     
                     {/* content */}

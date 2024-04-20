@@ -2,37 +2,65 @@ import { useDispatch } from 'react-redux';
 import Img from '../../components/lazyLoadImage/Img'
 import { convertViews, handleDayCount } from '../../utils/constant'
 import { BsDot } from "react-icons/bs";
-import { setCurrentlyPlayingVdoId } from '../../store/WatchSlice';
+import { setCurrentlyPlayingVdoId, setIsPlaylistRendered } from '../../store/WatchSlice';
+import { CiClock2 } from "react-icons/ci";
+import { PiQueueFill } from "react-icons/pi";
 
-const RecommendedCard = ({item, index}) => {
+const RecommendedCard = ({ item, snippetType }) => {
     const dispatch = useDispatch();
 
     const handleClick = async () => {
-        const videoID = item?.contentDetails?.upload?.videoId; 
-        dispatch(setCurrentlyPlayingVdoId(videoID));
+        // if (snippetType === 'upload') {
+            const videoID = item?.contentDetails?.upload?.videoId;
+            // console.log(videoID)
+            dispatch(setCurrentlyPlayingVdoId(videoID));
+            dispatch(setIsPlaylistRendered(false));
+        // }
+    };
+
+    const addToWatchLater = (e, item) => {
+        e.stopPropagation();
+        console.log('watch later', item)
+    };
+    
+    const addToQueue = (e, item) => {
+        e.stopPropagation();
+        // dispatch(setWatchQueueCreated(true));
+        console.log('queue', item)
     };
 
     return (
         <>
             {item?.snippet?.type === 'upload' && (
-                <div className='hover:bg-neutral-700 cursor-pointer rounded-lg flex items-center justify-start'
-                onClick={() => handleClick(item?.id)}>
-                    <div className=' flex gap-x-3'>
-                        {/* {index+1} */}
-                        <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden'>
-                            <Img
+                <div className='hover:bg-neutral-700 cursor-pointer rounded-lg flex items-center justify-start group'
+                onClick={handleClick}>
+                    <div className=' flex items-center gap-x-3'>
+                        <div className='relative min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden'>
+                            <Img 
                                 className={` h-full w-full`}
                                 src={
                                     item?.snippet?.thumbnails?.maxres?.url
-                
                                     || item?.snippet?.thumbnails?.high?.url
                                     || item?.snippet?.thumbnails?.standard?.url
                                     || item?.snippet?.thumbnails?.medium?.url
                                     || item?.snippet?.thumbnails?.default?.url
                                 }
-                            />                    
+                            />
+
+                            <div className=' absolute right-1 top-2 hidden group-hover:flex flex-col gap-y-1'>
+                                <div className='bg-black backdrop-blur-md text-white text-[21px] rounded-md p-1'
+                                onClick={(e) => addToWatchLater(e, item)}>
+                                    <CiClock2/>
+                                </div>
+                                
+                                <div className='bg-black backdrop-blur-md text-white text-[21px] rounded-md p-1'
+                                onClick={(e) => addToQueue(e, item)}>
+                                    <PiQueueFill/>
+                                </div>
+                            </div>                
                         </div>
 
+                        {/* text section */}
                         <div className=' mt-1 lg:mt-3'>
                             <p className=' line-clamp-1 lg:line-clamp-2 lg:text-[14px] xl:text-md'>
                                 {item?.snippet?.title}
@@ -48,11 +76,16 @@ const RecommendedCard = ({item, index}) => {
                             </div>
 
                             <div className=' flex items-center line-clamp-1 text-[.75rem] text-gray-400 mt-.5'>
-                                <div className=''>
-                                    {convertViews(item?.viewCount)} views
-                                </div>                        
+                                {snippetType === 'upload' && (
+                                    <>
+                                        <div className=''>
+                                            {convertViews(item?.viewCount)} views
+                                        </div>                        
+                                      
 
-                                <BsDot/>
+                                        <BsDot/>
+                                    </>
+                                )}
 
                                 <p className=''>
                                     {handleDayCount(item?.snippet?.publishedAt)}
