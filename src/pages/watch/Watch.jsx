@@ -63,14 +63,17 @@ const Watch = () => {
     const [snippetType, setSnippetType] = useState(itemType[0]);
     const [showMore , setShowMore] = useState({
         btnVisibility: false,
-        btnFunctionality: window.innerWidth < 1024
+        fetchMoreData: window.innerWidth < 1024 ? false : true,
     });
     
-    useLayoutEffect(() => {
-        const handleResize = () => {
-            setShowMore(window.innerWidth < 1024);
-        }
+    const handleResize = () => {
+        setShowMore({
+            ...btnVisibility,
+            fetchMoreData: false
+        });
+    };
 
+    useLayoutEffect(() => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -165,12 +168,12 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        fetchVdoInfo(id);
-        fetchRecommendedVideos(channelID);
+        // fetchVdoInfo(id);
+        // fetchRecommendedVideos(channelID);
     }, []);
 
     useEffect(() => {
-        fetchVdoInfo(currentlyPlayingVdoId);
+        // fetchVdoInfo(currentlyPlayingVdoId);
     }, [currentlyPlayingVdoId]);
 
     useEffect(() => {
@@ -320,6 +323,18 @@ const Watch = () => {
 
     const handleRedirect = () => {
         navigate(`/channel/${channelID}`)
+    };
+
+    const handleBtnVisibility = () => {
+        if (windowWidth <= 1024 && isVisible === false){
+            setIsVisible(true)
+        }else if (windowWidth >  1024 && isVisible !== null ) {
+            setIsVisible(false)
+        }else if (windowHeight <= 600 && windowWidth >  1024 && isVisible == true ){
+            setIsVisible(null)
+        }else{
+            return
+        }
     };
 
     return (
@@ -503,7 +518,7 @@ const Watch = () => {
 
                 {resultCount.current <= resultCount.total &&
                     <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'
-                    onClick={() => setShowMoreBtn(true)}>
+                    onClick={handleBtnVisibility}>
                         Show more
                     </button>
                 }
