@@ -10,6 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import './videoContainer.css'
 import axios from 'axios';
 import { setVidIdArr } from '../../../store/WatchSlice.js';
+import { setPlayListOn } from '../../../store/PlayListSlice.js';
 
 const VideoContainer = () => {
     const currentVideos = useSelector((state) => state.youtube.videos);
@@ -85,6 +86,7 @@ const VideoContainer = () => {
 
     useEffect(() => {
         fetchYoutubeVideos();
+        dispatch(setPlayListOn(false));
     }, []);
 
     useEffect(() => {

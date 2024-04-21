@@ -23,7 +23,7 @@ const VideoCard = ({item, indx}) => {
     };
 
     useEffect(() => {
-        handleLogoURL(item?.snippet?.channelId)
+        handleLogoURL(item?.snippet?.channelId);
     }, [])
 
     const handleClick = async (id) => {

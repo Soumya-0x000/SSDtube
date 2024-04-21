@@ -5,7 +5,7 @@ import { handleDayCount } from '../../../utils/constant';
 import { Link } from 'react-router-dom';
 import { FaPlay } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
-import { setBannerUrl, setPlaylistID, setPlaylistName } from '../../../store/PlayListSlice';
+import { setBannerUrl, setPlayListOn, setPlaylistID, setPlaylistName } from '../../../store/PlayListSlice';
 import { setChannelId } from '../../../store/ChannelSlice';
 import { setChannelId as setChannelID } from '../../../store/WatchSlice';
 import { setIsPlaylistRendered } from '../../../store/WatchSlice';
@@ -41,8 +41,9 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
         ));
         dispatch(setPlaylistID(itemData?.id))
         dispatch(setIsPlaylistRendered(true));
-        // console.log(itemData)
+        dispatch(setPlayListOn(true));
     };
+
     return (
         <Link to={`/watch/${itemData?.id}`}
         onMouseEnter={handleMouseEntry}

@@ -61,22 +61,40 @@ const Watch = () => {
 
     const [truncateText, setTruncateText] = useState(true);
     const [snippetType, setSnippetType] = useState(itemType[0]);
-    const [showMore , setShowMore] = useState({
-        btnVisibility: false,
-        fetchMoreData: window.innerWidth < 1024 ? false : true,
-    });
+    // const [showMore , setShowMore] = useState({
+    //     btnVisibility: false,
+    //     fetchMoreData: window.innerWidth <= 1024 ? false : true,
+    // });
+    // const [btnClicked, setBtnClicked] = useState(false);
     
-    const handleResize = () => {
-        setShowMore({
-            ...btnVisibility,
-            fetchMoreData: false
-        });
-    };
+    // const handleResize = () => {
+    //     if (window.innerWidth <= 1024) {
+    //         setShowMore({
+    //             btnVisibility: true,
+    //             fetchMoreData: false,
+    //         });
+    //     } else {
+    //         setShowMore({
+    //             btnVisibility: false,
+    //             fetchMoreData: true,
+    //         })
+    //     }
+    // };
 
-    useLayoutEffect(() => {
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    // useLayoutEffect(() => {
+    //     window.addEventListener('resize', handleResize);
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, []);
+
+    // const handleBtnVisibility = () => {
+    //     setShowMore(prevState => ({
+    //         ...prevState,
+    //         btnVisibility: true,
+    //         fetchMoreData: true,
+    //     }));
+    //     console.log(showMore.btnVisibility, showMore.fetchMoreData);
+    //     fetchNextPageRecommendedVdo();
+    // };
 
     const fetchVdoInfo = async (vdoID) => {
         const vdoInfo = await getVideoInfo(vdoID);
@@ -134,46 +152,56 @@ const Watch = () => {
     const fetchNextPageRecommendedVdo = async () => {
         const NEXT_RECOMMENDED_VIDEOS = `${BASE_URL}/activities?part=snippet%2CcontentDetails&channelId=${channelID}&maxResults=20&pageToken=${nxtPgToken}&key=${YOUTUBE_API_KEY}`;
         
-        if (isRecommendedVdoFetched) {
-            try {
-                const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
-                const nextRecommendedVdoItems = nextData?.data?.items;
-        
-                const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
-                    try {
-                        const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
-                        const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
-                        return {...item, viewCount}
-                    } catch (error) {
-                        console.error(error);
-                        return item;
-                    }}
-                ));
+        // console.log('fetched', showMore.fetchMoreData);
+        // if (showMore.fetchMoreData) {
+            if (isRecommendedVdoFetched) {
+                try {
+                    const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
+                    const nextRecommendedVdoItems = nextData?.data?.items;
+            
+                    const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
+                        try {
+                            const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
+                            const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
+                            return {...item, viewCount}
+                        } catch (error) {
+                            console.error(error);
+                            return item;
+                        }}
+                    ));
 
-                setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
-                // dispatch(setRecommendedVdo(recommendedItems));
+                    setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
+                    // dispatch(setRecommendedVdo(recommendedItems));
 
-                setResultCount(prevResultCount => ({
-                    ...prevResultCount,
-                    current: prevResultCount.current + nextRecommendedVdoItems.length
-                }));
+                    setResultCount(prevResultCount => ({
+                        ...prevResultCount,
+                        current: prevResultCount.current + nextRecommendedVdoItems.length
+                    }));
 
-                if (nextData?.data?.nextPageToken) {
-                    dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
+                    if (nextData?.data?.nextPageToken) {
+                        dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
+                    }
+                } catch (error) {
+                    console.error(error);
                 }
-            } catch (error) {
-                console.error(error);
-            }
-        };
+            };
+
+        //     if (showMore.btnVisibility) {
+        //         setShowMore({
+        //             btnVisibility: true,
+        //             fetchMoreData: false,
+        //         });
+        //     }
+        // }
     };
 
     useEffect(() => {
-        // fetchVdoInfo(id);
-        // fetchRecommendedVideos(channelID);
+        fetchVdoInfo(id);
+        fetchRecommendedVideos(channelID);
     }, []);
 
     useEffect(() => {
-        // fetchVdoInfo(currentlyPlayingVdoId);
+        fetchVdoInfo(currentlyPlayingVdoId);
     }, [currentlyPlayingVdoId]);
 
     useEffect(() => {
@@ -325,18 +353,6 @@ const Watch = () => {
         navigate(`/channel/${channelID}`)
     };
 
-    const handleBtnVisibility = () => {
-        if (windowWidth <= 1024 && isVisible === false){
-            setIsVisible(true)
-        }else if (windowWidth >  1024 && isVisible !== null ) {
-            setIsVisible(false)
-        }else if (windowHeight <= 600 && windowWidth >  1024 && isVisible == true ){
-            setIsVisible(null)
-        }else{
-            return
-        }
-    };
-
     return (
         <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt-2 flex flex-col gap-y-4 lg:flex-row  lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
             {/* video part */}
@@ -485,7 +501,7 @@ const Watch = () => {
                 className=' h-full flex flex-col gap-y-2 pt-3 border-t-2 border-t-slate-600'
                 loader={<>
                     {[...Array(9)].map((_, indx) => (
-                        <div key={indx} className='hidden lg:block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
+                        <div key={indx} className='hidde n lg: block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
                             <div className=' flex gap-x-3'>
                                 <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
 
@@ -516,12 +532,12 @@ const Watch = () => {
                     ))}
                 </InfiniteScroll>
 
-                {resultCount.current <= resultCount.total &&
+                {/* {resultCount.current <= resultCount.total && (   
                     <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'
                     onClick={handleBtnVisibility}>
                         Show more
                     </button>
-                }
+                )} */}
             </div>
         </div>
     );

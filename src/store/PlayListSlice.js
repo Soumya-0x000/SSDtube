@@ -10,6 +10,7 @@ const initialState = {
     playListData: [],
     playListBannerUrl: '',
     playListDescription: '',
+    playListOn: null,
 }
 
 export const PlayListSlice = createSlice({
@@ -24,7 +25,7 @@ export const PlayListSlice = createSlice({
         },
         setCounting: function(state, action) {
             const {totalCount, currentCount} = action.payload;
-            // console.log(totalCount, currentCount)
+            console.log(totalCount, currentCount)
             state.totalItemCount = totalCount;
             state.currentItemsCount = currentCount
         },
@@ -42,7 +43,10 @@ export const PlayListSlice = createSlice({
         },
         setPlayListDescription: function(state, action) {
             state.playListDescription = action.payload
-        }
+        },
+        setPlayListOn: function (state, action) {
+            state.playListOn = action.payload;
+        },
     },
 })
 
@@ -54,5 +58,6 @@ export const {
     setNextPgToken,
     setBannerUrl,
     setPlaylistID,
-    setPlayListDescription
+    setPlayListDescription,
+    setPlayListOn
 } = PlayListSlice.actions

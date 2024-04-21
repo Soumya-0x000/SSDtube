@@ -75,3 +75,15 @@ export const useWindowDimensions = () => {
   
     return windowDimensions;
 };
+
+export const getViews = async(videoID) => {
+    const VIEWS = `${BASE_URL}/videos?part=statistics&id=${videoID}&key=${YOUTUBE_API_KEY}`;
+
+    try {
+        const videoViews = await axios.get(VIEWS);
+        return videoViews?.data?.items[0]?.statistics?.viewCount
+    } catch (error) {
+        console.error('error', error);
+        return 0
+    }
+};
