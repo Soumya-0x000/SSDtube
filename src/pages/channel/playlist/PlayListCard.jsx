@@ -9,6 +9,7 @@ import { setBannerUrl, setPlayListOn, setPlaylistID, setPlaylistName } from '../
 import { setChannelId } from '../../../store/ChannelSlice';
 import { setChannelId as setChannelID } from '../../../store/WatchSlice';
 import { setIsPlaylistRendered } from '../../../store/WatchSlice';
+import { setIsWatchQueueOn } from '../../../store/WatchQueueSlice';
 
 const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
     const [showPlayAll, setShowPlayAll] = useState(new Array(orgArr.length).fill(false));
@@ -42,6 +43,7 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
         dispatch(setPlaylistID(itemData?.id))
         dispatch(setIsPlaylistRendered(true));
         dispatch(setPlayListOn(true));
+        dispatch(setIsWatchQueueOn(false));
     };
 
     return (

@@ -17,6 +17,7 @@ import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/WatchSlic
 import { MdOutlineWatchLater } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import ThreeDotOptions from '../../../common/ThreeDotOptions';
 
 const PlayListItems = () => {
     const {id} = useParams();
@@ -40,7 +41,8 @@ const PlayListItems = () => {
     const [dataToRender, setDataToRender] = useState([]);
     const [hideVids, setHideVids] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    var [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
+    const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
+    const [mouseEnter, setMouseEnter] = useState(false);
 
     const fetchFullPlayList = async(playListId) => {
         const PLAY_LIST_DATA_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=${playListId}&key=${YOUTUBE_API_KEY}`;
@@ -133,33 +135,38 @@ const PlayListItems = () => {
         return () => clearTimeout(timer)
     }, []);
 
-    const ThreeDotClickOptions = (data, videoCode, index) => {
-        return (
-            <div className=' space-y-3'>
-                <div className=' flex flex-wrap gap-x-3'>
-                    <MdOutlineWatchLater className=' text-2xl'/>
-                    <span>Add to watch later</span>
-                </div>
+    // const ThreeDotClickOptions = (data, videoCode, index) => {
+    //     return (
+    //         <div className=' space-y-3'>
+    //             <div className=' flex flex-wrap gap-x-3'>
+    //                 <MdOutlineWatchLater className=' text-2xl'/>
+    //                 <span>Add to watch later</span>
+    //             </div>
                 
-                <div className=' flex flex-wrap gap-x-3'>
-                    <FaRegTrashCan className=' text-xl'/>
-                    <span>Remove from queue</span>
-                </div>
-            </div>
-        )
-    };
+    //             <div className=' flex flex-wrap gap-x-3'>
+    //                 <FaRegTrashCan className=' text-xl'/>
+    //                 <span>Remove from queue</span>
+    //             </div>
+    //         </div>
+    //     )
+    // };
 
-    const handleThreeDotClick = (e, data, videoCode, index) => {
-        e.stopPropagation();
-        setOptionsClicked(prevOptionsClicked => {
-            const tempArr = [...prevOptionsClicked];
-            tempArr[index] = !tempArr[index];
-            return tempArr;
-        });
-    };  
+    // const handleThreeDotClick = (e, data, videoCode, index) => {
+    //     e.stopPropagation();
+    //     setOptionsClicked(prevOptionsClicked => {
+    //         const tempArr = [...prevOptionsClicked];
+    //         tempArr[index] = !tempArr[index];
+    //         return tempArr;
+    //     });
+    // };  
     
     const handleMouseLeave = () => {
-        // optionsClicked = new Array(playListData.length).fill(false)
+        setOptionsClicked(new Array(playListData.length).fill(false))
+        setMouseEnter(false);
+    };
+    
+    const handleMouseEnter = () => {
+        setMouseEnter(true)
     };
     
     return (
@@ -246,6 +253,7 @@ const PlayListItems = () => {
                         {playListData.map((data, index) => (
                             <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3 relative group/all'
                             key={generateRandomID()}
+                            onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
                             onClick={() => handleCurrentVdo(index, data?.videoId)}>
                                 {/* index */}
@@ -276,7 +284,7 @@ const PlayListItems = () => {
                                 </div>
 
                                 {/* 3 dot */}
-                                <div className='group absolute right-1 top-1/2 -translate-y-1/2'>
+                                {/* <div className='group absolute right-1 top-1/2 -translate-y-1/2'>
                                     <div className=' group-hover:bg-neutral-800 hidden group-hover/all:flex items-center justify-center rounded-full w-8 h-8 relative'
                                     onClick={(e) => handleThreeDotClick(e, data, data?.videoId, index)}>
                                         <BsThreeDotsVertical className='text-xl'/>
@@ -287,7 +295,15 @@ const PlayListItems = () => {
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </div> */}
+                                <ThreeDotOptions
+                                    data={data}
+                                    index={index}
+                                    optionsClicked={optionsClicked}
+                                    setOptionsClicked={setOptionsClicked}
+                                    mode={`playList`}
+                                    mouseEnter={mouseEnter}
+                                />
                             </div>
                         ))}
                     </InfiniteScroll>

@@ -11,12 +11,14 @@ import './videoContainer.css'
 import axios from 'axios';
 import { setVidIdArr } from '../../../store/WatchSlice.js';
 import { setPlayListOn } from '../../../store/PlayListSlice.js';
+import { setIsWatchQueueOn } from '../../../store/WatchQueueSlice.js';
 
 const VideoContainer = () => {
     const currentVideos = useSelector((state) => state.youtube.videos);
     const loading = useSelector((state) => state.youtube.isLoading);
     const isSidebarOpen = useSelector((state) => state.sidebar.isSidebarOpen);
     const nxtPgToken = useSelector((state) => state.youtube.nextPageToken);
+    const { watchQueue } = useSelector((state) => state.watchQueue)
     const dispatch = useDispatch();
     const skeletonNumbers = 20;
     const [homePgVids, setHomePgVids] = useState([]);
@@ -87,6 +89,7 @@ const VideoContainer = () => {
     useEffect(() => {
         fetchYoutubeVideos();
         dispatch(setPlayListOn(false));
+        (watchQueue.length < 1) && dispatch(setIsWatchQueueOn(false));
     }, []);
 
     useEffect(() => {

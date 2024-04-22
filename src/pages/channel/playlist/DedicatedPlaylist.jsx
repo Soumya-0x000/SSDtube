@@ -11,10 +11,11 @@ import { LiaDownloadSolid } from "react-icons/lia";
 import { BsDot, BsThreeDotsVertical } from "react-icons/bs";
 import { convertViews, handleDayCount } from '../../../utils/constant';
 import axios from 'axios';
-import { setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
+import { setCounting, setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
 import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../../../components/loading/Spinner';
+import { setCurrentlyPlayingVdoId } from '../../../store/WatchSlice';
 
 const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
@@ -255,7 +256,13 @@ const DedicatedPlaylist = () => {
 
     const handleNavigate = () => {
         navigate(`/channel/${channelID}`)
-    }
+    };
+
+    const handleCurrentVdo = (index, vdoId) => {
+        setCurrentVdoCount(index+1);
+        dispatch(setCurrentlyPlayingVdoId(vdoId));
+        dispatch(setCounting({currentCount: index+1, totalCount: playListData.length }));
+    };
 
     return (
         <div 
@@ -305,7 +312,8 @@ const DedicatedPlaylist = () => {
                             ) : (
                                 <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
                                 key={data?.videoId}
-                                to={`/watch/${data?.videoId}`}>
+                                to={`/watch/${data?.videoId}`}
+                                onClick={() => handleCurrentVdo(index, data?.videoId)}>
                                     {/* index */}
                                     <div className=' text-[.8rem] text-gray-400 flex items-center'>
                                         {index+1}

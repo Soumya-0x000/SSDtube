@@ -14,7 +14,10 @@ const initialState = {
         comment: 0,
         channelTitle: '',
         subscribers: 0
-    }
+    },
+    // watchQueue: [],
+    // isWatchQueueOn: false,
+    watchLater: [],
 };
 
 export const WatchSlice = createSlice({
@@ -49,6 +52,15 @@ export const WatchSlice = createSlice({
         setEssentialVdoItems: function(state, action) {
             state.essentialVdoItems = action.payload
         },
+        // setWatchQueue: function(state, action) {
+        //     state.watchQueue = action.payload;
+        // },
+        // setIsWatchQueueOn: function(state, action) {
+        //     state.isWatchQueueOn = action.payload;
+        // },
+        setWatchLater: function(state, action) {
+            state.watchLater = action.payload;
+        },
     }
 })
 
@@ -62,4 +74,7 @@ export const {
     // setCurrentPlaylistId,
     setIsPlaylistRendered,
     setEssentialVdoItems,
+    // setWatchQueue,
+    // setIsWatchQueueOn,
+    setWatchLater,
 } = WatchSlice.actions;

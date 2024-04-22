@@ -18,6 +18,7 @@ import { LiaDownloadSolid } from "react-icons/lia";
 import { RiFlagLine } from "react-icons/ri";
 import Player from './Player';
 import PlayListItems from '../channel/playlist/PlayListItems';
+import WatchQueueList from './WatchQueueList'
 
 const orgIconTray = [
     { icon: <RiShareForwardLine />, fontSize: 'text-[21px]', text: 'Share' },
@@ -36,9 +37,14 @@ const Watch = () => {
         vdoData, 
         channelID, 
         nxtPgToken,
-        isPlaylistRendered,
-        essentialVdoItems
+        essentialVdoItems,
     } = useSelector(state => state.watch);
+    const {
+        isWatchQueueOn,
+        watchQueue
+    } = useSelector(state => state.watchQueue);
+
+    const { playListOn } = useSelector(state => state.playlist)
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -493,8 +499,12 @@ const Watch = () => {
 
             {/* recommended video part */}
             <div className=' rounded-lg w-full overflow-y-auto lg:w-[32%] lg:min-w-[25rem]'>
-                {isPlaylistRendered && (
+                {playListOn && (
                     <PlayListItems/>
+                )}
+
+                {isWatchQueueOn && watchQueue.length > 0 && (
+                    <WatchQueueList/>
                 )}
 
                 <InfiniteScroll 

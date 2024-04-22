@@ -10,7 +10,7 @@ const initialState = {
     playListData: [],
     playListBannerUrl: '',
     playListDescription: '',
-    playListOn: null,
+    playListOn: false,
 }
 
 export const PlayListSlice = createSlice({
@@ -25,7 +25,7 @@ export const PlayListSlice = createSlice({
         },
         setCounting: function(state, action) {
             const {totalCount, currentCount} = action.payload;
-            console.log(totalCount, currentCount)
+            
             state.totalItemCount = totalCount;
             state.currentItemsCount = currentCount
         },

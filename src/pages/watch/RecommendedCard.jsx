@@ -2,18 +2,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../components/lazyLoadImage/Img'
 import { convertViews, handleDayCount } from '../../utils/constant'
 import { BsDot } from "react-icons/bs";
-import { setCurrentlyPlayingVdoId, setIsPlaylistRendered } from '../../store/WatchSlice';
+import { setCurrentlyPlayingVdoId } from '../../store/WatchSlice';
 import { CiClock2 } from "react-icons/ci";
 import { PiQueueFill } from "react-icons/pi";
 import { setCounting, setPlayListData } from '../../store/PlayListSlice';
 import { useEffect, useState } from 'react';
 import { CgPlayListCheck } from "react-icons/cg";
+import ThreeDotOptions from '../../common/ThreeDotOptions';
+import { setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
 
 const RecommendedCard = ({ item, snippetType, index }) => {
     const dispatch = useDispatch();
-    const { playListData, totalItemCount, currentItemsCount } = useSelector(state=> state.playlist)
-    const { isPlaylistRendered } = useSelector(state=> state.watch);
+    const { playListData, playListOn, totalItemCount, currentItemsCount } = useSelector(state=> state.playlist)
+    const { isWatchQueueOn, watchQueue } = useSelector(state=> state.watchQueue);
     const [addedPlayList, setAddedPlayList] = useState(new Array(playListData.length).fill(false));
+    const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
+    const [mouseEnter, setMouseEnter] = useState(false);
 
     const handleClick = async () => {
         // if (snippetType === 'upload') {
@@ -29,8 +33,10 @@ const RecommendedCard = ({ item, snippetType, index }) => {
     
     const handleAddVdo = async (e, item) => {
         e.stopPropagation();
-        // dispatch(setWatchQueueCreated(true));
-        if (isPlaylistRendered) {
+        !playListOn && dispatch(setIsWatchQueueOn(true));
+
+        if (playListOn) {
+            dispatch(setIsWatchQueueOn(false));
             (async () => {
                 const videoId = item?.contentDetails?.upload?.videoId;
                 const views = item?.viewCount;
@@ -48,8 +54,22 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                     {videoId, views, publishedAt, description: description ? description : "", title, thumbnail}
                 ]));
             })();
-        } else {
-            
+        } else if (isWatchQueueOn) {
+            (async () => {    
+                const videoId = item?.contentDetails?.upload?.videoId;
+                const publishedAt = item?.snippet?.publishedAt;
+                const title = item?.snippet?.title;
+                const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                || item?.snippet?.thumbnails?.high?.url
+                                || item?.snippet?.thumbnails?.medium?.url
+                                || item?.snippet?.thumbnails?.standard?.url
+                                || item?.snippet?.thumbnails?.default?.url
+                
+                dispatch(setWatchQueue([
+                    ...watchQueue,
+                    {videoId, title, thumbnail, publishedAt}
+                ]));
+            })();
         }
     };
 
@@ -60,11 +80,22 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         }))
     }, [playListData]);
 
+    const handleMouseLeave = () => {
+        setOptionsClicked(new Array(playListData.length).fill(false))
+        setMouseEnter(false);
+    };
+    
+    const handleMouseEnter = () => {
+        setMouseEnter(true)
+    };
+
     return (
         <>
             {item?.snippet?.type === 'upload' && (
-                <div className='hover:bg-neutral-700 cursor-pointer rounded-lg flex items-center justify-start group'
-                onClick={handleClick}>
+                <div className='hover:bg-neutral-700 cursor-pointer rounded-lg flex items-center justify-start group relative'
+                onClick={handleClick}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
                     <div className=' flex items-center gap-x-3'>
                         <div className='relative min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden'>
                             <Img 
@@ -88,7 +119,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                                 onClick={(e) => handleAddVdo(e, item)}>
                                     <PiQueueFill/>
                                 </div>
-                            </div>                
+                            </div>              
                         </div>
 
                         {/* text section */}
@@ -126,6 +157,15 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                             </div>
                         </div>
                     </div>
+
+                    <ThreeDotOptions 
+                        data={item}
+                        optionsClicked={optionsClicked}
+                        setOptionsClicked={setOptionsClicked}
+                        index={index}
+                        mode={`recommended`}
+                        mouseEnter={mouseEnter}
+                    />
                 </div>
             )}
         </>
