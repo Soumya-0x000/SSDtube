@@ -53,7 +53,7 @@ const ThreeDotOptions = ({ data, index, optionsClicked, setOptionsClicked, mode,
         )
     };
 
-    const handleThreeDotClick = (e, index) => {
+    const handleThreeDotClick = (e, data, videoId, index) => {
         e.stopPropagation();
         setOptionsClicked(prevOptionsClicked => {
             const tempArr = [...prevOptionsClicked];

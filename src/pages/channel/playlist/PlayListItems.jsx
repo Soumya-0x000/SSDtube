@@ -126,7 +126,7 @@ const PlayListItems = () => {
     }, [dataToRender])
 
     useEffect(() => {
-        fetchFullPlayList(playListID);
+        // fetchFullPlayList(playListID);
 
         const timer = setTimeout(() => {
             setIsLoading(false);
@@ -135,38 +135,13 @@ const PlayListItems = () => {
         return () => clearTimeout(timer)
     }, []);
 
-    // const ThreeDotClickOptions = (data, videoCode, index) => {
-    //     return (
-    //         <div className=' space-y-3'>
-    //             <div className=' flex flex-wrap gap-x-3'>
-    //                 <MdOutlineWatchLater className=' text-2xl'/>
-    //                 <span>Add to watch later</span>
-    //             </div>
-                
-    //             <div className=' flex flex-wrap gap-x-3'>
-    //                 <FaRegTrashCan className=' text-xl'/>
-    //                 <span>Remove from queue</span>
-    //             </div>
-    //         </div>
-    //     )
-    // };
+    const handleMouseEnter = () => {
+        setMouseEnter(true)
+    };
 
-    // const handleThreeDotClick = (e, data, videoCode, index) => {
-    //     e.stopPropagation();
-    //     setOptionsClicked(prevOptionsClicked => {
-    //         const tempArr = [...prevOptionsClicked];
-    //         tempArr[index] = !tempArr[index];
-    //         return tempArr;
-    //     });
-    // };  
-    
     const handleMouseLeave = () => {
         setOptionsClicked(new Array(playListData.length).fill(false))
         setMouseEnter(false);
-    };
-    
-    const handleMouseEnter = () => {
-        setMouseEnter(true)
     };
     
     return (
@@ -284,18 +259,6 @@ const PlayListItems = () => {
                                 </div>
 
                                 {/* 3 dot */}
-                                {/* <div className='group absolute right-1 top-1/2 -translate-y-1/2'>
-                                    <div className=' group-hover:bg-neutral-800 hidden group-hover/all:flex items-center justify-center rounded-full w-8 h-8 relative'
-                                    onClick={(e) => handleThreeDotClick(e, data, data?.videoId, index)}>
-                                        <BsThreeDotsVertical className='text-xl'/>
-
-                                        {optionsClicked[index] && (
-                                            <div className=' absolute right-10 w-[14rem] bg-slate-800 z-50 pl-3 py-3 rounded-md'>
-                                                <ThreeDotClickOptions/>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div> */}
                                 <ThreeDotOptions
                                     data={data}
                                     index={index}

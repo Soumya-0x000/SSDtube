@@ -503,7 +503,7 @@ const Watch = () => {
                     <PlayListItems/>
                 )}
 
-                {isWatchQueueOn && watchQueue.length > 0 && (
+                {isWatchQueueOn && (
                     <WatchQueueList/>
                 )}
 

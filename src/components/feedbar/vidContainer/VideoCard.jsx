@@ -60,7 +60,7 @@ const VideoCard = ({item, indx}) => {
                     </div>
                 </Link>
                 
-                <Link to={`/watch/${item?.id}`} className='w-full' onClick={handleClick}>
+                <Link to={`/watch/${item?.id}`} className='w-full' onClick={() => handleClick(item?.id)}>
                     <div className='flex flex-col w-full pt-[.2rem]'>
                         <div className='w-[88%] font-bold text-[.9rem] line-clamp-2'>
                             {item?.snippet?.title}

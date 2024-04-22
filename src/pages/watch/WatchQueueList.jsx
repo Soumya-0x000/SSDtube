@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MdOutlineErrorOutline } from 'react-icons/md';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../components/lazyLoadImage/Img';
 import { generateRandomID } from '../../utils/constant';
 import { IoIosArrowDown } from 'react-icons/io';
 import { RxCross1, RxLoop, RxShuffle } from 'react-icons/rx';
 import { SlOptionsVertical } from 'react-icons/sl';
+import { MdPlaylistAdd } from "react-icons/md";
+import { setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
+import ThreeDotOptions from '../../common/ThreeDotOptions';
 
 const WatchQueueList = () => {
     const {watchQueue} = useSelector(state => state.watchQueue);
@@ -13,6 +16,11 @@ const WatchQueueList = () => {
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
     const [hideVids, setHideVids] = useState(false);
+    const dispatch = useDispatch();
+    
+    useEffect(() => {
+        console.log(watchQueue);
+    }, []);
 
     const handleMouseLeave = () => {
         setOptionsClicked(new Array(playListData.length).fill(false))
@@ -23,8 +31,19 @@ const WatchQueueList = () => {
         setMouseEnter(true)
     };
 
+    const clearQueue = () => {
+        dispatch(setWatchQueue([]));
+        dispatch(setIsWatchQueueOn(false));
+    };
+
+    const handleCurrentVdo = (index, vdoId) => {
+        // setCurrentVdoCount(index+1)
+        // dispatch(setCurrentlyPlayingVdoId(vdoId));
+        // dispatch(setCounting({currentCount: index+1, totalCount: playListData.length }))
+    };
+
     return (
-        <>
+        <div className='bg-neutral-900 rounded-lg overflow-hidden mb-2'>
             <div className='space-y-2 bg-neutral-800 px-3 py-3'>
                 {/* Upper part */}
                 <div className='relative flex items-center justify-between'>
@@ -33,7 +52,8 @@ const WatchQueueList = () => {
                         className='text-[1.3rem] font-bold'>
                             Queue
                         </div>
-                        <p><Link to={`/channel/${channelID}`}>{channelName}</Link> - {currentItemsCount}/{totalItemCount}</p>
+
+                        {/* <p><Link to={`/channel/${channelID}`}>{channelName}</Link> - {currentItemsCount}/{totalItemCount}</p> */}
                     </div>
 
                     {hideVids ? (
@@ -45,15 +65,20 @@ const WatchQueueList = () => {
 
                 {/* Lower part */}
                 <div className='flex items-center justify-between'>
-                    <div className='flex text-2xl items-center gap-x-5'>
-                        <RxLoop/>
-                        <RxShuffle/>
+                    <div className='flex items-center gap-x-1'>
+                        <MdPlaylistAdd className=' text-2xl'/>
+                        <p className=' text-sm'>
+                            Save
+                        </p>
                     </div>
-                    <SlOptionsVertical className=' text-xl'/>
+                    <button className=' text-sm'
+                    onClick={clearQueue}>
+                        Clear
+                    </button>
                 </div>
             </div>
 
-            <div className={` ${hideVids ? 'hidden' : 'block'} max-h-[28rem] overflow-y-auto mt-2`}>
+            <div className={` ${hideVids ? 'hidden' : 'block'} max-h-[28rem] overflow-y-auto mt-2 `}>
                 {watchQueue.map((data, index) => (
                     <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3 relative group/all'
                     key={generateRandomID()}
@@ -82,24 +107,12 @@ const WatchQueueList = () => {
                         </div>
 
                         {/* content */}
-                        <div className=' space-y-2 '>
-                            <div className='line-clamp-1 w-full'>{data?.title}</div>
-                            <p className='text-gray-400 text-[.8rem]'>{channelName}</p>
+                        <div className='mt-1 space-y-3 '>
+                            <div className='line-clamp-2 w-full'>{data?.title}</div>
+                            <p className='text-gray-400 text-[.8rem]'>{data?.channelName}</p>
                         </div>
 
                         {/* 3 dot */}
-                        {/* <div className='group absolute right-1 top-1/2 -translate-y-1/2'>
-                            <div className=' group-hover:bg-neutral-800 hidden group-hover/all:flex items-center justify-center rounded-full w-8 h-8 relative'
-                            onClick={(e) => handleThreeDotClick(e, data, data?.videoId, index)}>
-                                <BsThreeDotsVertical className='text-xl'/>
-
-                                {optionsClicked[index] && (
-                                    <div className=' absolute right-10 w-[14rem] bg-slate-800 z-50 pl-3 py-3 rounded-md'>
-                                        <ThreeDotClickOptions/>
-                                    </div>
-                                )}
-                            </div>
-                        </div> */}
                         <ThreeDotOptions
                             data={data}
                             index={index}
@@ -111,7 +124,7 @@ const WatchQueueList = () => {
                     </div>
                 ))}
             </div>
-        </>
+        </div>
     )
 }
 

@@ -8,8 +8,11 @@ import { PiQueueFill } from "react-icons/pi";
 import { setCounting, setPlayListData } from '../../store/PlayListSlice';
 import { useEffect, useState } from 'react';
 import { CgPlayListCheck } from "react-icons/cg";
+import { IoMdCheckmark } from "react-icons/io";
 import ThreeDotOptions from '../../common/ThreeDotOptions';
 import { setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const RecommendedCard = ({ item, snippetType, index }) => {
     const dispatch = useDispatch();
@@ -18,6 +21,10 @@ const RecommendedCard = ({ item, snippetType, index }) => {
     const [addedPlayList, setAddedPlayList] = useState(new Array(playListData.length).fill(false));
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
+    const [clicked, setClicked] = useState({
+        watchLater: false,
+        watchQ: false,
+    });
 
     const handleClick = async () => {
         // if (snippetType === 'upload') {
@@ -28,48 +35,70 @@ const RecommendedCard = ({ item, snippetType, index }) => {
 
     const addToWatchLater = (e, item) => {
         e.stopPropagation();
+        setClicked({
+            ...clicked,
+            watchLater: true
+        })
         console.log('watch later', item)
     };
     
     const handleAddVdo = async (e, item) => {
         e.stopPropagation();
+        setClicked({
+            ...clicked,
+            watchQ: true
+        });
         !playListOn && dispatch(setIsWatchQueueOn(true));
 
+        const id = item?.contentDetails?.upload?.videoId;
         if (playListOn) {
-            dispatch(setIsWatchQueueOn(false));
-            (async () => {
-                const videoId = item?.contentDetails?.upload?.videoId;
-                const views = item?.viewCount;
-                const publishedAt = item?.snippet?.publishedAt;
-                const description = item?.snippet?.description;
-                const title = item?.snippet?.title;
-                const thumbnail = item?.snippet?.thumbnails?.maxres?.url
-                                || item?.snippet?.thumbnails?.high?.url
-                                || item?.snippet?.thumbnails?.medium?.url
-                                || item?.snippet?.thumbnails?.standard?.url
-                                || item?.snippet?.thumbnails?.default?.url
-                
-                dispatch(setPlayListData([
-                    ...playListData, 
-                    {videoId, views, publishedAt, description: description ? description : "", title, thumbnail}
-                ]));
-            })();
+            const isDuplicate = playListData.some((entry) => entry.videoId === id);
+
+            if (isDuplicate) {
+                alert('Already added to watch playlist');
+            } else {
+                dispatch(setIsWatchQueueOn(false));
+                (async () => {
+                    const videoId = item?.contentDetails?.upload?.videoId;
+                    const views = item?.viewCount;
+                    const publishedAt = item?.snippet?.publishedAt;
+                    const description = item?.snippet?.description;
+                    const title = item?.snippet?.title;
+                    const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                    || item?.snippet?.thumbnails?.high?.url
+                                    || item?.snippet?.thumbnails?.medium?.url
+                                    || item?.snippet?.thumbnails?.standard?.url
+                                    || item?.snippet?.thumbnails?.default?.url
+                    
+                    dispatch(setPlayListData([
+                        ...playListData, 
+                        {videoId, views, publishedAt, description: description ? description : "", title, thumbnail}
+                    ]));
+                })();
+            }
         } else if (isWatchQueueOn) {
-            (async () => {    
-                const videoId = item?.contentDetails?.upload?.videoId;
-                const publishedAt = item?.snippet?.publishedAt;
-                const title = item?.snippet?.title;
-                const thumbnail = item?.snippet?.thumbnails?.maxres?.url
-                                || item?.snippet?.thumbnails?.high?.url
-                                || item?.snippet?.thumbnails?.medium?.url
-                                || item?.snippet?.thumbnails?.standard?.url
-                                || item?.snippet?.thumbnails?.default?.url
-                
-                dispatch(setWatchQueue([
-                    ...watchQueue,
-                    {videoId, title, thumbnail, publishedAt}
-                ]));
-            })();
+            const isDuplicate = watchQueue.some((entry) => entry.videoId === id);
+
+            if (isDuplicate) {
+                alert('Already added to watch queue');
+            } else {
+                (async () => {    
+                    const videoId = item?.contentDetails?.upload?.videoId;
+                    const publishedAt = item?.snippet?.publishedAt;
+                    const title = item?.snippet?.title;
+                    const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                    || item?.snippet?.thumbnails?.high?.url
+                                    || item?.snippet?.thumbnails?.medium?.url
+                                    || item?.snippet?.thumbnails?.standard?.url
+                                    || item?.snippet?.thumbnails?.default?.url
+                    const channelName = item?.snippet?.channelTitle;
+                    
+                    dispatch(setWatchQueue([
+                        ...watchQueue,
+                        {videoId, title, thumbnail, publishedAt, channelName}
+                    ]));
+                })();
+            }
         }
     };
 
@@ -112,12 +141,20 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                             <div className=' absolute right-1 top-2 hidden group-hover:flex flex-col gap-y-1'>
                                 <div className='bg-black backdrop-blur-md text-white text-[21px] rounded-md p-1'
                                 onClick={(e) => addToWatchLater(e, item)}>
-                                    <CiClock2/>
+                                    {clicked.watchLater ? (
+                                        <IoMdCheckmark/>
+                                    ) : (
+                                        <CiClock2/>
+                                    )}
                                 </div>
                                 
                                 <div className='bg-black backdrop-blur-md text-white text-[21px] rounded-md p-1'
                                 onClick={(e) => handleAddVdo(e, item)}>
-                                    <PiQueueFill/>
+                                    {clicked.watchQ ? (
+                                        <CgPlayListCheck/>
+                                    ) : (
+                                        <PiQueueFill/>
+                                    )}
                                 </div>
                             </div>              
                         </div>
