@@ -89,7 +89,7 @@ const VideoContainer = () => {
     useEffect(() => {
         fetchYoutubeVideos();
         dispatch(setPlayListOn(false));
-        (watchQueue.length < 1) && dispatch(setIsWatchQueueOn(false));
+        dispatch(setIsWatchQueueOn(false));
     }, []);
 
     useEffect(() => {

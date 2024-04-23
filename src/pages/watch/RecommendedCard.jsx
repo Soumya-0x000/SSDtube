@@ -11,14 +11,14 @@ import { CgPlayListCheck } from "react-icons/cg";
 import { IoMdCheckmark } from "react-icons/io";
 import ThreeDotOptions from '../../common/ThreeDotOptions';
 import { setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const RecommendedCard = ({ item, snippetType, index }) => {
     const dispatch = useDispatch();
-    const { playListData, playListOn, totalItemCount, currentItemsCount } = useSelector(state=> state.playlist)
-    const { isWatchQueueOn, watchQueue } = useSelector(state=> state.watchQueue);
-    const [addedPlayList, setAddedPlayList] = useState(new Array(playListData.length).fill(false));
+    const { playListData, playListOn, currentItemsCount } = useSelector(state=> state.playlist);
+    const { 
+        isWatchQueueOn, 
+        watchQueue, 
+    } = useSelector(state=> state.watchQueue);
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
     const [clicked, setClicked] = useState({
@@ -76,31 +76,42 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                     ]));
                 })();
             }
-        } else if (isWatchQueueOn) {
-            const isDuplicate = watchQueue.some((entry) => entry.videoId === id);
-
-            if (isDuplicate) {
-                alert('Already added to watch queue');
-            } else {
-                (async () => {    
-                    const videoId = item?.contentDetails?.upload?.videoId;
-                    const publishedAt = item?.snippet?.publishedAt;
-                    const title = item?.snippet?.title;
-                    const thumbnail = item?.snippet?.thumbnails?.maxres?.url
-                                    || item?.snippet?.thumbnails?.high?.url
-                                    || item?.snippet?.thumbnails?.medium?.url
-                                    || item?.snippet?.thumbnails?.standard?.url
-                                    || item?.snippet?.thumbnails?.default?.url
-                    const channelName = item?.snippet?.channelTitle;
-                    
-                    dispatch(setWatchQueue([
-                        ...watchQueue,
-                        {videoId, title, thumbnail, publishedAt, channelName}
-                    ]));
-                })();
-            }
         }
     };
+
+    useEffect(() => {
+        if (clicked.watchQ) {
+            const id = item?.contentDetails?.upload?.videoId;
+            if (isWatchQueueOn) {
+                const isDuplicate = watchQueue.some((entry) => entry.videoId === id);
+    
+                if (!isDuplicate) {
+                    (async () => {    
+                        const videoId = item?.contentDetails?.upload?.videoId;
+                        const publishedAt = item?.snippet?.publishedAt;
+                        const title = item?.snippet?.title;
+                        const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                        || item?.snippet?.thumbnails?.high?.url
+                                        || item?.snippet?.thumbnails?.medium?.url
+                                        || item?.snippet?.thumbnails?.standard?.url
+                                        || item?.snippet?.thumbnails?.default?.url
+                        const channelName = item?.snippet?.channelTitle;
+                        const channelID = item?.snippet?.channelId;
+                        
+                        dispatch(setWatchQueue([
+                            ...watchQueue,
+                            {videoId, title, thumbnail, publishedAt, channelName, channelID}
+                        ]));
+                    })();
+                }
+            }
+
+            setClicked(prevState => ({
+                ...prevState,
+                watchQ: false
+            }));
+        }
+    }, [clicked.watchQ]);
 
     useEffect(() => {
         dispatch(setCounting({

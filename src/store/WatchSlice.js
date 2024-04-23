@@ -15,8 +15,6 @@ const initialState = {
         channelTitle: '',
         subscribers: 0
     },
-    // watchQueue: [],
-    // isWatchQueueOn: false,
     watchLater: [],
 };
 

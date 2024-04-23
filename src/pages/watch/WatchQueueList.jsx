@@ -7,20 +7,18 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { RxCross1, RxLoop, RxShuffle } from 'react-icons/rx';
 import { SlOptionsVertical } from 'react-icons/sl';
 import { MdPlaylistAdd } from "react-icons/md";
-import { setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
+import { setCurrentClickIndex, setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
 import ThreeDotOptions from '../../common/ThreeDotOptions';
+import { setChannelId, setCurrentlyPlayingVdoId } from '../../store/WatchSlice';
 
 const WatchQueueList = () => {
-    const {watchQueue} = useSelector(state => state.watchQueue);
-    const {playListData} = useSelector(state => state.playlist);
+    const { watchQueue, totalVdo, currentClickIndex } = useSelector(state => state.watchQueue);
+    const { channelID } = useSelector(state => state.watch);
+    const { playListData } = useSelector(state => state.playlist);
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
     const [hideVids, setHideVids] = useState(false);
     const dispatch = useDispatch();
-    
-    useEffect(() => {
-        console.log(watchQueue);
-    }, []);
 
     const handleMouseLeave = () => {
         setOptionsClicked(new Array(playListData.length).fill(false))
@@ -37,9 +35,9 @@ const WatchQueueList = () => {
     };
 
     const handleCurrentVdo = (index, vdoId) => {
-        // setCurrentVdoCount(index+1)
-        // dispatch(setCurrentlyPlayingVdoId(vdoId));
-        // dispatch(setCounting({currentCount: index+1, totalCount: playListData.length }))
+        dispatch(setCurrentClickIndex(index+1))
+        dispatch(setCurrentlyPlayingVdoId(vdoId));
+        channelID !== watchQueue[index].channelID && dispatch(setChannelId(watchQueue[index].channelID));
     };
 
     return (
@@ -53,7 +51,9 @@ const WatchQueueList = () => {
                             Queue
                         </div>
 
-                        {/* <p><Link to={`/channel/${channelID}`}>{channelName}</Link> - {currentItemsCount}/{totalItemCount}</p> */}
+                        <div>
+                            {currentClickIndex}/{totalVdo}
+                        </div>
                     </div>
 
                     {hideVids ? (
@@ -78,6 +78,7 @@ const WatchQueueList = () => {
                 </div>
             </div>
 
+            {/* video part */}
             <div className={` ${hideVids ? 'hidden' : 'block'} max-h-[28rem] overflow-y-auto mt-2 `}>
                 {watchQueue.map((data, index) => (
                     <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3 relative group/all'

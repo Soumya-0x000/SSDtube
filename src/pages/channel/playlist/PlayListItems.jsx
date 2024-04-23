@@ -126,7 +126,7 @@ const PlayListItems = () => {
     }, [dataToRender])
 
     useEffect(() => {
-        // fetchFullPlayList(playListID);
+        fetchFullPlayList(playListID);
 
         const timer = setTimeout(() => {
             setIsLoading(false);
