@@ -202,13 +202,13 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        // fetchVdoInfo(id);
-        // fetchRecommendedVideos(channelID);
+        fetchVdoInfo(id);
+        fetchRecommendedVideos(channelID);
     }, []);
     
     useEffect(() => {
-        // fetchRecommendedVideos(channelID);
-        // fetchVdoInfo(currentlyPlayingVdoId);
+        fetchRecommendedVideos(channelID);
+        fetchVdoInfo(currentlyPlayingVdoId);
     }, [currentlyPlayingVdoId, channelID]);
 
     useEffect(() => {
