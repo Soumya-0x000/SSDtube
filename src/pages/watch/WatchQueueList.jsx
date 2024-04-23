@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { MdOutlineErrorOutline } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../components/lazyLoadImage/Img';
-import { generateRandomID } from '../../utils/constant';
+import { generateRandomID, handleDayCount } from '../../utils/constant';
 import { IoIosArrowDown } from 'react-icons/io';
 import { RxCross1, RxLoop, RxShuffle } from 'react-icons/rx';
 import { SlOptionsVertical } from 'react-icons/sl';
@@ -41,8 +41,8 @@ const WatchQueueList = () => {
     };
 
     return (
-        <div className='bg-neutral-900 rounded-lg overflow-hidden mb-2'>
-            <div className='space-y-2 bg-neutral-800 px-3 py-3'>
+        <div className='rounded-xl overflow-hidden border mb-3'>
+            <div className='space-y-2 bg-neutral-800 p-3'>
                 {/* Upper part */}
                 <div className='relative flex items-center justify-between'>
                     <div className='text-[.84rem] space-y-1'>
@@ -51,9 +51,7 @@ const WatchQueueList = () => {
                             Queue
                         </div>
 
-                        <div>
-                            {currentClickIndex}/{totalVdo}
-                        </div>
+                        <div> {currentClickIndex}/{totalVdo} </div>
                     </div>
 
                     {hideVids ? (
@@ -65,12 +63,13 @@ const WatchQueueList = () => {
 
                 {/* Lower part */}
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-x-1'>
+                    <button className='flex items-center gap-x-1'>
                         <MdPlaylistAdd className=' text-2xl'/>
-                        <p className=' text-sm'>
+                        <span className=' text-sm '>
                             Save
-                        </p>
-                    </div>
+                        </span>
+                    </button>
+
                     <button className=' text-sm'
                     onClick={clearQueue}>
                         Clear
@@ -81,7 +80,7 @@ const WatchQueueList = () => {
             {/* video part */}
             <div className={` ${hideVids ? 'hidden' : 'block'} max-h-[28rem] overflow-y-auto mt-2 `}>
                 {watchQueue.map((data, index) => (
-                    <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3 relative group/all'
+                    <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3 relative group/all rounded-md'
                     key={generateRandomID()}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
@@ -109,16 +108,20 @@ const WatchQueueList = () => {
 
                         {/* content */}
                         <div className='mt-1 space-y-3 '>
-                            <div className='line-clamp-2 w-full'>{data?.title}</div>
-                            <p className='text-gray-400 text-[.8rem]'>{data?.channelName}</p>
+                            <div className='line-clamp-1 w-full'>{data?.title}</div>
+                            
+                            <div>
+                                <p className='text-gray-400 text-[.8rem]'>{data?.channelName}</p>
+                                <p className='text-gray-400 text-[.8rem]'>{handleDayCount(data?.publishedAt)}</p>
+                            </div>
                         </div>
 
                         {/* 3 dot */}
                         <ThreeDotOptions
-                            data={data}
-                            index={index}
+                            vdoCode={data?.videoId}
                             optionsClicked={optionsClicked}
                             setOptionsClicked={setOptionsClicked}
+                            index={index}
                             mode={`watchQueue`}
                             mouseEnter={mouseEnter}
                         />

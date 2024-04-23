@@ -190,7 +190,7 @@ const PlayListItems = () => {
                 </>
             ) : (
                 <>
-                    <div className='space-y-2 bg-neutral-800 px-3 py-3'>
+                    <div className='space-y-2 bg-neutral-800 p-3'>
                         {/* Upper part */}
                         <div className='relative flex items-center justify-between'>
                             <div className='text-[.84rem] space-y-1'>
@@ -215,6 +215,7 @@ const PlayListItems = () => {
                                 <RxLoop/>
                                 <RxShuffle/>
                             </div>
+
                             <SlOptionsVertical className=' text-xl'/>
                         </div>
                     </div>
@@ -260,7 +261,7 @@ const PlayListItems = () => {
 
                                 {/* 3 dot */}
                                 <ThreeDotOptions
-                                    data={data}
+                                    vdoCode={data?.videoId}
                                     index={index}
                                     optionsClicked={optionsClicked}
                                     setOptionsClicked={setOptionsClicked}

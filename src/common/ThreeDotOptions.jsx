@@ -1,25 +1,59 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { MdOutlineWatchLater } from 'react-icons/md';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { PiQueueFill } from "react-icons/pi";
+import { setCounting, setPlayListData } from '../store/PlayListSlice';
+import { setCurrentClickIndex, setWatchQueue } from '../store/WatchQueueSlice';
 
-const ThreeDotOptions = ({ data, index, optionsClicked, setOptionsClicked, mode, mouseEnter }) => {
-    const { playListData, playListOn } = useSelector(state=> state.playlist)
-    const { isWatchQueueOn, watchQueue, watchLater } = useSelector(state=> state.watch);
-
-    const handleOperations = () => {
-
-    };
+const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mode, mouseEnter }) => {
+    const { 
+        playListData, 
+        totalItemCount, 
+        currentItemsCount 
+    } = useSelector(state=> state.playlist)
+    const { 
+        watchQueue, 
+        currentClickIndex, 
+        totalVdo 
+    } = useSelector(state=> state.watchQueue);
+    const dispatch = useDispatch();
+    const handleWatchLater = () => {};
     
-    const handleWatchLater = () => {
-
+    const handleOperations = (mode, index) => {
+        switch (mode) {
+            case 'removePlaylistEntry':
+                const tempArr = [...playListData].filter(entry => entry.videoId !== vdoCode);
+                dispatch(setPlayListData(tempArr));
+                break;
+            case 'removeWatchQentry':
+                const tempArr1 = [...watchQueue].filter(entry => entry.videoId !== vdoCode);
+                dispatch(setWatchQueue(tempArr1));
+                break;
+            case 'addToWatchQ':
+                break;
+            default:
+                break
+        }
     };
+
+    useEffect(() => {
+        dispatch(setCurrentClickIndex(
+            currentClickIndex > watchQueue.length ? watchQueue.length : currentClickIndex
+        ));
+    }, [watchQueue]);
     
-    const ThreeDotClickOptions = (data, videoCode, index) => {
+    useEffect(() => {
+        dispatch(setCounting({
+            currentCount: currentItemsCount > playListData.length ? playListData.length : currentItemsCount,
+            totalCount: playListData.length
+        }));
+    }, [playListData]);
+    
+    const ThreeDotClickOptions = (videoCode, index) => {
         return (
-            <div className=' space-y-3'>
+            <div className=' space-y-5'>
                 <div className=' flex flex-wrap gap-x-3'
                 onClick={() => handleWatchLater()}>
                     <MdOutlineWatchLater className=' text-2xl'/>
@@ -28,7 +62,7 @@ const ThreeDotOptions = ({ data, index, optionsClicked, setOptionsClicked, mode,
                 
                 {mode === 'playList' && (
                     <div className=' flex flex-wrap gap-x-3'
-                    onClick={() => handleOperations()}>
+                    onClick={() => handleOperations('removePlaylistEntry', videoCode, index)}>
                         <FaRegTrashCan className=' text-xl'/>
                         <span>Remove from playList</span>
                     </div>
@@ -36,7 +70,7 @@ const ThreeDotOptions = ({ data, index, optionsClicked, setOptionsClicked, mode,
                 
                 {mode === 'watchQueue' && (
                     <div className=' flex flex-wrap gap-x-3'
-                    onClick={() => handleOperations()}>
+                    onClick={() => handleOperations('removeWatchQentry', videoCode, index)}>
                         <FaRegTrashCan className=' text-xl'/>
                         <span>Remove from queue</span>
                     </div>
@@ -44,7 +78,7 @@ const ThreeDotOptions = ({ data, index, optionsClicked, setOptionsClicked, mode,
 
                 {mode === 'recommended' && (
                     <div className=' flex flex-wrap gap-x-3'
-                    onClick={() => handleOperations()}>
+                    onClick={() => handleOperations('addToWatchQ', videoCode, index)}>
                         <PiQueueFill className=' text-xl'/>
                         <span>Add to queue</span>
                     </div>
@@ -53,19 +87,19 @@ const ThreeDotOptions = ({ data, index, optionsClicked, setOptionsClicked, mode,
         )
     };
 
-    const handleThreeDotClick = (e, data, videoId, index) => {
+    const handleThreeDotClick = (e, videoId, index) => {
         e.stopPropagation();
         setOptionsClicked(prevOptionsClicked => {
             const tempArr = [...prevOptionsClicked];
-            tempArr[index] = !tempArr[index];
+            tempArr[index] = true;
             return tempArr;
         });
     }; 
 
     return (
         <div className='group absolute right-1 top-1/2 -translate-y-1/2'>
-            <div className={` group-hover:bg-neutral-800 ${mouseEnter ? 'flex' : 'hidden'} items-center justify-center rounded-full w-8 h-8 relative`}
-            onClick={(e) => handleThreeDotClick(e, data, data?.videoId, index)}>
+            <div className={` bg-neutral-800 ${mouseEnter ? 'flex' : 'hidden'} items-center justify-center rounded-full w-8 h-8 relative`}
+            onClick={(e) => handleThreeDotClick(e, vdoCode, index)}>
                 <BsThreeDotsVertical className='text-xl'/>
 
                 {optionsClicked[index] && (

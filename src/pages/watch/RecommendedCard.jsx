@@ -207,7 +207,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                     </div>
 
                     <ThreeDotOptions 
-                        data={item}
+                        vdoCode={item?.contentDetails?.upload?.videoId}
                         optionsClicked={optionsClicked}
                         setOptionsClicked={setOptionsClicked}
                         index={index}
