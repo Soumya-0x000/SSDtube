@@ -9,13 +9,11 @@ import { MdPlaylistAdd } from "react-icons/md";
 import { RiShareForwardLine } from "react-icons/ri";
 import { LiaDownloadSolid } from "react-icons/lia";
 import { BsDot, BsThreeDotsVertical } from "react-icons/bs";
-import { convertViews, handleDayCount } from '../../../utils/constant';
 import axios from 'axios';
-import { setCounting, setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
-import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY, convertViews, extractLinks, generateRandomID, handleDayCount } from '../../../utils/Constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Spinner from '../../../components/loading/Spinner';
-import { setCurrentlyPlayingVdoId } from '../../../store/WatchSlice';
+import { setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/reducers/PlayListSlice';
+import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/reducers/WatchSlice';
 
 const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
@@ -26,6 +24,18 @@ const iconTray = [
 
 const DedicatedPlaylist = () => {
     const {id} = useParams();
+    const totalVideos = id.split(' ')[1]; 
+    const playListCode = id.split(' ')[0]; 
+const playListDescription = `Choosing the Right Solution:
+
+The best approach depends on the complexity of your content, performance requirements, and desired UI flexibility.
+If you have a simple list with predictable content sizes, dynamic height calculation might suffice.
+For more complex scenarios or large datasets, consider virtualization libraries.
+Additional Tips:
+
+Adjust the hasMore prop of InfiniteScroll based on your data loading logic to ensure it triggers when there's more data to fetch.
+Use a loading indicator while fetching new data to enhance user experience.
+By trying these solutions and tailoring them to your specific project setup, you should be able to resolve the InfiniteScroll issue and achieve smooth scrolling with dynamic content heights.`
     const {
         playListId,
         playListTitle, 
@@ -33,16 +43,22 @@ const DedicatedPlaylist = () => {
         channelName, 
         playListBannerUrl,
         totalItemCount,
-        nxtPgToken
+        nxtPgToken,
+        // playListDescription
     } = useSelector(state => state.playlist);
-    const [showPlayAll, setShowPlayAll] = useState(false);
     const channelID = useSelector(state => state.channel.channelId);
     const comparableHeight = 585;
     const [showBanner, setShowBanner] = useState(window.innerHeight >= comparableHeight);
     const dispatch = useDispatch();
-    const [dataToRender, setDataToRender] = useState(playListData);
     const navigate = useNavigate();
+    const [dataToRender, setDataToRender] = useState(playListData);
     const [isLoading, setIsLoading] = useState(true);
+    const [resultCount, setResultCount] = useState({
+        total: 0,
+        current: 0,
+    });
+    const [currentVdoCount, setCurrentVdoCount] = useState(1);
+    const [truncateText, setTruncateText] = useState(true);
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -52,6 +68,13 @@ const DedicatedPlaylist = () => {
         
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const /* The above code appears to be a comment block in JavaScript React code. It mentions a
+    function or method called `handleTextTruncate`, but the actual implementation of this
+    function is not provided in the comment block. */
+    handleTextTruncate = () => {
+        setTruncateText(prevVal => !prevVal)
+    };
 
     const PlayListAreaSideBar = () => {
         return(
@@ -67,6 +90,7 @@ const DedicatedPlaylist = () => {
                                 backdropFilter: blur,
                             }}
                         />
+
                         <div 
                             className=' absolute top-0 left-0 h-full w-full bg-gradient-to-b from-transparent via-transparent to-[#0f0f0f]'
                         />
@@ -127,32 +151,23 @@ const DedicatedPlaylist = () => {
                                             WebkitBoxShadow: '0px 0px 37px -3px rgba(0,0,0,0.67)',
                                             MozBoxShadow: '0px 0px 37px -3px rgba(0,0,0,0.67)'
                                         }}
-                                        // onMouseEnter={() => setShowPlayAll(true)}
-                                        // onMouseLeave={() => setShowPlayAll(false)}
-                                        to={`/playlist/${id}`}>
+                                        to={`/watch/${playListCode}`}>
                                             <Img
                                                 className={` h-full w-full rounded-lg `}
                                                 src={playListBannerUrl}
                                             />
-
-                                            {showPlayAll && (
-                                                <div className=' '>
-                                                    <div className=' absolute flex items-center justify-center gap-x-3 '>
-                                                        {/* <FaPlay/> */}
-                                                        <p>Play All</p>
-                                                    </div>
-                                                </div>
-                                            )}
                                         </Link>    
                                     )}
                                     
                                     {/* data */}
                                     <div className='font-bold lg:mt-2 text-white md:max-w-[27rem] relative tracking-wide'>
+                                        {/* playlist title */}
                                         <p className='text-2xl lg:text-3xl line-clamp-1 lg:line-clamp-none '>
                                             {playListTitle}
                                         </p>
                                         
                                         <div className=' flex flex-row md:flex-col justify-between'>
+                                            {/* channel name and video count */}
                                             <div className=''>
                                                 <p className=' font-bold text-[1.05rem] mt-6 line-clamp-1'>
                                                     <Link to={`/channel/${channelID}`}>
@@ -162,7 +177,7 @@ const DedicatedPlaylist = () => {
 
                                                 <div className='flex items-center gap-x-2 mt-1'>
                                                     <p className='text-[.9rem] font-normal'>
-                                                        {totalItemCount} videos
+                                                        {playListData.length} out of {totalVideos} videos loaded
                                                     </p>
                                                 </div>
                                             </div>
@@ -177,20 +192,51 @@ const DedicatedPlaylist = () => {
                                                 ))}
                                             </div>
                                         </div>
+
+                                        <div className={` mt-2 block lg:hidden text-[15px] whitespace-pre-line relative`}>
+                                            <div className={`line-clamp-2 font-light`}>
+                                                {extractLinks(playListDescription)}
+                                            </div>
+
+                                            <div className=' absolute text-[13px] right-0 bottom-0 text-white cursor-pointer w-12 flex items-end justify-end'
+                                            onClick={handleTextTruncate}>
+                                                ...more
+                                            </div>
+                                        </div>
+
+                                        {truncateText && (
+                                            <div className=' fixed top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 font-light bg-gray-800 rounded-md overflow-hidden z-10 flex flex-col items-end gap-y-6'>
+                                                <div className=' relative px-7 py-5'>
+                                                    {extractLinks(playListDescription)}
+                                                </div>
+
+                                                <button className='px-5 py-2 hover:bg-blue-900 hover:text-blue-300 rounded-tl-md'
+                                                onClick={handleTextTruncate}>
+                                                    Close
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className=' w-full relative flex items-center justify-between gap-x-3 mt-4 lg:mt-8'>
-                                    <Link 
-                                    className='flex items-center justify-center h-[2.6rem] rounded-full w-1/2 bg-white text-black'
-                                    to={`/playlist/${playListId}`}>
-                                        <RxTriangleRight className='text-[2.4rem]'/> Play all
-                                    </Link>
-                                    <Link 
-                                    className='flex items-center justify-center gap-x-3 h-[2.7rem] bg-[#ffffff1f] rounded-full w-1/2 '
-                                    to={`/playlist/${playListId}`}>
-                                        <TfiControlShuffle className='text-[1.3rem]'/> Shuffle
-                                    </Link>
+                                <div className=' relative'>
+                                    <div className=' w-full relative flex items-center justify-between gap-x-3 mt-4 lg:mt-8'>
+                                        <Link 
+                                        className='flex items-center justify-center h-[2.6rem] rounded-full w-1/2 bg-white text-black'
+                                        to={`/watch/${playListId}`}>
+                                            <RxTriangleRight className='text-[2.4rem]'/> Play all
+                                        </Link>
+
+                                        <Link 
+                                        className='flex items-center justify-center gap-x-3 h-[2.7rem] bg-[#ffffff1f] rounded-full w-1/2 '
+                                        to={`/watch/${playListId}`}>
+                                            <TfiControlShuffle className='text-[1.3rem]'/> Shuffle
+                                        </Link>
+                                    </div>
+
+                                    <p className=' mt-3 hidden lg:block text-[15px] whitespace-pre-line overflow-y-auto max-h-[22rem]'>
+                                        {extractLinks(playListDescription)}
+                                    </p>
                                 </div>
                             </>
                         )}
@@ -212,16 +258,59 @@ const DedicatedPlaylist = () => {
         }
     };
 
-    const fetchNxtPgData = async() => {
-        const NXT_PG_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&pageToken=${nxtPgToken}&playlistId=${id}&key=${YOUTUBE_API_KEY}`;
+    const fetchFullPlayList = async(playListId) => {
+        const PLAY_LIST_DATA_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=${playListId}&key=${YOUTUBE_API_KEY}`;
 
-        if (playListData.length <= totalItemCount) {
+        try {
+            const getFullPlayList = await axios.get(PLAY_LIST_DATA_URL);
+            const vdoItems = getFullPlayList?.data?.items;
+            dispatch(setCurrentlyPlayingVdoId(vdoItems[0]?.contentDetails?.videoId))
+            dispatch(setChannelId(vdoItems[0]?.snippet?.channelId))
+            const channelName = vdoItems[0]?.snippet?.channelTitle
+            setResultCount({
+                total: getFullPlayList?.data?.pageInfo?.totalResults,
+                current: vdoItems.length,
+            })
+            const nextPgToken = getFullPlayList?.data?.nextPageToken;
+            if (!nextPgToken && vdoItems.length === 0) return;
+            
+            const mainData = await Promise.all(vdoItems.map(async(item, indx) => {
+                const videoId = item?.contentDetails?.videoId;
+                const views = await getViews(videoId);
+                const publishedAt = item?.contentDetails?.videoPublishedAt;
+                const description = item?.snippet?.description;
+                const title = item?.snippet?.title;
+                const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                || item?.snippet?.thumbnails?.high?.url
+                                || item?.snippet?.thumbnails?.medium?.url
+                                || item?.snippet?.thumbnails?.standard?.url
+                                || item?.snippet?.thumbnails?.default?.url
+                return {videoId, publishedAt, description, title, thumbnail, views}                
+            }));
+            setDataToRender(mainData);
+            dispatch(setPlayListData(mainData));
+            dispatch(setChannelName(channelName));
+            dispatch(setCounting({
+                totalCount: resultCount.total, 
+                currentCount: currentVdoCount
+            }));
+            dispatch(setNextPgToken(nextPgToken));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchNxtPgData = async() => {
+        const NXT_PG_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&pageToken=${nxtPgToken}&playlistId=${playListCode}&key=${YOUTUBE_API_KEY}`;
+
+        if (resultCount.current <= resultCount.total) {
             try {
                 const getNxtPgData = await axios.get(NXT_PG_URL);
                 const vdoItems = getNxtPgData?.data?.items;
                 const nextPgToken = getNxtPgData?.data?.nextPageToken;
+                if (!nextPgToken && vdoItems.length === 0) return;
 
-                const moreItems = await Promise.all(vdoItems.map(async(item, indx) => {
+                const moreItems = await Promise.all(vdoItems.map(async (item, indx) => {
                     const videoId = item?.contentDetails?.videoId;
                     const views = await getViews(videoId)
                     const publishedAt = item?.contentDetails?.videoPublishedAt;
@@ -232,21 +321,23 @@ const DedicatedPlaylist = () => {
                                     || item?.snippet?.thumbnails?.medium?.url
                                     || item?.snippet?.thumbnails?.standard?.url
                                     || item?.snippet?.thumbnails?.default?.url
-                    return {videoId, publishedAt, description, title, thumbnail, views}
+                    return {videoId, publishedAt, description, title, thumbnail, views};                  
                 }));
                 setDataToRender(prevData => [...prevData, ...moreItems]);
                 dispatch(setNextPgToken(nextPgToken));
             } catch (error) {
-                console.error('error', error);
+                console.error(error);
             }
         };
-    }
+    };
 
     useEffect(() => {
         dispatch(setPlayListData(dataToRender))
     }, [dataToRender])
 
     useEffect(() => {
+        // fetchFullPlayList(playListCode);
+
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 300);
@@ -271,99 +362,87 @@ const DedicatedPlaylist = () => {
                 <PlayListAreaSideBar/>
             </div>
 
-            <div className='space-y-1 lg:ml-[2rem w-full'>
-                <InfiniteScroll 
-                className=''
-                next={fetchNxtPgData}
-                dataLength={playListData.length}
-                hasMore={playListData.length <= totalItemCount}
-                loader={<Spinner/>}>
-                    {playListData.map((data, index) => (
-                        <React.Fragment key={data?.videoId + index}> 
-                            {isLoading ? (
-                                <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
-                                key={data?.videoId}>
-                                    {/* index */}
-                                    <div className=' text-[.8rem] text-gray-400 flex items-center'>
-                                        <span className='bg-slate-400 h-3 w-3 flex items-center animate-pulse rounded-full'/>
-                                    </div>
+            <InfiniteScroll 
+            next={fetchNxtPgData}
+            dataLength={playListData.length}
+            height={'60rem'}
+            className={`  max-h-[28rem] overflow-y-auto mt-2`}
+            loader={
+                <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'>
+                    <div className=' text-[.8rem] text-gray-400 flex items-center'>
+                        <span className='bg-slate-400 h-3 w-3 flex items-center animate-pulse rounded-full'/>
+                    </div>
 
-                                    {/* image */}
-                                    <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'>
-                                    </div>
+                    <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'>
+                    </div>
 
-                                    {/* content */}
-                                    <div className=' space-y-3 lg:space-y-5 mt-2'>
-                                        <div className='min- w-[20rem] h-[1rem] bg-slate-600 rounded-full animate-pulse'/>
+                    <div className=' space-y-3 lg:space-y-5 mt-2'>
+                        <div className='min- w-[20rem] h-[1rem] bg-slate-600 rounded-full animate-pulse'/>
 
-                                        <div className=' flex items-center gap-x-1'>
-                                            <p className='min-w-10 max-w-24 h-[10px] bg-slate-600 rounded-full animate-pulse'/>
+                        <div className=' flex items-center gap-x-1'>
+                            <p className='min-w-10 max-w-24 h-[10px] bg-slate-600 rounded-full animate-pulse'/>
 
-                                            <BsDot className=' animate-pulse text-lg text-slate-600'/>
+                            <BsDot className=' animate-pulse text-lg text-slate-600'/>
 
-                                            <p className='min-w-16 max-w-28 h-[10px] bg-slate-600 rounded-full animate-pulse'/>
+                            <p className='min-w-16 max-w-28 h-[10px] bg-slate-600 rounded-full animate-pulse'/>
 
-                                            <BsDot className=' animate-pulse text-lg text-slate-600'/>
+                            <BsDot className=' animate-pulse text-lg text-slate-600'/>
 
-                                            <p className='min-w-14 max-w-24 h-[10px] bg-slate-600 rounded-full animate-pulse'/>
-                                        </div>
-                                    </div>
+                            <p className='min-w-14 max-w-24 h-[10px] bg-slate-600 rounded-full animate-pulse'/>
+                        </div>
+                    </div>
+                </div>
+            }
+            hasMore={playListData.length <= resultCount.total}>
+                {playListData.map((data, index) => (
+                    <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
+                    key={data?.videoId+index}
+                    to={`/watch/${data?.videoId}`}
+                    onClick={() => handleCurrentVdo(index, data?.videoId)}>
+                        <div className=' text-[.8rem] text-gray-400 flex items-center'>
+                            {index+1}
+                        </div>
+
+                        <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden'>
+                            {data?.title === 'Private video' ? (
+                                <div className=' h-full w-full bg-slate-600 animate-pulse flex items-center justify-center'>
+                                    <MdOutlineErrorOutline
+                                        className=' text-5xl'
+                                    />
                                 </div>
                             ) : (
-                                <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
-                                key={data?.videoId}
-                                to={`/watch/${data?.videoId}`}
-                                onClick={() => handleCurrentVdo(index, data?.videoId)}>
-                                    {/* index */}
-                                    <div className=' text-[.8rem] text-gray-400 flex items-center'>
-                                        {index+1}
-                                    </div>
-
-                                    {/* image */}
-                                    <div className='min-w-[9rem] lg:min-w-[11rem] max-w-[11rem] h-[5rem] lg:min-h-[6rem] lg:max-h-[6rem] rounded-lg overflow-hidden'>
-                                        {data?.title === 'Private video' ? (
-                                            <div className=' h-full w-full bg-slate-600 animate-pulse flex items-center justify-center'>
-                                                <MdOutlineErrorOutline
-                                                    className=' text-5xl'
-                                                />
-                                            </div>
-                                        ) : (
-                                            <Img
-                                                src={data?.thumbnail}
-                                                className={` w-full h-full`}
-                                            />
-                                        )}
-                                    </div>
-
-                                    {/* content */}
-                                    <div className=' space-y-3 lg:space-y-5 mt-2'>
-                                        <div className='line-clamp-1 w-full lg:text-md'>{data?.title}</div>
-
-                                        <div className=' flex items-center gap-x-1'>
-                                            <div className='text-gray-400 z-10 text-[.8rem] line-clamp-1'
-                                            onClick={handleNavigate}>
-                                                {channelName}
-                                            </div>
-
-                                            <BsDot/>
-
-                                            <p className='text-gray-400 text-[.8rem] line-clamp-1'>
-                                                {convertViews(data?.views)} views
-                                            </p>
-
-                                            <BsDot/>
-
-                                            <p className='text-gray-400 text-[.8rem] line-clamp-1'>
-                                                {handleDayCount(data?.publishedAt)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </Link> 
+                                <Img
+                                    src={data?.thumbnail}
+                                    className={` w-full h-full`}
+                                />
                             )}
-                        </React.Fragment>
-                    ))}
-                </InfiniteScroll>
-            </div>
+                        </div>
+
+                        <div className=' space-y-3 lg:space-y-5 mt-2'>
+                            <div className='line-clamp-1 w-full lg:text-md'>{data?.title}</div>
+
+                            <div className=' flex items-center gap-x-1'>
+                                <div className='text-gray-400 z-10 text-[.8rem] line-clamp-1'
+                                onClick={handleNavigate}>
+                                    {channelName}
+                                </div>
+
+                                <BsDot/>
+
+                                <p className='text-gray-400 text-[.8rem] line-clamp-1'>
+                                    {convertViews(data?.views)} views
+                                </p>
+
+                                <BsDot/>
+
+                                <p className='text-gray-400 text-[.8rem] line-clamp-1'>
+                                    {handleDayCount(data?.publishedAt)}
+                                </p>
+                            </div>
+                        </div>
+                    </Link>
+                ))}
+            </InfiniteScroll>
         </div>
     );
 }

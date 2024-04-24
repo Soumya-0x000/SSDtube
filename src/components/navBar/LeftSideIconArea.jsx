@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'
-import { sideBarFloat, sideBarOpen } from '../../store/SidebarSlice';
+import { sideBarFloat, sideBarOpen } from '../../store/reducers/SidebarSlice';
 
 const LeftSideIconArea = ({ setHoverBG, hoverBG }) => {
     const isSideBarOpen = useSelector((state) => state.sidebar.isSidebarOpen);

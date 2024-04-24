@@ -12,15 +12,21 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { MdOutlineVideoLibrary } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import LeftSideIconArea from '../navBar/LeftSideIconArea';
+import { Link } from 'react-router-dom';
 
 export const DesktopSidebar = ({ sidebarVisible }) => {
     const [showPlaylist, setShowPlaylist] = useState(false);
+    const [clickedOption, setClickedOption] = useState('Home');
     const [showSubscriptions, setShowSubscriptions] = useState(false);
     const isSidebarFloating = useSelector((state) => state.sidebar.isFloatSidebar);
     const [hoverBG, setHoverBG] = useState({
         hamBurger: false,
     });
     const isFullSidebarWindow = useSelector((state) => state.sidebar.isFullSidebarWindowSupport);
+
+    const handleOptionClick = (name) => {
+        setClickedOption(name);
+    };
 
     return (
         <div className='w-full'>
@@ -33,13 +39,14 @@ export const DesktopSidebar = ({ sidebarVisible }) => {
                 </div>
             )}
 
-            {/* topmost part, home shorts subscriptions */}
-            <ul className={`${isSidebarFloating && isFullSidebarWindow && 'pt-[3.3rem]'} flex flex-col gap-y-3 border-b-2 border-gray-700 pb-3`}>
+            {/* topmost part: home, watch later, shorts, subscriptions */}
+            <ul className={`${isSidebarFloating && isFullSidebarWindow && 'pt-[3.3rem]'} flex flex-col gap-y-1 border-b-2 border-gray-700 pb-3`}>
                 {mainLinks.map((link, index) => (
-                    <a 
-                    href="#" 
-                    className={`hover:bg-zinc-800 rounded-lg mx-3 pl-3 py-3 ${link.name === 'Home' ? 'bg-zinc-800' : ''}`}
-                    key={link.name+index}>
+                    <Link 
+                    to={`${link.route}`} 
+                    className={`hover:bg-gray-800 rounded-lg mx-3 pl-3 py-3 ${clickedOption === link.name ? 'bg-zinc-800' : ''}`}
+                    key={link.name+index}
+                    onClick={() => handleOptionClick(link.name)}>
                         <li 
                         className={` flex items-center gap-x-5`}>
                             {link.icon}
@@ -47,7 +54,7 @@ export const DesktopSidebar = ({ sidebarVisible }) => {
                                 {link.name}
                             </span>
                         </li>
-                    </a>
+                    </Link>
                 ))}
             </ul>
 
@@ -199,22 +206,30 @@ export const DesktopSidebar = ({ sidebarVisible }) => {
 }
 
 export const MobileSidebar = () => {
+    const [clickedOption, setClickedOption] = useState('Home');
+
+    const handleOptionClick = (name) => {
+        setClickedOption(name);
+    };
+
     return (
         <ul className={`flex flex-col gap-y-4`}>
             {[...mainLinks, {
                 icon: <MdOutlineVideoLibrary className="text-[1.3rem]" />,
                 name: "You",
+                route: '/',
             }].map((link, index) => (
-                <a 
-                href="#" 
-                className={`hover:bg-zinc-800 rounded-lg ml-3 px-2 py-3 ${link.name === 'Home' ? 'bg-zinc-800' : ''}`}
-                key={link.name+index}>
+                <Link 
+                to={`${link.route}`} 
+                className={`hover:bg-zinc-800 rounded-lg ml-3 px-2 py-3 ${clickedOption === link.name ? 'bg-zinc-700' : ''}`}
+                key={link.name+index}
+                onClick={() => handleOptionClick(link.name)}>
                     <li 
                     className={`flex-col flex items-center`}>
                         {link.icon}
                         <span className='text-[10px] mt-1.5'>{link.name}</span>
                     </li>
-                </a>
+                </Link>
             ))}
         </ul>
     )

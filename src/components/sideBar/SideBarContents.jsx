@@ -28,14 +28,22 @@ export const mainLinks = [
     {
         icon: <MdHomeFilled className="text-[1.3rem]" />,
         name: "Home",
+        route: '/',
+    },
+    {
+        icon: <MdOutlineWatchLater className="text-[1.3rem]" />,
+        name: "Watch Later",
+        route: '/watchLater',
     },
     {
         icon: <SiYoutubeshorts className="text-[1.3rem]" />,
         name: "Shorts",
+        route: '',
     },
     {
         icon: <MdSubscriptions className="text-[1.3rem]" />,
         name: "Subscriptions",
+        route: '',
     },
 ];
 
@@ -52,10 +60,7 @@ export const secondaryLinks = [
         icon: <MdOutlineSmartDisplay className="text-[1.3rem]" />,
         name: "Your Videos",
     },
-    {
-        icon: <MdOutlineWatchLater className="text-[1.3rem]" />,
-        name: "Watch Later",
-    },
+    
     {
         icon: <MdThumbUpOffAlt className="text-[1.3rem]" />,
         name: "Liked Videos",

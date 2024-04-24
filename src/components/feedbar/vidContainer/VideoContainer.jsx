@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { getYoutubeData } from '../../../utils/Hooks';
-import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant.js'
+import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/Constant'
 import { useDispatch, useSelector } from "react-redux";
-import { setHomePageVideo, setNxtPageToken } from "../../../store/YoutubeSlice";
 import Skeleton from './Skeleton';
 import VideoCard from './VideoCard';
 import Spinner from '../../loading/Spinner'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import './videoContainer.css'
 import axios from 'axios';
-import { setVidIdArr } from '../../../store/WatchSlice.js';
-import { setPlayListOn } from '../../../store/PlayListSlice.js';
-import { setIsWatchQueueOn } from '../../../store/WatchQueueSlice.js';
+import { setHomePageVideo, setNxtPageToken } from "../../../store/reducers/YoutubeSlice";
+import { setVidIdArr } from '../../../store/reducers/WatchSlice.js';
+import { setPlayListOn } from '../../../store/reducers/PlayListSlice.js';
+import { setIsWatchQueueOn } from '../../../store/reducers/WatchQueueSlice.js';
 
 const VideoContainer = () => {
     const currentVideos = useSelector((state) => state.youtube.videos);
@@ -84,7 +84,6 @@ const VideoContainer = () => {
             console.error(error);
         }
     };
-
 
     useEffect(() => {
         fetchYoutubeVideos();

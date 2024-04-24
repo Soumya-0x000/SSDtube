@@ -7,6 +7,7 @@ import Channel from './pages/channel/Channel'
 import Navbar from './components/navBar/Navbar'
 import PlayListItems from './pages/channel/playlist/PlayListItems'
 import DedicatedPlaylist from './pages/channel/playlist/DedicatedPlaylist'
+import WatchLater from './pages/watch/WatchLater'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -23,13 +24,17 @@ const App = () => {
             element: <Watch/>
         },
         {
+            path: '/watchLater',
+            element: <WatchLater/>
+        },
+        {
             path: '/channel/:id',
             element: <Channel/>
         },
-        {
-            path: '/playlist/:id',
-            element: <PlayListItems/>
-        },
+        // {
+        //     path: '/playlist/:id',
+        //     element: <PlayListItems/>
+        // },
         {
             path: '/dedicatedPlaylist/:id',
             element: <DedicatedPlaylist/>

@@ -2,9 +2,9 @@ import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getChannelInfo, getRecommendedVideos, getVideoInfo, useWindowDimensions } from '../../utils/Hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { setEssentialVdoItems, setIsPlaylistRendered, setNxtPgToken, setRecommendedVdo, setVidIdArr, setWatchData } from '../../store/WatchSlice';
+import { setEssentialVdoItems, setNxtPgToken, setRecommendedVdo, setWatchData } from '../../store/reducers/WatchSlice';
 import axios from 'axios';
-import { BASE_URL, YOUTUBE_API_KEY, convertViews, handleDayCount } from '../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY, convertViews, extractLinks, handleDayCount } from '../../utils/Constant';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import RecommendedCard from './RecommendedCard';
 import Loading from '../../components/loading/Loading';
@@ -43,7 +43,6 @@ const Watch = () => {
         isWatchQueueOn,
         watchQueue
     } = useSelector(state => state.watchQueue);
-
     const { playListOn } = useSelector(state => state.playlist)
 
     const dispatch = useDispatch();
@@ -202,13 +201,13 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        fetchVdoInfo(id);
-        fetchRecommendedVideos(channelID);
+        // fetchVdoInfo(id);
+        // fetchRecommendedVideos(channelID);
     }, []);
     
     useEffect(() => {
-        fetchRecommendedVideos(channelID);
-        fetchVdoInfo(currentlyPlayingVdoId);
+        // fetchRecommendedVideos(channelID);
+        // fetchVdoInfo(currentlyPlayingVdoId);
     }, [currentlyPlayingVdoId, channelID]);
 
     useEffect(() => {
@@ -326,31 +325,6 @@ const Watch = () => {
     const handleOptionClick = () => {
         setIsOptionsLgScrnOpen(!isOptionsLgScrnOpen);
     };
-
-    function extractLinks(text) {
-        if (!text) return null;
-    
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        const matches = text.match(urlRegex);
-    
-        if (!matches) return text;
-        
-        return (
-            <>
-                {text.split(urlRegex).map((part, index) => {
-                    if (matches.includes(part)) {
-                        return (
-                            <a className=' text-blue-400 underline' key={index} href={part} target="_blank" rel="noopener noreferrer">
-                                {part}
-                            </a>
-                        );
-                    } else {
-                        return <span key={index}>{part}</span>;
-                    }
-                })}
-            </>
-        );
-    }
     
     const handleTextTruncate = () => {
         setTruncateText(prevVal => !prevVal)

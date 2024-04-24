@@ -39,3 +39,28 @@ export const generateRandomID = () => {
 
     return randomID;
 }
+
+export function extractLinks(text) {
+    if (!text) return null;
+
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const matches = text.match(urlRegex);
+
+    if (!matches) return text;
+    
+    return (
+        <>
+            {text.split(urlRegex).map((part, index) => {
+                if (matches.includes(part)) {
+                    return (
+                        <a className=' text-blue-400 underline' key={index} href={part} target="_blank" rel="noopener noreferrer">
+                            {part}
+                        </a>
+                    );
+                } else {
+                    return <span key={index}>{part}</span>;
+                }
+            })}
+        </>
+    );
+}

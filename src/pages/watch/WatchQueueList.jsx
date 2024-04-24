@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { MdOutlineErrorOutline } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../components/lazyLoadImage/Img';
-import { generateRandomID, handleDayCount } from '../../utils/constant';
+import { generateRandomID, handleDayCount } from '../../utils/Constant';
 import { IoIosArrowDown } from 'react-icons/io';
 import { RxCross1, RxLoop, RxShuffle } from 'react-icons/rx';
 import { SlOptionsVertical } from 'react-icons/sl';
 import { MdPlaylistAdd } from "react-icons/md";
-import { setCurrentClickIndex, setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
+import { setCurrentClickIndex, setIsWatchQueueOn, setWatchQueue } from '../../store/reducers/WatchQueueSlice';
 import ThreeDotOptions from '../../common/ThreeDotOptions';
-import { setChannelId, setCurrentlyPlayingVdoId } from '../../store/WatchSlice';
+import { setChannelId, setCurrentlyPlayingVdoId } from '../../store/reducers/WatchSlice';
 
 const WatchQueueList = () => {
     const { watchQueue, totalVdo, currentClickIndex } = useSelector(state => state.watchQueue);
@@ -124,6 +124,7 @@ const WatchQueueList = () => {
                             index={index}
                             mode={`watchQueue`}
                             mouseEnter={mouseEnter}
+                            data={data}
                         />
                     </div>
                 ))}

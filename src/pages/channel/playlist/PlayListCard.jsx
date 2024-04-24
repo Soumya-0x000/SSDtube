@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import Img from '../../../components/lazyLoadImage/Img';
 import { CgPlayList } from "react-icons/cg";
-import { handleDayCount } from '../../../utils/constant';
+import { handleDayCount } from '../../../utils/Constant';
 import { Link } from 'react-router-dom';
 import { FaPlay } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
-import { setBannerUrl, setPlayListOn, setPlaylistID, setPlaylistName } from '../../../store/PlayListSlice';
-import { setChannelId } from '../../../store/ChannelSlice';
-import { setChannelId as setChannelID } from '../../../store/WatchSlice';
-import { setIsPlaylistRendered } from '../../../store/WatchSlice';
-import { setIsWatchQueueOn } from '../../../store/WatchQueueSlice';
+import { setBannerUrl, setPlayListDescription, setPlayListOn, setPlaylistID, setPlaylistName } from '../../../store/reducers/PlayListSlice';
+import { setChannelId } from '../../../store/reducers/ChannelSlice';
+import { setChannelId as setChannelID } from '../../../store/reducers/WatchSlice';
+import { setIsPlaylistRendered } from '../../../store/reducers/WatchSlice';
+import { setIsWatchQueueOn } from '../../../store/reducers/WatchQueueSlice';
 
 const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
     const [showPlayAll, setShowPlayAll] = useState(new Array(orgArr.length).fill(false));
     const dispatch = useDispatch();
-
+    
     const handleMouseEntry = () => {
         const updatedArr = [...showPlayAll];
         updatedArr[indx] = true;
@@ -44,6 +44,7 @@ const PlayListCard = ({channelID, itemData, indx, orgArr}) => {
         dispatch(setIsPlaylistRendered(true));
         dispatch(setPlayListOn(true));
         dispatch(setIsWatchQueueOn(false));
+        dispatch(setPlayListDescription(itemData?.snippet?.description));
     };
 
     return (

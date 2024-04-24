@@ -1,5 +1,5 @@
 import axios from "axios";
-import { YOUTUBE_VIDEO_API, BASE_URL, YOUTUBE_API_KEY } from "./constant";
+import { YOUTUBE_VIDEO_API, BASE_URL, YOUTUBE_API_KEY } from "./Constant";
 import { useLayoutEffect, useState } from "react";
 
 export const getYoutubeData = async () => {

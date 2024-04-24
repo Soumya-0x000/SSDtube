@@ -1,9 +1,9 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getChannelInfo } from '../../utils/Hooks';
-import { setChannelData } from '../../store/ChannelSlice';
+import { setChannelData } from '../../store/reducers/ChannelSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { BASE_URL, YOUTUBE_API_KEY, convertViews, handleDayCount } from '../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY, convertViews, handleDayCount } from '../../utils/Constant';
 import { LuDot } from "react-icons/lu";
 import { FaChevronRight } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
@@ -63,17 +63,19 @@ const Channel = () => {
                 loaded: true,
                 channelCoverImg
             });
-        }
-
+        } else { return }
+        
         const primaryPart = channelData?.data?.items[0];
         const title = primaryPart?.snippet?.localized?.title;
         const description = primaryPart?.snippet?.localized?.description;
         const subscribers = primaryPart?.statistics?.subscriberCount;
         const videoCount = primaryPart?.statistics?.videoCount;
         const viewCount = primaryPart?.statistics?.viewCount;
-        const url = primaryPart?.snippet?.thumbnails?.high?.url 
+        const url = primaryPart?.snippet?.thumbnails?.default?.url
                     || primaryPart?.snippet?.thumbnails?.medium?.url 
-                    || primaryPart?.snippet?.thumbnails?.default?.url;
+                    || primaryPart?.snippet?.thumbnails?.high?.url 
+                    || primaryPart?.snippet?.thumbnails?.standard?.url
+                    || primaryPart?.snippet?.thumbnails?.maxres?.url;
         const customUrl = primaryPart?.snippet?.customUrl;
         const creationTime = primaryPart?.snippet?.publishedAt;
         dispatch(setChannelData({

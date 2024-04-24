@@ -1,24 +1,31 @@
 import { useDispatch, useSelector } from 'react-redux';
 import Img from '../../components/lazyLoadImage/Img'
-import { convertViews, handleDayCount } from '../../utils/constant'
+import { convertViews, handleDayCount } from '../../utils/Constant'
 import { BsDot } from "react-icons/bs";
-import { setCurrentlyPlayingVdoId } from '../../store/WatchSlice';
+import { setCurrentlyPlayingVdoId } from '../../store/reducers/WatchSlice';
 import { CiClock2 } from "react-icons/ci";
 import { PiQueueFill } from "react-icons/pi";
-import { setCounting, setPlayListData } from '../../store/PlayListSlice';
+import { setCounting, setPlayListData } from '../../store/reducers/PlayListSlice';
 import { useEffect, useState } from 'react';
 import { CgPlayListCheck } from "react-icons/cg";
 import { IoMdCheckmark } from "react-icons/io";
 import ThreeDotOptions from '../../common/ThreeDotOptions';
-import { setIsWatchQueueOn, setWatchQueue } from '../../store/WatchQueueSlice';
+import { setIsWatchQueueOn, setWatchQueue } from '../../store/reducers/WatchQueueSlice';
+import { setWatchLaterData } from '../../store/reducers/WatchLaterSlice';
+import { getViews } from '../../utils/Hooks';
 
 const RecommendedCard = ({ item, snippetType, index }) => {
     const dispatch = useDispatch();
-    const { playListData, playListOn, currentItemsCount } = useSelector(state=> state.playlist);
+    const { 
+        playListData, 
+        playListOn, 
+        currentItemsCount 
+    } = useSelector(state=> state.playlist);
     const { 
         isWatchQueueOn, 
         watchQueue, 
     } = useSelector(state=> state.watchQueue);
+    const { watchLaterData, totalVids } = useSelector(state=> state.watchLater)
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
     const [clicked, setClicked] = useState({
@@ -33,7 +40,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         // }
     };
 
-    const addToWatchLater = (e, item) => {
+    const handleWatchLaterVdo = (e, item) => {
         e.stopPropagation();
         setClicked({
             ...clicked,
@@ -41,6 +48,40 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         })
         console.log('watch later', item)
     };
+
+    useEffect(() => {
+        if (clicked.watchLater) {
+            const id = item?.contentDetails?.upload?.videoId;
+            const isDuplicate = watchLaterData.some((entry) => entry.videoId === id);
+
+            if (!isDuplicate) {
+                (async () => {    
+                    const videoId = item?.contentDetails?.upload?.videoId;
+                    const views = await getViews(videoId)
+                    const publishedAt = item?.snippet?.publishedAt;
+                    const title = item?.snippet?.title;
+                    const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                    || item?.snippet?.thumbnails?.high?.url
+                                    || item?.snippet?.thumbnails?.medium?.url
+                                    || item?.snippet?.thumbnails?.standard?.url
+                                    || item?.snippet?.thumbnails?.default?.url
+                    const channelName = item?.snippet?.channelTitle;
+                    const channelID = item?.snippet?.channelId;
+                    const mode = 'recommend';
+                    
+                    dispatch(setWatchLaterData([
+                        ...watchLaterData,
+                        {videoId, views, title, thumbnail, publishedAt, channelName, channelID, mode}
+                    ]));
+                })();
+            }
+            
+            setClicked(prevState => ({
+                ...prevState,
+                watchLater: false
+            }));
+        }
+    }, [clicked.watchLater]);
     
     const handleAddVdo = async (e, item) => {
         e.stopPropagation();
@@ -54,9 +95,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         if (playListOn) {
             const isDuplicate = playListData.some((entry) => entry.videoId === id);
 
-            if (isDuplicate) {
-                alert('Already added to watch playlist');
-            } else {
+            if (!isDuplicate) {
                 dispatch(setIsWatchQueueOn(false));
                 (async () => {
                     const videoId = item?.contentDetails?.upload?.videoId;
@@ -151,7 +190,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
 
                             <div className=' absolute right-1 top-2 hidden group-hover:flex flex-col gap-y-1'>
                                 <div className='bg-black backdrop-blur-md text-white text-[21px] rounded-md p-1'
-                                onClick={(e) => addToWatchLater(e, item)}>
+                                onClick={(e) => handleWatchLaterVdo(e, item)}>
                                     {clicked.watchLater ? (
                                         <IoMdCheckmark/>
                                     ) : (
@@ -213,6 +252,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                         index={index}
                         mode={`recommended`}
                         mouseEnter={mouseEnter}
+                        data={item}
                     />
                 </div>
             )}

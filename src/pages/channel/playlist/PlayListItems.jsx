@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { BASE_URL, YOUTUBE_API_KEY, generateRandomID } from '../../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY, generateRandomID } from '../../../utils/Constant';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBannerUrl, setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/PlayListSlice';
+import { setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/reducers/PlayListSlice';
 import { RxCross1, RxShuffle } from "react-icons/rx";
 import { RxLoop } from "react-icons/rx";
 import { MdOutlineErrorOutline } from "react-icons/md";
@@ -11,12 +11,8 @@ import { SlOptionsVertical } from "react-icons/sl";
 import Img from '../../../components/lazyLoadImage/Img';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { IoIosArrowDown } from "react-icons/io";
-import { data } from 'autoprefixer';
-import { getPlayLists, getViews } from '../../../utils/Hooks';
-import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/WatchSlice';
-import { MdOutlineWatchLater } from "react-icons/md";
-import { FaRegTrashCan } from "react-icons/fa6";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { getViews } from '../../../utils/Hooks';
+import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/reducers/WatchSlice';
 import ThreeDotOptions from '../../../common/ThreeDotOptions';
 
 const PlayListItems = () => {
@@ -54,10 +50,10 @@ const PlayListItems = () => {
             dispatch(setChannelId(vdoItems[0]?.snippet?.channelId))
             const channelName = vdoItems[0]?.snippet?.channelTitle
             const totalCount = getFullPlayList?.data?.pageInfo?.totalResults;
-            // setResultCount({
-            //     total: totalCount,
-            //     current: vdoItems.length,
-            // })
+            setResultCount({
+                total: getFullPlayList?.data?.pageInfo?.totalResults,
+                current: vdoItems.length,
+            })
             const nextPgToken = getFullPlayList?.data?.nextPageToken;
             if (!nextPgToken && vdoItems.length === 0) return;
             
@@ -77,7 +73,10 @@ const PlayListItems = () => {
             setDataToRender(mainData);
             dispatch(setPlayListData(mainData));
             dispatch(setChannelName(channelName));
-            dispatch(setCounting({totalCount, currentCount: currentVdoCount}));
+            dispatch(setCounting({
+                totalCount: resultCount.total, 
+                currentCount: currentVdoCount
+            }));
             dispatch(setNextPgToken(nextPgToken));
         } catch (error) {
             console.error(error);
@@ -166,6 +165,7 @@ const PlayListItems = () => {
                                 <p className='bg-slate-600 animate-pulse rounded-full p-2 w-9 h-9 '/>
                                 <p className='bg-slate-600 animate-pulse rounded-full p-2 w-9 h-9 '/>
                             </div>
+
                             <p className='bg-slate-600 animate-pulse rounded-full p-2 w-5 h-10 '/>
                         </div>
                     </div>
@@ -196,10 +196,16 @@ const PlayListItems = () => {
                             <div className='text-[.84rem] space-y-1'>
                                 <Link 
                                 className='text-[1.3rem] font-bold'
-                                to={`/dedicatedPlaylist/${playListID}`}>
+                                to={`/dedicatedPlaylist/${playListID} ${resultCount.total}`}>
                                     {playListTitle}
                                 </Link>
-                                <p><Link to={`/channel/${channelID}`}>{channelName}</Link> - {currentItemsCount}/{totalItemCount}</p>
+
+                                <p>
+                                    <Link 
+                                    to={`/channel/${channelID}`}>
+                                        {channelName}
+                                    </Link> - {currentItemsCount}/{resultCount.total}
+                                </p>
                             </div>
 
                             {hideVids ? (
@@ -267,6 +273,7 @@ const PlayListItems = () => {
                                     setOptionsClicked={setOptionsClicked}
                                     mode={`playList`}
                                     mouseEnter={mouseEnter}
+                                    data={data}
                                 />
                             </div>
                         ))}

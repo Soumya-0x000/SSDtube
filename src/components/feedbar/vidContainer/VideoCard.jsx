@@ -3,9 +3,9 @@ import Img from '../../lazyLoadImage/Img';
 import { Link } from 'react-router-dom';
 import { GoDotFill } from "react-icons/go";
 import { getChannelInfo } from '../../../utils/Hooks';
-import { convertViews, handleDayCount } from '../../../utils/constant';
+import { convertViews, handleDayCount } from '../../../utils/Constant';
 import { useDispatch } from 'react-redux';
-import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/WatchSlice';
+import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/reducers/WatchSlice';
 
 const VideoCard = ({item, indx}) => {
     const [logoURL, setLogoURL] = useState('');

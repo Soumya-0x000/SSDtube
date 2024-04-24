@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/constant';
+import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/Constant';
 import { useParams } from 'react-router-dom';
 import PlayListSkeleton from './PlayListSkeleton';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -86,7 +86,7 @@ const PlayListSection = ({ isChannelContentLoaded }) => {
         const selectedOptionColor = Object.fromEntries(Object.keys(activeSortOption).map(key => [key, key === sortType]))
         setActiveSortOption(selectedOptionColor)
     };
-
+        
     return (
         <>
             {playListDataStatus ? (

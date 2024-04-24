@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DesktopSidebar, MobileSidebar } from './Sidebars';
-import { fullSidebarWindowSupport, sideBarFloat, sideBarOpen } from '../../store/SidebarSlice';
+import { fullSidebarWindowSupport, sideBarFloat, sideBarOpen } from '../../store/reducers/SidebarSlice';
 
 const Sidebar = () => {
     const isSideBarOpen = useSelector((state) => state.sidebar.isSidebarOpen);

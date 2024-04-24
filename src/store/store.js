@@ -1,10 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { SideBarSlice } from "./SidebarSlice";
-import { YoutubeSlice } from "./YoutubeSlice";
-import { WatchSlice } from "./WatchSlice";
-import { ChannelSlice } from "./ChannelSlice";
-import { PlayListSlice } from "./PlayListSlice";
-import { WatchQueueSlice } from "./WatchQueueSlice";
+import { SideBarSlice } from "./reducers/SidebarSlice";
+import { YoutubeSlice } from "./reducers/YoutubeSlice";
+import { WatchSlice } from "./reducers/WatchSlice";
+import { ChannelSlice } from "./reducers/ChannelSlice";
+import { PlayListSlice } from "./reducers/PlayListSlice";
+import { WatchQueueSlice } from "./reducers/WatchQueueSlice";
+import { WatchLaterSlice } from "./reducers/WatchLaterSlice";
 
 export const store = configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
         channel: ChannelSlice.reducer,
         playlist: PlayListSlice.reducer,
         watchQueue: WatchQueueSlice.reducer,
+        watchLater: WatchLaterSlice.reducer,
     }
 })
