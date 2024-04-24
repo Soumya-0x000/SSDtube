@@ -32,6 +32,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         watchLater: false,
         watchQ: false,
     });
+    const [watchLaterMode, setWatchLaterMode] = useState('');
 
     const handleClick = async () => {
         // if (snippetType === 'upload') {
@@ -41,12 +42,14 @@ const RecommendedCard = ({ item, snippetType, index }) => {
     };
 
     const handleWatchLaterVdo = (e, item) => {
+        // dispatch(setWatchLaterData('ttbhw'))
         e.stopPropagation();
         setClicked({
+            watchLater: true,
             ...clicked,
-            watchLater: true
-        })
-        console.log('watch later', item)
+        });
+        setWatchLaterMode('shs');
+        console.log('watch later', clicked)
     };
 
     useEffect(() => {
@@ -67,11 +70,10 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                                     || item?.snippet?.thumbnails?.default?.url
                     const channelName = item?.snippet?.channelTitle;
                     const channelID = item?.snippet?.channelId;
-                    const mode = 'recommend';
                     
                     dispatch(setWatchLaterData([
                         ...watchLaterData,
-                        {videoId, views, title, thumbnail, publishedAt, channelName, channelID, mode}
+                        {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
                     ]));
                 })();
             }

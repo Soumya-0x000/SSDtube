@@ -26,16 +26,7 @@ const DedicatedPlaylist = () => {
     const {id} = useParams();
     const totalVideos = id.split(' ')[1]; 
     const playListCode = id.split(' ')[0]; 
-const playListDescription = `Choosing the Right Solution:
 
-The best approach depends on the complexity of your content, performance requirements, and desired UI flexibility.
-If you have a simple list with predictable content sizes, dynamic height calculation might suffice.
-For more complex scenarios or large datasets, consider virtualization libraries.
-Additional Tips:
-
-Adjust the hasMore prop of InfiniteScroll based on your data loading logic to ensure it triggers when there's more data to fetch.
-Use a loading indicator while fetching new data to enhance user experience.
-By trying these solutions and tailoring them to your specific project setup, you should be able to resolve the InfiniteScroll issue and achieve smooth scrolling with dynamic content heights.`
     const {
         playListId,
         playListTitle, 
@@ -44,21 +35,21 @@ By trying these solutions and tailoring them to your specific project setup, you
         playListBannerUrl,
         totalItemCount,
         nxtPgToken,
-        // playListDescription
+        playListDescription
     } = useSelector(state => state.playlist);
     const channelID = useSelector(state => state.channel.channelId);
     const comparableHeight = 585;
     const [showBanner, setShowBanner] = useState(window.innerHeight >= comparableHeight);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [dataToRender, setDataToRender] = useState(playListData);
+    const [dataToRender, setDataToRender] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [resultCount, setResultCount] = useState({
         total: 0,
         current: 0,
     });
     const [currentVdoCount, setCurrentVdoCount] = useState(1);
-    const [truncateText, setTruncateText] = useState(true);
+    const [truncateText, setTruncateText] = useState(false);
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -69,10 +60,7 @@ By trying these solutions and tailoring them to your specific project setup, you
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const /* The above code appears to be a comment block in JavaScript React code. It mentions a
-    function or method called `handleTextTruncate`, but the actual implementation of this
-    function is not provided in the comment block. */
-    handleTextTruncate = () => {
+    const handleTextTruncate = () => {
         setTruncateText(prevVal => !prevVal)
     };
 
@@ -324,6 +312,7 @@ By trying these solutions and tailoring them to your specific project setup, you
                     return {videoId, publishedAt, description, title, thumbnail, views};                  
                 }));
                 setDataToRender(prevData => [...prevData, ...moreItems]);
+                
                 dispatch(setNextPgToken(nextPgToken));
             } catch (error) {
                 console.error(error);
@@ -336,7 +325,7 @@ By trying these solutions and tailoring them to your specific project setup, you
     }, [dataToRender])
 
     useEffect(() => {
-        // fetchFullPlayList(playListCode);
+        fetchFullPlayList(playListCode);
 
         const timer = setTimeout(() => {
             setIsLoading(false);
@@ -354,7 +343,7 @@ By trying these solutions and tailoring them to your specific project setup, you
         dispatch(setCurrentlyPlayingVdoId(vdoId));
         dispatch(setCounting({currentCount: index+1, totalCount: playListData.length }));
     };
-
+    
     return (
         <div 
         className=' h-screen lg:py-2 lg:pl-2 flex flex-col lg:flex-row gap-x-3 w-full'>
@@ -365,8 +354,7 @@ By trying these solutions and tailoring them to your specific project setup, you
             <InfiniteScroll 
             next={fetchNxtPgData}
             dataLength={playListData.length}
-            height={'60rem'}
-            className={`  max-h-[28rem] overflow-y-auto mt-2`}
+            className={` overflow-y-auto mt-2`}
             loader={
                 <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'>
                     <div className=' text-[.8rem] text-gray-400 flex items-center'>
@@ -393,7 +381,7 @@ By trying these solutions and tailoring them to your specific project setup, you
                     </div>
                 </div>
             }
-            hasMore={playListData.length <= resultCount.total}>
+            hasMore={dataToRender.length < resultCount.total}>
                 {playListData.map((data, index) => (
                     <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
                     key={data?.videoId+index}

@@ -132,7 +132,6 @@ const Watch = () => {
             try {
                 const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
                 const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
-                // console.log(item)
                 return {...item, viewCount}
             } catch (error) {
                 console.error(error);
@@ -176,7 +175,6 @@ const Watch = () => {
                     ));
 
                     setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
-                    // dispatch(setRecommendedVdo(recommendedItems));
 
                     setResultCount(prevResultCount => ({
                         ...prevResultCount,

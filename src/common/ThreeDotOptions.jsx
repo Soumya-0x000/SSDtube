@@ -27,7 +27,7 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
         watchQ: false,
     });
     const [watchLaterContent, setWatchLaterContent] = useState([]);
-    const [watchLaterMode, setWatchLaterMode] = useState([]);
+    const [watchLaterMode, setWatchLaterMode] = useState('');
     
     const handleOperations = (parentComp, videoCode, index, mainMode) => {
         switch (parentComp) {
@@ -74,86 +74,132 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
                 };
                 break;
             case 'addToWatchLater':
-                console.log('ssd')
-                setWatchLaterMode('mainMode');
+                setClicked({
+                    ...clicked,
+                    watchLater: true,
+                });
+                
+                console.log(clicked)
+                if(mainMode === 'recommended') {
+                    const watchLaterVdoId = data?.contentDetails?.upload?.videoId;
+                    const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
+        
+                    (async () => {
+                        try {
+                            const videoId = data?.contentDetails?.upload?.videoId;
+                            const views = await getViews(videoId)
+                            const publishedAt = data?.snippet?.publishedAt;
+                            const title = data?.snippet?.title;
+                            const thumbnail = data?.snippet?.thumbnails?.maxres?.url
+                                            || data?.snippet?.thumbnails?.high?.url
+                                            || data?.snippet?.thumbnails?.medium?.url
+                                            || data?.snippet?.thumbnails?.standard?.url
+                                            || data?.snippet?.thumbnails?.default?.url
+                            const channelName = data?.snippet?.channelTitle;
+                            const channelID = data?.snippet?.channelId;
+                            
+                            const allVal = {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
+                            
+                            setWatchLaterContent(prevVal => [ ...prevVal, allVal ]);
+                            console.log(allVal);
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    })();
+                } else if (mainMode === 'playList' || mainMode === 'watchQueue') {
+                    const watchLaterVdoId = data?.videoId;                    
+                    const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
+                    
+                    (async() => {
+                        try {
+                            const views = await getViews(watchLaterVdoId)
+                            const updatedData = ({ ...data, views });
+
+                            setWatchLaterContent(prevVal => [ ...prevVal, updatedData ]);
+                            dispatch(setWatchLaterData(updatedData));
+                            console.log(updatedData);
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    })(); 
+                }
+                
+                console.log(watchLaterData)
                 break;
             default:
                 break
         }
     };
 
-    const handleWatchLater = (mainMode) => {
-        // setClicked(prevVal => ({
-        //     ...prevVal,
-        //     watchLater: true
-        // }))
-        setWatchLaterMode('mainMode');
-        console.log(watchLaterMode)
-    };
-        // if(mainMode === 'recommended') {
-        //     const watchLaterVdoId = data?.contentDetails?.upload?.videoId;
-        //     console.log(watchLaterVdoId)
-
-        //     // if (clicked.watchLater) {
-        //         const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
-    
-        //         // if (!isDuplicate) {
-        //             (async () => {
-        //                 try {
-        //                     const videoId = data?.contentDetails?.upload?.videoId;
-        //                     const views = await getViews(videoId)
-        //                     const publishedAt = data?.snippet?.publishedAt;
-        //                     const title = data?.snippet?.title;
-        //                     const thumbnail = data?.snippet?.thumbnails?.maxres?.url
-        //                                     || data?.snippet?.thumbnails?.high?.url
-        //                                     || data?.snippet?.thumbnails?.medium?.url
-        //                                     || data?.snippet?.thumbnails?.standard?.url
-        //                                     || data?.snippet?.thumbnails?.default?.url
-        //                     const channelName = data?.snippet?.channelTitle;
-        //                     const channelID = data?.snippet?.channelId;
-                            
-        //                     const allVal = {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
-                            
-        //                     setWatchLaterContent(prevVal => [ ...prevVal, allVal ]);
-        //                     console.log(allVal);
-        //                 } catch (error) {
-        //                     console.error(error);
-        //                 }
-        //             })();
-        //         // }
-                
-        //         // setClicked(prevState => ({
-        //         //     ...prevState,
-        //         //     watchLater: false
-        //         // }));
-        //     // }
-        // } else if (mainMode === 'playList' || mainMode === 'watchQueue') {
-        //     const watchLaterVdoId = data?.videoId;
-        //     console.log(watchLaterVdoId)
-            
-        //     // if (clicked.watchLater) {
-        //         const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
-                
-        //         // if (!isDuplicate) {
-        //             (async() => {
-        //                 try {
-        //                     const views = await getViews(watchLaterVdoId)
-        //                     const updatedData = ({ ...data, views });
-
-        //                     setWatchLaterContent(prevVal => [ ...prevVal, updatedData ]);
-        //                     console.log(updatedData);
-        //                 } catch (error) {
-        //                     console.error(error);
-        //                 }
-        //             })();
-        //         // };
-        //     // }
-        // }
-    useEffect(() => {
+    // const handleWatchLater = (parentComp, videoCode, index, mainMode) => {
+    //     setClicked(prevVal => ({
+    //         ...prevVal,
+    //         watchLater: true
+    //     }))
+    //     setWatchLaterMode(mainMode);
         
-    })
-    
+    //     // if(mainMode === 'recommended') {
+    //     //     const watchLaterVdoId = data?.contentDetails?.upload?.videoId;
+    //     //     console.log(watchLaterVdoId)
 
+    //     //     // if (clicked.watchLater) {
+    //     //         const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
+    
+    //     //         // if (!isDuplicate) {
+    //     //             (async () => {
+    //     //                 try {
+    //     //                     const videoId = data?.contentDetails?.upload?.videoId;
+    //     //                     const views = await getViews(videoId)
+    //     //                     const publishedAt = data?.snippet?.publishedAt;
+    //     //                     const title = data?.snippet?.title;
+    //     //                     const thumbnail = data?.snippet?.thumbnails?.maxres?.url
+    //     //                                     || data?.snippet?.thumbnails?.high?.url
+    //     //                                     || data?.snippet?.thumbnails?.medium?.url
+    //     //                                     || data?.snippet?.thumbnails?.standard?.url
+    //     //                                     || data?.snippet?.thumbnails?.default?.url
+    //     //                     const channelName = data?.snippet?.channelTitle;
+    //     //                     const channelID = data?.snippet?.channelId;
+                            
+    //     //                     const allVal = {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
+                            
+    //     //                     setWatchLaterContent(prevVal => [ ...prevVal, allVal ]);
+    //     //                     console.log(allVal);
+    //     //                 } catch (error) {
+    //     //                     console.error(error);
+    //     //                 }
+    //     //             })();
+    //     //         // }
+                
+    //     //         // setClicked(prevState => ({
+    //     //         //     ...prevState,
+    //     //         //     watchLater: false
+    //     //         // }));
+    //     //     // }
+    //     // } else if (mainMode === 'playList' || mainMode === 'watchQueue') {
+    //     //     const watchLaterVdoId = data?.videoId;
+    //     //     console.log(watchLaterVdoId)
+            
+    //     //     // if (clicked.watchLater) {
+    //     //         const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
+                
+    //     //         // if (!isDuplicate) {
+    //     //             (async() => {
+    //     //                 try {
+    //     //                     const views = await getViews(watchLaterVdoId)
+    //     //                     const updatedData = ({ ...data, views });
+
+    //     //                     setWatchLaterContent(prevVal => [ ...prevVal, updatedData ]);
+    //     //                     console.log(updatedData);
+    //     //                 } catch (error) {
+    //     //                     console.error(error);
+    //     //                 }
+    //     //             })();
+    //     //         // };
+    //     //     // }
+    //     // }
+        
+    //     console.log(watchLaterMode)
+    // };
 
     useEffect(() => {
         dispatch(setCurrentClickIndex(
@@ -205,6 +251,12 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
     const ThreeDotClickOptions = (videoCode, index) => {
         return (
             <div className=' space-y-5'>
+                <div className=' flex flex-wrap gap-x-3'
+                onClick={() => handleOperations('addToWatchLater', videoCode, index, mode)}>
+                    <MdOutlineWatchLater className=' text-2xl'/>
+                    <span>Add to watch later</span>
+                </div>
+                
                 {mode === 'playList' && (
                     <div className=' flex flex-wrap gap-x-3'
                     onClick={() => handleOperations('removePlaylistEntry', videoCode, index, mode)}>
@@ -228,12 +280,6 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
                         <span>Add to queue</span>
                     </div>
                 )}
-
-                <div className=' flex flex-wrap gap-x-3'
-                onClick={() => handleOperations('addToWatchLater', videoCode, index, mode)}>
-                    <MdOutlineWatchLater className=' text-2xl'/>
-                    <span>Add to watch later</span>
-                </div>
             </div>
         )
     };
