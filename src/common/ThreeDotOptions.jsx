@@ -7,7 +7,9 @@ import { PiQueueFill } from "react-icons/pi";
 import { setCounting, setPlayListData } from '../store/reducers/PlayListSlice';
 import { setCurrentClickIndex, setIsWatchQueueOn, setWatchQueue } from '../store/reducers/WatchQueueSlice';
 import { setWatchLaterData } from '../store/reducers/WatchLaterSlice';
-import { getViews } from '../utils/Hooks';
+import { getVideoInfo, getViews } from '../utils/Hooks';
+import {BASE_URL, YOUTUBE_API_KEY} from '../utils/Constant';
+import axios from 'axios';
 
 const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mode, mouseEnter, data }) => {
     const { 
@@ -26,8 +28,6 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
         watchLater: false,
         watchQ: false,
     });
-    const [watchLaterContent, setWatchLaterContent] = useState([]);
-    const [watchLaterMode, setWatchLaterMode] = useState('');
     
     const handleOperations = (parentComp, videoCode, index, mainMode) => {
         switch (parentComp) {
@@ -74,20 +74,14 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
                 };
                 break;
             case 'addToWatchLater':
-                setClicked({
-                    ...clicked,
-                    watchLater: true,
-                });
-                
-                console.log(clicked)
                 if(mainMode === 'recommended') {
-                    const watchLaterVdoId = data?.contentDetails?.upload?.videoId;
-                    const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
-        
-                    (async () => {
-                        try {
+                    const id = data?.contentDetails?.upload?.videoId;
+                    const isDuplicate = watchLaterData.some((entry) => entry.videoId === id);
+
+                    if (!isDuplicate) {
+                        (async () => {
                             const videoId = data?.contentDetails?.upload?.videoId;
-                            const views = await getViews(videoId)
+                            const views = data?.viewCount;
                             const publishedAt = data?.snippet?.publishedAt;
                             const title = data?.snippet?.title;
                             const thumbnail = data?.snippet?.thumbnails?.maxres?.url
@@ -97,109 +91,49 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
                                             || data?.snippet?.thumbnails?.default?.url
                             const channelName = data?.snippet?.channelTitle;
                             const channelID = data?.snippet?.channelId;
-                            
-                            const allVal = {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
-                            
-                            setWatchLaterContent(prevVal => [ ...prevVal, allVal ]);
-                            console.log(allVal);
-                        } catch (error) {
-                            console.error(error);
-                        }
-                    })();
-                } else if (mainMode === 'playList' || mainMode === 'watchQueue') {
-                    const watchLaterVdoId = data?.videoId;                    
-                    const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
-                    
-                    (async() => {
-                        try {
-                            const views = await getViews(watchLaterVdoId)
-                            const updatedData = ({ ...data, views });
 
-                            setWatchLaterContent(prevVal => [ ...prevVal, updatedData ]);
-                            dispatch(setWatchLaterData(updatedData));
-                            console.log(updatedData);
-                        } catch (error) {
-                            console.error(error);
-                        }
-                    })(); 
+                            dispatch(setWatchLaterData([
+                                ...watchLaterData, 
+                                {videoId, views, publishedAt, title, thumbnail, channelName, channelID}
+                            ]));
+                        })();
+                    }
+                } else if (mainMode === 'playList' || mainMode === 'watchQueue') {
+                    const id = data?.videoId;
+                    const isDuplicate = watchLaterData.some((entry) => entry.videoId === id);
+                    
+                    if (!isDuplicate) {
+                        (async() => {
+                            try {
+                                const GET_VIDEO_INFO = `${BASE_URL}/videos?part=snippet&id=${id}&key=${YOUTUBE_API_KEY}`;
+                                const views = await getViews(id);
+                                const vdoInfo = await axios.get(GET_VIDEO_INFO);
+                                const primaryPart = vdoInfo?.data?.items[0]?.snippet;
+
+                                const channelID = primaryPart?.channelId;
+                                const channelName = primaryPart?.channelTitle;
+
+                                const newData = { ...data };
+                                if (!newData.channelID && !newData.channelName) {
+                                    newData.channelID = channelID;
+                                    newData.channelName = channelName;
+                                }
+                                                        
+                                dispatch(setWatchLaterData([
+                                    ...watchLaterData,
+                                    { ...newData, views }
+                                ]));
+                            } catch (error) {
+                                console.error(error);
+                            }
+                        })(); 
+                    }
                 }
-                
-                console.log(watchLaterData)
                 break;
             default:
                 break
         }
     };
-
-    // const handleWatchLater = (parentComp, videoCode, index, mainMode) => {
-    //     setClicked(prevVal => ({
-    //         ...prevVal,
-    //         watchLater: true
-    //     }))
-    //     setWatchLaterMode(mainMode);
-        
-    //     // if(mainMode === 'recommended') {
-    //     //     const watchLaterVdoId = data?.contentDetails?.upload?.videoId;
-    //     //     console.log(watchLaterVdoId)
-
-    //     //     // if (clicked.watchLater) {
-    //     //         const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
-    
-    //     //         // if (!isDuplicate) {
-    //     //             (async () => {
-    //     //                 try {
-    //     //                     const videoId = data?.contentDetails?.upload?.videoId;
-    //     //                     const views = await getViews(videoId)
-    //     //                     const publishedAt = data?.snippet?.publishedAt;
-    //     //                     const title = data?.snippet?.title;
-    //     //                     const thumbnail = data?.snippet?.thumbnails?.maxres?.url
-    //     //                                     || data?.snippet?.thumbnails?.high?.url
-    //     //                                     || data?.snippet?.thumbnails?.medium?.url
-    //     //                                     || data?.snippet?.thumbnails?.standard?.url
-    //     //                                     || data?.snippet?.thumbnails?.default?.url
-    //     //                     const channelName = data?.snippet?.channelTitle;
-    //     //                     const channelID = data?.snippet?.channelId;
-                            
-    //     //                     const allVal = {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
-                            
-    //     //                     setWatchLaterContent(prevVal => [ ...prevVal, allVal ]);
-    //     //                     console.log(allVal);
-    //     //                 } catch (error) {
-    //     //                     console.error(error);
-    //     //                 }
-    //     //             })();
-    //     //         // }
-                
-    //     //         // setClicked(prevState => ({
-    //     //         //     ...prevState,
-    //     //         //     watchLater: false
-    //     //         // }));
-    //     //     // }
-    //     // } else if (mainMode === 'playList' || mainMode === 'watchQueue') {
-    //     //     const watchLaterVdoId = data?.videoId;
-    //     //     console.log(watchLaterVdoId)
-            
-    //     //     // if (clicked.watchLater) {
-    //     //         const isDuplicate = watchLaterContent.some((entry) => entry.videoId === watchLaterVdoId);
-                
-    //     //         // if (!isDuplicate) {
-    //     //             (async() => {
-    //     //                 try {
-    //     //                     const views = await getViews(watchLaterVdoId)
-    //     //                     const updatedData = ({ ...data, views });
-
-    //     //                     setWatchLaterContent(prevVal => [ ...prevVal, updatedData ]);
-    //     //                     console.log(updatedData);
-    //     //                 } catch (error) {
-    //     //                     console.error(error);
-    //     //                 }
-    //     //             })();
-    //     //         // };
-    //     //     // }
-    //     // }
-        
-    //     console.log(watchLaterMode)
-    // };
 
     useEffect(() => {
         dispatch(setCurrentClickIndex(

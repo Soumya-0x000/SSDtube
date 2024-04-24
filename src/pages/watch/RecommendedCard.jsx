@@ -32,7 +32,6 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         watchLater: false,
         watchQ: false,
     });
-    const [watchLaterMode, setWatchLaterMode] = useState('');
 
     const handleClick = async () => {
         // if (snippetType === 'upload') {
@@ -42,49 +41,32 @@ const RecommendedCard = ({ item, snippetType, index }) => {
     };
 
     const handleWatchLaterVdo = (e, item) => {
-        // dispatch(setWatchLaterData('ttbhw'))
         e.stopPropagation();
-        setClicked({
-            watchLater: true,
-            ...clicked,
-        });
-        setWatchLaterMode('shs');
-        console.log('watch later', clicked)
+        const id = item?.contentDetails?.upload?.videoId;
+        const isDuplicate = watchLaterData.some((entry) => entry.videoId === id);
+
+        if (!isDuplicate) {
+            (async () => {
+                const videoId = item?.contentDetails?.upload?.videoId;
+                const views = item?.viewCount;
+                const publishedAt = item?.snippet?.publishedAt;
+                const title = item?.snippet?.title;
+                const thumbnail = item?.snippet?.thumbnails?.maxres?.url
+                                || item?.snippet?.thumbnails?.high?.url
+                                || item?.snippet?.thumbnails?.medium?.url
+                                || item?.snippet?.thumbnails?.standard?.url
+                                || item?.snippet?.thumbnails?.default?.url
+                const channelName = item?.snippet?.channelTitle;
+                const channelID = item?.snippet?.channelId;
+                dispatch(setWatchLaterData([
+                    ...watchLaterData, 
+                    {videoId, views, publishedAt, title, thumbnail, channelName, channelID}
+                ]));
+                console.log({videoId, views, publishedAt, title, thumbnail, channelName, channelID})
+            })();
+        }
     };
 
-    useEffect(() => {
-        if (clicked.watchLater) {
-            const id = item?.contentDetails?.upload?.videoId;
-            const isDuplicate = watchLaterData.some((entry) => entry.videoId === id);
-
-            if (!isDuplicate) {
-                (async () => {    
-                    const videoId = item?.contentDetails?.upload?.videoId;
-                    const views = await getViews(videoId)
-                    const publishedAt = item?.snippet?.publishedAt;
-                    const title = item?.snippet?.title;
-                    const thumbnail = item?.snippet?.thumbnails?.maxres?.url
-                                    || item?.snippet?.thumbnails?.high?.url
-                                    || item?.snippet?.thumbnails?.medium?.url
-                                    || item?.snippet?.thumbnails?.standard?.url
-                                    || item?.snippet?.thumbnails?.default?.url
-                    const channelName = item?.snippet?.channelTitle;
-                    const channelID = item?.snippet?.channelId;
-                    
-                    dispatch(setWatchLaterData([
-                        ...watchLaterData,
-                        {videoId, views, title, thumbnail, publishedAt, channelName, channelID}
-                    ]));
-                })();
-            }
-            
-            setClicked(prevState => ({
-                ...prevState,
-                watchLater: false
-            }));
-        }
-    }, [clicked.watchLater]);
-    
     const handleAddVdo = async (e, item) => {
         e.stopPropagation();
         setClicked({
@@ -174,7 +156,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         <>
             {item?.snippet?.type === 'upload' && (
                 <div className='hover:bg-neutral-700 cursor-pointer rounded-lg flex items-center justify-start group relative'
-                onClick={handleClick}
+                onClick={handleClick} 
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}>
                     <div className=' flex items-center gap-x-3'>

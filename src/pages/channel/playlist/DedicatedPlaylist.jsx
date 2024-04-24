@@ -113,7 +113,7 @@ const DedicatedPlaylist = () => {
                                             {/* icons */}
                                             <div className='flex items-center justify-between w-[11rem] lg:w-[13rem] mt-4'>
                                                 {iconTray.map((icon, index) => (
-                                                    <div className={` bg-slate-600 animate-pulse w-10 h-10 rounded-full`}
+                                                    <div className={` bg-slate-600 animate-pulse w-10 h-10 rounded-full shadow-md shadow-[#07070756]`}
                                                     key={index + icon.fontSize}/>
                                                 ))}
                                             </div>
@@ -173,7 +173,7 @@ const DedicatedPlaylist = () => {
                                             {/* icons */}
                                             <div className='flex items-center justify-between w-[11rem] lg:w-[13rem] mt-4'>
                                                 {iconTray.map((icon, index) => (
-                                                    <div className={` bg-[#ffffff23] w-10 h-10 rounded-full flex items-center justify-center ${icon.fontSize} hover:bg-[#ffffff3f] cursor-pointer`}
+                                                    <div className={` bg-[#ffffff23] w-10 h-10 rounded-full flex items-center justify-center ${icon.fontSize} hover:bg-[#ffffff3f] cursor-pointer shadow-md shadow-[#07070756]`}
                                                     key={index + icon.fontSize}>
                                                         {icon.icon}
                                                     </div>
@@ -210,13 +210,13 @@ const DedicatedPlaylist = () => {
                                 <div className=' relative'>
                                     <div className=' w-full relative flex items-center justify-between gap-x-3 mt-4 lg:mt-8'>
                                         <Link 
-                                        className='flex items-center justify-center h-[2.6rem] rounded-full w-1/2 bg-white text-black'
+                                        className='flex items-center justify-center h-[2.6rem] rounded-full w-1/2 bg-white text-black shadow-md shadow-[#07070756]'
                                         to={`/watch/${playListId}`}>
                                             <RxTriangleRight className='text-[2.4rem]'/> Play all
                                         </Link>
 
                                         <Link 
-                                        className='flex items-center justify-center gap-x-3 h-[2.7rem] bg-[#ffffff1f] rounded-full w-1/2 '
+                                        className='flex items-center justify-center gap-x-3 h-[2.7rem] bg-[#ffffff1f] rounded-full w-1/2 shadow-md shadow-[#07070756]'
                                         to={`/watch/${playListId}`}>
                                             <TfiControlShuffle className='text-[1.3rem]'/> Shuffle
                                         </Link>
@@ -346,7 +346,7 @@ const DedicatedPlaylist = () => {
     
     return (
         <div 
-        className=' h-screen lg:py-2 lg:pl-2 flex flex-col lg:flex-row gap-x-3 w-full'>
+        className=' h-screen lg:py-2 lg:pl-2 flex flex-col lg:flex-row gap-x-3 w-full '>
             <div className='lg:min-w-[23rem] lg:max-w-[23rem] ' >
                 <PlayListAreaSideBar/>
             </div>
@@ -354,7 +354,7 @@ const DedicatedPlaylist = () => {
             <InfiniteScroll 
             next={fetchNxtPgData}
             dataLength={playListData.length}
-            className={` overflow-y-auto mt-2`}
+            className={` overflow-y-auto w-full`}
             loader={
                 <div className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'>
                     <div className=' text-[.8rem] text-gray-400 flex items-center'>
@@ -383,7 +383,7 @@ const DedicatedPlaylist = () => {
             }
             hasMore={dataToRender.length < resultCount.total}>
                 {playListData.map((data, index) => (
-                    <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3'
+                    <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3 min-w lg:min-w-[39rem] xl:min-w-[55rem] 2xl:min-w-[70rem] max-w-[100rem]'
                     key={data?.videoId+index}
                     to={`/watch/${data?.videoId}`}
                     onClick={() => handleCurrentVdo(index, data?.videoId)}>

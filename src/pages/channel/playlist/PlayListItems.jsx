@@ -204,7 +204,7 @@ const PlayListItems = () => {
                                     <Link 
                                     to={`/channel/${channelID}`}>
                                         {channelName}
-                                    </Link> - {currentItemsCount}/{resultCount.total}
+                                    </Link> - {currentItemsCount}/{playListData.length}
                                 </p>
                             </div>
 
