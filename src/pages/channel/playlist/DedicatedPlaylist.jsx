@@ -34,8 +34,10 @@ const DedicatedPlaylist = () => {
         channelName, 
         playListBannerUrl,
         totalItemCount,
+        currentItemsCount,
         nxtPgToken,
-        playListDescription
+        playListDescription,
+        prevPgItemCount
     } = useSelector(state => state.playlist);
     const channelID = useSelector(state => state.channel.channelId);
     const comparableHeight = 585;

@@ -1,13 +1,12 @@
 import React from 'react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Home from './pages/Home'
-import Search from './pages/Search'
 import Watch from './pages/watch/Watch'
 import Channel from './pages/channel/Channel'
 import Navbar from './components/navBar/Navbar'
-import PlayListItems from './pages/channel/playlist/PlayListItems'
 import DedicatedPlaylist from './pages/channel/playlist/DedicatedPlaylist'
 import WatchLater from './pages/watch/WatchLater'
+import Search from './pages/search/Search'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -31,10 +30,6 @@ const App = () => {
             path: '/channel/:id',
             element: <Channel/>
         },
-        // {
-        //     path: '/playlist/:id',
-        //     element: <PlayListItems/>
-        // },
         {
             path: '/dedicatedPlaylist/:id',
             element: <DedicatedPlaylist/>

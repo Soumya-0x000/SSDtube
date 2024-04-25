@@ -6,6 +6,7 @@ const initialState = {
     playListTitle: '',
     totalItemCount: 0,
     currentItemsCount: 0,
+    prevPgItemCount: 0,
     nxtPgToken: '',
     playListData: [],
     playListBannerUrl: '',
@@ -47,6 +48,9 @@ export const PlayListSlice = createSlice({
         setPlayListOn: function (state, action) {
             state.playListOn = action.payload;
         },
+        setPrevPgItemCount: function(state, action) {
+            state.prevPgItemCount = action.payload;
+        },
     },
 })
 
@@ -59,5 +63,6 @@ export const {
     setBannerUrl,
     setPlaylistID,
     setPlayListDescription,
-    setPlayListOn
+    setPlayListOn,
+    setPrevPgItemCount
 } = PlayListSlice.actions

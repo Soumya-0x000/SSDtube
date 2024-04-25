@@ -12,7 +12,6 @@ import { IoMdCheckmark } from "react-icons/io";
 import ThreeDotOptions from '../../common/ThreeDotOptions';
 import { setIsWatchQueueOn, setWatchQueue } from '../../store/reducers/WatchQueueSlice';
 import { setWatchLaterData } from '../../store/reducers/WatchLaterSlice';
-import { getViews } from '../../utils/Hooks';
 
 const RecommendedCard = ({ item, snippetType, index }) => {
     const dispatch = useDispatch();
@@ -25,7 +24,7 @@ const RecommendedCard = ({ item, snippetType, index }) => {
         isWatchQueueOn, 
         watchQueue, 
     } = useSelector(state=> state.watchQueue);
-    const { watchLaterData, totalVids } = useSelector(state=> state.watchLater)
+    const { watchLaterData } = useSelector(state=> state.watchLater)
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
     const [clicked, setClicked] = useState({
@@ -62,7 +61,6 @@ const RecommendedCard = ({ item, snippetType, index }) => {
                     ...watchLaterData, 
                     {videoId, views, publishedAt, title, thumbnail, channelName, channelID}
                 ]));
-                console.log({videoId, views, publishedAt, title, thumbnail, channelName, channelID})
             })();
         }
     };

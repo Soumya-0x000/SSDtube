@@ -7,7 +7,7 @@ import { PiQueueFill } from "react-icons/pi";
 import { setCounting, setPlayListData } from '../store/reducers/PlayListSlice';
 import { setCurrentClickIndex, setIsWatchQueueOn, setWatchQueue } from '../store/reducers/WatchQueueSlice';
 import { setWatchLaterData } from '../store/reducers/WatchLaterSlice';
-import { getVideoInfo, getViews } from '../utils/Hooks';
+import { getViews } from '../utils/Hooks';
 import {BASE_URL, YOUTUBE_API_KEY} from '../utils/Constant';
 import axios from 'axios';
 
@@ -16,13 +16,13 @@ const ThreeDotOptions = ({ vdoCode, optionsClicked, setOptionsClicked, index, mo
         playListData, 
         currentItemsCount, 
         playListOn, 
-    } = useSelector(state=> state.playlist)
+    } = useSelector(state => state.playlist)
     const { 
         watchQueue, 
         currentClickIndex, 
         isWatchQueueOn, 
-    } = useSelector(state=> state.watchQueue);
-    const { watchLaterData, totalVids } = useSelector(state=> state.watchLater)
+    } = useSelector(state => state.watchQueue);
+    const { watchLaterData } = useSelector(state => state.watchLater)
     const dispatch = useDispatch();
     const [clicked, setClicked] = useState({
         watchLater: false,

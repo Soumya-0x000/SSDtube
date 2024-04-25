@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { BASE_URL, YOUTUBE_API_KEY, generateRandomID } from '../../../utils/Constant';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/reducers/PlayListSlice';
+import { setChannelName, setCounting, setNextPgToken, setPlayListData, setPrevPgItemCount } from '../../../store/reducers/PlayListSlice';
 import { RxCross1, RxShuffle } from "react-icons/rx";
 import { RxLoop } from "react-icons/rx";
 import { MdOutlineErrorOutline } from "react-icons/md";
@@ -39,6 +39,7 @@ const PlayListItems = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
+    const [totalFetchedItemsCount, setTotalFetchedItemsCount] = useState(0);
 
     const fetchFullPlayList = async(playListId) => {
         const PLAY_LIST_DATA_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=${playListId}&key=${YOUTUBE_API_KEY}`;
@@ -71,6 +72,8 @@ const PlayListItems = () => {
                 return {videoId, publishedAt, description, title, thumbnail, views}                
             }));
             setDataToRender(mainData);
+            setTotalFetchedItemsCount(mainData.length)
+            dispatch(setPrevPgItemCount(mainData.length));
             dispatch(setPlayListData(mainData));
             dispatch(setChannelName(channelName));
             dispatch(setCounting({
@@ -122,6 +125,8 @@ const PlayListItems = () => {
     
     useEffect(() => {
         dispatch(setPlayListData(dataToRender))
+        setTotalFetchedItemsCount(dataToRender.length)
+        dispatch(setPrevPgItemCount(dataToRender.length));
     }, [dataToRender])
 
     useEffect(() => {

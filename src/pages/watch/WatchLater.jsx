@@ -12,6 +12,7 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import { setCurrentlyPlayingVdoId } from '../../store/reducers/WatchSlice';
 import { MdOutlineErrorOutline, MdOutlineSort } from 'react-icons/md';
 import { convertViews, handleDayCount } from '../../utils/Constant';
+import ThreeDotOptions_2 from '../../common/ThreeDotOptions_2';
 
 const iconTray = [
     {icon: <RiShareForwardLine/>, fontSize: 'text-[24px]'},
@@ -34,6 +35,7 @@ const WatchLater = () => {
     } = useSelector(state => state.watchLater);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const comparableHeight = 585;
     const [showBanner, setShowBanner] = useState(window.innerHeight >= comparableHeight);
     const [isLoading, setIsLoading] = useState(true);
@@ -45,6 +47,9 @@ const WatchLater = () => {
         most: false,
         least: false,
     });
+    const [mouseEnter, setMouseEnter] = useState(false);
+    const [optionsClicked, setOptionsClicked] = useState(new Array(watchLaterData.length).fill(false));
+
     useLayoutEffect(() => {
         const handleResize = () => {
             window.innerHeight >= comparableHeight ? setShowBanner(true) : setShowBanner(false);
@@ -225,15 +230,6 @@ const WatchLater = () => {
             dispatch(setWatchLaterBanner(watchLaterData[0].thumbnail))
         }
 
-        const updatedWatchLaterData = watchLaterData.map(item => {
-            if (item.hasOwnProperty('description')) {
-                const { description, ...updatedItem } = item;
-                return updatedItem;
-            }
-            return item;
-        });
-        dispatch(setWatchLaterData(updatedWatchLaterData));
-
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 300);
@@ -243,6 +239,7 @@ const WatchLater = () => {
     
     const handleCurrentVdo = (index, vdoId) => {
         dispatch(setCurrentlyPlayingVdoId(vdoId));
+        navigate(`/watch/${vdoId}`)
     };
 
     const sortContents = (sortType) => {
@@ -268,7 +265,20 @@ const WatchLater = () => {
         dispatch(setWatchLaterData(sortedContents));
         setActiveSortOption(sortType)
     };
+
+    const handleRedirect = (channelID) => {
+        navigate(`/channel/${channelID}`)
+    };
+
+    const handleMouseLeave = (indx) => {
+        setOptionsClicked(new Array(watchLaterData.length).fill(false))
+        setMouseEnter(false);
+    };
     
+    const handleMouseEnter = () => {
+        setMouseEnter(true)
+    };
+
     return (
         <div 
         className=' h-screen lg:py-2 lg:pl-2 flex flex-col lg:flex-row gap-x-3 w-full'>
@@ -307,7 +317,7 @@ const WatchLater = () => {
                     ))}
                 </div>
             ) : (
-                <div className=' w-full'>
+                <div className=' w-full space-y-4'>
                     <div className={`flex items-center gap-x-2 cursor-pointer hover:bg-slate-800 ${showSortOption && 'bg-slate-800'} rounded-lg  px-3 py-1 relative w-fit`}
                     onClick={() => setShowSortOption(!showSortOption)}>
                         <MdOutlineSort className=' text-2xl' />
@@ -327,9 +337,10 @@ const WatchLater = () => {
                     </div>
 
                     {watchLaterData.map((data, index) => ( 
-                        <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg px-2 flex gap-x-3'
+                        <div className=' relative py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg px-2 flex gap-x-3 group '
                         key={data?.videoId+index}
-                        to={`/watch/${data?.videoId}`}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={() => handleMouseLeave(index)}
                         onClick={() => handleCurrentVdo(index, data?.videoId)}>
                             <div className=' text-[.8rem] text-gray-400 flex items-center'>
                                 {index+1}
@@ -354,10 +365,10 @@ const WatchLater = () => {
                                 <div className='line-clamp-1 w-full lg:text-md'>{data?.title}</div>
 
                                 <div className=' flex items-center gap-x-1'>
-                                    <Link className='text-gray-400 z-10 text-[.8rem] line-clamp-1'
-                                    to={`/channel/${data?.channelID}`}>
+                                    <div className='text-gray-400 z-10 text-[.8rem] line-clamp-1'
+                                    onClick={() => handleRedirect(data?.channelID)}>
                                         {data?.channelName}
-                                    </Link>
+                                    </div>
 
                                     <BsDot/>
 
@@ -372,7 +383,17 @@ const WatchLater = () => {
                                     </p>
                                 </div>
                             </div>
-                        </Link> 
+                            
+                            <ThreeDotOptions_2
+                                optionsClicked={optionsClicked}
+                                setOptionsClicked={setOptionsClicked}
+                                videoCode={data?.videoId}
+                                index={index}
+                                mode={`watchLater`}
+                                mouseEnter={mouseEnter}
+                                data={data}
+                            />
+                        </div> 
                     ))}
                 </div>
             )}
