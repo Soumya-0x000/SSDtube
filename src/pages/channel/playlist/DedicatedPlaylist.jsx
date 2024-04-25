@@ -14,6 +14,7 @@ import { BASE_URL, YOUTUBE_API_KEY, convertViews, extractLinks, generateRandomID
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { setChannelName, setCounting, setNextPgToken, setPlayListData } from '../../../store/reducers/PlayListSlice';
 import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/reducers/WatchSlice';
+import ThreeDotOptions_2 from '../../../common/ThreeDotOptions_2';
 
 const iconTray = [
     {icon: <MdPlaylistAdd/>, fontSize: 'text-[26px]'},
@@ -52,6 +53,17 @@ const DedicatedPlaylist = () => {
     });
     const [currentVdoCount, setCurrentVdoCount] = useState(1);
     const [truncateText, setTruncateText] = useState(false);
+    const [mouseEnter, setMouseEnter] = useState(false);
+    const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
+
+    const handleMouseLeave = (indx) => {
+        setOptionsClicked(new Array(playListData.length).fill(false))
+        setMouseEnter(false);
+    };
+    
+    const handleMouseEnter = () => {
+        setMouseEnter(true)
+    };
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -336,14 +348,11 @@ const DedicatedPlaylist = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleNavigate = () => {
-        navigate(`/channel/${channelID}`)
-    };
-
     const handleCurrentVdo = (index, vdoId) => {
         setCurrentVdoCount(index+1);
         dispatch(setCurrentlyPlayingVdoId(vdoId));
         dispatch(setCounting({currentCount: index+1, totalCount: playListData.length }));
+        navigate(`/watch/${vdoId}`)
     };
     
     return (
@@ -385,9 +394,10 @@ const DedicatedPlaylist = () => {
             }
             hasMore={dataToRender.length < resultCount.total}>
                 {playListData.map((data, index) => (
-                    <Link className='py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg pl-2 flex gap-x-3 min-w lg:min-w-[39rem] xl:min-w-[55rem] 2xl:min-w-[70rem] max-w-[100rem]'
+                    <div className=' relative py-1.5 cursor-pointer hover:bg-neutral-700 hover:rounded-lg px-2 flex gap-x-3 group lg:min-w-[39rem] xl:min-w-[55rem] 2xl:min-w-[70rem] max-w-[100rem]'
                     key={data?.videoId+index}
-                    to={`/watch/${data?.videoId}`}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={() => handleMouseLeave(index)}
                     onClick={() => handleCurrentVdo(index, data?.videoId)}>
                         <div className=' text-[.8rem] text-gray-400 flex items-center'>
                             {index+1}
@@ -407,15 +417,16 @@ const DedicatedPlaylist = () => {
                                 />
                             )}
                         </div>
-
+                        
                         <div className=' space-y-3 lg:space-y-5 mt-2'>
                             <div className='line-clamp-1 w-full lg:text-md'>{data?.title}</div>
 
                             <div className=' flex items-center gap-x-1'>
-                                <div className='text-gray-400 z-10 text-[.8rem] line-clamp-1'
-                                onClick={handleNavigate}>
+                                <Link className='text-gray-400 z-10 text-[.8rem] line-clamp-1'
+                                to={`/channel/${data?.channelID}`}
+                                onClick={() => handleRedirect(data?.channelID)}>
                                     {channelName}
-                                </div>
+                                </Link>
 
                                 <BsDot/>
 
@@ -430,7 +441,17 @@ const DedicatedPlaylist = () => {
                                 </p>
                             </div>
                         </div>
-                    </Link>
+                        
+                        <ThreeDotOptions_2
+                            optionsClicked={optionsClicked}
+                            setOptionsClicked={setOptionsClicked}
+                            videoCode={data?.videoId}
+                            index={index}
+                            mode={`dedicatedPlayList`}
+                            mouseEnter={mouseEnter}
+                            data={data}
+                        />
+                    </div> 
                 ))}
             </InfiniteScroll>
         </div>

@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { IoIosSearch } from "react-icons/io";
 import { FaMicrophone } from "react-icons/fa";
 import avatar from '../../assets/avatar.jpg'
@@ -7,9 +7,11 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { RiVideoAddLine } from "react-icons/ri";
 import { IoNotificationsOutline } from "react-icons/io5";
 import LeftSideIconArea from './LeftSideIconArea';
+import { useDispatch } from 'react-redux';
+import { setSearchItem } from '../../store/reducers/SearchSlice';
 
 const Navbar = () => {
-    const [searchItem, setSearchItem] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const [createIconColor, setCreateIconColor] = useState(false);
     const comparableWidth = 718;
     const [showSearchBar, setShowSearchBar] = useState(window.innerWidth > comparableWidth);
@@ -23,6 +25,8 @@ const Navbar = () => {
         notifications: false,
         backArrow: false,
     });
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -40,26 +44,40 @@ const Navbar = () => {
 
     const handleSearch = (item) => {
         item.preventDefault();
+        setSearchQuery(item.target.value);
+    };
 
-        console.log(item.target.value);
-        setSearchItem(item.target.value);
-        console.log(searchItem);
-    }
+    const initiateSearch = (e) => {
+        e.preventDefault();
+        dispatch(setSearchItem(searchQuery))
+        navigate(`/search`)
+    };
 
     const SearchInput = ({width}) => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+                initiateSearch(e)
+            }
+        };
+
         return (
-            <div className={`${width} flex items-center gap-x-4`}>
+            <div className={`${width} flex items-center gap-x-4 `}>
                 <div className=' w-full'>
-                    <form action="" className=' w-full '>
+                    <form className=' w-full' onSubmit={initiateSearch}>
                         <div className='flex h-[2.6rem] w-full'>
                             <input 
                                 type="text" 
                                 placeholder="Search" 
                                 className='h-full bg-zinc-900 border border-zinc-600 px-5 rounded-l-full focus:border-blue-500 focus:outline-none text-white font-xl w-[100%]'
-                                onChange={(e) => handleSearch(e)}
+                                autoFocus
+                                value={searchQuery}
+                                onChange={handleSearch}
+                                onKeyDown={handleKeyDown}
                             />
 
-                            <button className='h-full px-2 lg:px-4 xl:px-5 py-[.4rem] rounded-r-full border-t border-r border-b border-zinc-600 bg-zinc-800'>
+                            <button 
+                            className='h-full px-2 lg:px-4 xl:px-5 py-[.4rem] rounded-r-full border-t border-r border-b border-zinc-600 bg-zinc-800'
+                            type='submit'>
                                 <IoIosSearch className=' text-white h-6 w-6'/>
                             </button>
                         </div>
@@ -72,7 +90,6 @@ const Navbar = () => {
             </div>
         );
     }
-
     
     return (
         <div className='w-full flex justify-between items-center px-7 opacity-95 sticky top-0'>

@@ -5,17 +5,12 @@ import { VscTrash } from 'react-icons/vsc';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWatchLaterBanner, setWatchLaterData } from '../store/reducers/WatchLaterSlice';
 import { setWatchQueue } from '../store/reducers/WatchQueueSlice';
+import {BASE_URL, YOUTUBE_API_KEY} from '../utils/Constant';
+import { getViews } from '../utils/Hooks';
 
-const ThreeDotOptions_2 = ({
-    optionsClicked, setOptionsClicked, videoCode, index, mode, mouseEnter, data
-}) => {
+const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index, mode, mouseEnter, data }) => {
     const { watchLaterData } = useSelector(state => state.watchLater);
     const { watchQueue } = useSelector(state => state.watchQueue);
-    const { 
-        playListData, 
-        currentItemsCount, 
-        playListOn, 
-    } = useSelector(state => state.playlist);
     const dispatch = useDispatch();
 
     const handleThreeDotClick = (e) => {
@@ -34,14 +29,42 @@ const ThreeDotOptions_2 = ({
                 const tempArr = [...watchLaterData].filter(entry => entry.videoId !== videoCode);
                 dispatch(setWatchLaterData(tempArr));
                 break;
-            case "videoContainer":
-                break;
-            case "dedicatedPlayList":
-                console.log(playListData);
+            case "addToWatchLater":
+                const id = data?.videoId;
+                const isDuplicateWatchLater = watchLaterData.some((entry) => entry.videoId === id);
+                
+                if (!isDuplicateWatchLater) {
+                    (async() => {
+                        try {
+                            const GET_VIDEO_INFO = `${BASE_URL}/videos?part=snippet&id=${id}&key=${YOUTUBE_API_KEY}`;
+                            const views = await getViews(id);
+                            const vdoInfo = await axios.get(GET_VIDEO_INFO);
+                            const primaryPart = vdoInfo?.data?.items[0]?.snippet;
+
+                            const channelID = primaryPart?.channelId;
+                            const channelName = primaryPart?.channelTitle;
+
+                            const newData = { ...data };
+                            if (!newData.channelID && !newData.channelName) {
+                                newData.channelID = channelID;
+                                newData.channelName = channelName;
+                            }
+                                                    
+                            dispatch(setWatchLaterData([
+                                ...watchLaterData,
+                                { ...newData, views }
+                            ]));
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    })(); 
+                }
+                console.log(data);
                 break;
             case "addWatchQentry":
-                const isDuplicate = watchQueue.some(entry => entry.videoId === videoCode)
-                if (!isDuplicate) {
+                const isDuplicateWatchQ = watchQueue.some(entry => entry.videoId === videoCode)
+               
+                if (!isDuplicateWatchQ) {
                     const channelID = data.channelID;
                     const channelName = data.channelName;
                     const publishedAt = data.publishedAt;
@@ -75,9 +98,9 @@ const ThreeDotOptions_2 = ({
                     </div>
                 )}
                 
-                {mode === 'videoContainer' || mode === 'dedicatedPlayList' && (
+                {mode === 'dedicatedPlayList' && (
                     <div className=' flex flex-wrap gap-x-3 pl-3 py-4 hover:bg-slate-900'
-                    onClick={() => handleOperations(mode)}>
+                    onClick={() => handleOperations('addToWatchLater')}>
                         <VscTrash className=' text-2xl'/>
                         <span>Add to watch later</span>
                     </div>
@@ -93,7 +116,7 @@ const ThreeDotOptions_2 = ({
     };
 
     return (
-        <div className='absolute right-1 top-1/2 -translate-y-1/2 flex items-center group/dot  h-full z-30'>
+        <div className='absolute right-1 top-1/2 -translate-y-1/2 flex items-center group/dot  z-30'>
             <div className={` bg-neutral-800 items-center justify-center rounded-full w-8 h-8 relative hidden group-hover:flex group-hover/dot:bg-slate-800`}
             onClick={(e) => handleThreeDotClick(e)}>
                 <BsThreeDotsVertical className='text-xl'/>

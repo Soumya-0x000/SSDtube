@@ -235,7 +235,7 @@ const PlayListItems = () => {
                     next={fetchNxtPgData}
                     dataLength={playListData.length}
                     height={'26rem'}
-                    className={` ${hideVids ? 'hidden' : 'block'} max-h-[28rem] overflow-y-auto mt-2`}
+                    className={` ${hideVids ? 'hidden' : 'block'} max-h-[28rem] overflow-y-auto mt-2 `}
                     hasMore={playListData.length <= resultCount.total}>
                         {playListData.map((data, index) => (
                             <div className='py-1.5 cursor-pointer hover:bg-neutral-700 pl-2 flex gap-x-3 relative group/all'
@@ -265,7 +265,7 @@ const PlayListItems = () => {
                                 </div>
 
                                 {/* content */}
-                                <div className=' space-y-2 '>
+                                <div className=' space-y-2'>
                                     <div className='line-clamp-1 w-full'>{data?.title}</div>
                                     <p className='text-gray-400 text-[.8rem]'>{channelName}</p>
                                 </div>

@@ -18,7 +18,6 @@ const VideoContainer = () => {
     const loading = useSelector((state) => state.youtube.isLoading);
     const isSidebarOpen = useSelector((state) => state.sidebar.isSidebarOpen);
     const nxtPgToken = useSelector((state) => state.youtube.nextPageToken);
-    const { watchQueue } = useSelector((state) => state.watchQueue)
     const dispatch = useDispatch();
     const skeletonNumbers = 20;
     const [homePgVids, setHomePgVids] = useState([]);
@@ -29,9 +28,6 @@ const VideoContainer = () => {
     const scrollRef = useRef(null);
     const [currentHeight, setCurrentHeight] = useState(650);
     const [videoIDs, setVideoIDs] = useState([]);
-    const [vdoContents, setVideoContents] = useState({
-        
-    });
 
     const renderSkeleton = new Array(skeletonNumbers).fill().map((_, indx) => (
         <Skeleton key={indx}/>

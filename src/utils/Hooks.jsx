@@ -76,7 +76,7 @@ export const useWindowDimensions = () => {
     return windowDimensions;
 };
 
-export const getViews = async(videoID) => {
+export const getViews = async (videoID) => {
     const VIEWS = `${BASE_URL}/videos?part=statistics&id=${videoID}&key=${YOUTUBE_API_KEY}`;
 
     try {
@@ -87,3 +87,5 @@ export const getViews = async(videoID) => {
         return 0
     }
 };
+
+export const getSearchResults = async (query) => {};

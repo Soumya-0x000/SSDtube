@@ -32,7 +32,7 @@ const VideoCard = ({item, indx}) => {
     };
     
     return (
-        <div className='cmd:max-w-[18rem flex flex-col gap-y-2 mb-1 '
+        <div className=' flex flex-col gap-y-2 mb-1 '
         key={indx}>
             <Link to={`/watch/${item?.id}`}
             onClick={() => handleClick(item?.id)}>
@@ -66,8 +66,8 @@ const VideoCard = ({item, indx}) => {
                             {item?.snippet?.title}
                         </div>
 
-                        <div className='flex items-center gap-x-2 w-[70%] pt-[.3rem] text-sm text-gray-400 '>
-                            {item?.snippet?.channelTitle}
+                        <div className='flex flex-wrap items-center gap-x-2 w-[70%] pt-[.3rem] text-sm text-gray-400 '>
+                            <p> {item?.snippet?.channelTitle} </p> 
 
                             {subscriberCount >= 100000 && (
                                 <div className=' h-4 w-4'>
