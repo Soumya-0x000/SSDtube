@@ -88,4 +88,28 @@ export const getViews = async (videoID) => {
     }
 };
 
-export const getSearchResults = async (query) => {};
+export const getSearchResults = async (query) => {
+    const SEARCH_URL = `${BASE_URL}/search?part=snippet%2CcontentDetails%2Cstatistics&channelId=UCA3-nIYWu4PTWkb6NwhEpzg&channelType=any&forDeveloper=true&maxResults=30&order=relevance&safeSearch=none&videoCaption=any&videoDefinition=any&videoDimension=2d&videoDuration=any&videoEmbeddable=any&videoLicense=any&videoPaidProductPlacement=any&videoSyndicated=any&videoType=any&key=${YOUTUBE_API_KEY}`;
+
+    try {
+        const results = await axios.get(SEARCH_URL);
+        return results;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getComments = async (vdoID) => {
+    const COMMENT_THREAD_URL = `${BASE_URL}/commentThreads?textFormat=plainText&part=snippet&maxResults=50&key=${YOUTUBE_API_KEY}&videoId=${vdoID}`;
+
+    const COMMENT_URL = `${BASE_URL}/comments?part=snippet&id=${vdoID}&maxResults=50&textFormat=plainText&key=${YOUTUBE_API_KEY}`
+
+    try {
+        const commentThreadResults = await axios.get(COMMENT_THREAD_URL);
+        // const commentResults = await axios.get(COMMENT_URL);
+        // console.log(commentResults)
+        return commentThreadResults;
+    } catch (error) {
+        console.error(error);
+    }
+};

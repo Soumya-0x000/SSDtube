@@ -37,12 +37,12 @@ const App = () => {
     ])
 
     return (
-        <>
+        <div>
             {/* <div className='h-[3.3rem] flex items-center '> */}
                 {/* <Navbar/> */}
             {/* </div> */}
             <RouterProvider router={router}/>
-        </>
+        </div>
     )
 }
 

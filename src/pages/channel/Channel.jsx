@@ -163,14 +163,15 @@ const Channel = () => {
                                             {channelContent.description}
                                         </div>
 
-                                        <button onClick={() => setShowDescription(!showDescription)}>
-                                            <FaChevronRight/>
-                                        </button>
+                                        {channelContent.description.length > 0 && (
+                                            <button onClick={() => setShowDescription(!showDescription)}>
+                                                <FaChevronRight/>
+                                            </button>
+                                        )}
 
                                         {showDescription && (
                                             <div className=' absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-slate-800 text-slate-200 text-justify rounded-lg flex flex-col'>
                                                 <div className='p-10 relative'>
-                                                    
                                                     <button className=' absolute right-0 top-0 p-2 text-xl'
                                                     onClick={()=>setShowDescription(false)} >
                                                         <RxCross1/>

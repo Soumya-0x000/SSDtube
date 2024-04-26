@@ -19,6 +19,7 @@ import { RiFlagLine } from "react-icons/ri";
 import Player from './Player';
 import PlayListItems from '../channel/playlist/PlayListItems';
 import WatchQueueList from './WatchQueueList'
+import CommentSection from './CommentSection';
 
 const orgIconTray = [
     { icon: <RiShareForwardLine />, fontSize: 'text-[21px]', text: 'Share' },
@@ -66,41 +67,14 @@ const Watch = () => {
 
     const [truncateText, setTruncateText] = useState(true);
     const [snippetType, setSnippetType] = useState(itemType[0]);
-    // const [showMore , setShowMore] = useState({
-    //     btnVisibility: false,
-    //     fetchMoreData: window.innerWidth <= 1024 ? false : true,
-    // });
-    // const [btnClicked, setBtnClicked] = useState(false);
+    const [isLgScr, setIsLgScr] = useState(window.innerWidth >= 1024)
+
+    const handleResize = () => {
+        if (window.innerWidth >= 1024) {
+            setIsLgScr(true);
+        }
+    };
     
-    // const handleResize = () => {
-    //     if (window.innerWidth <= 1024) {
-    //         setShowMore({
-    //             btnVisibility: true,
-    //             fetchMoreData: false,
-    //         });
-    //     } else {
-    //         setShowMore({
-    //             btnVisibility: false,
-    //             fetchMoreData: true,
-    //         })
-    //     }
-    // };
-
-    // useLayoutEffect(() => {
-    //     window.addEventListener('resize', handleResize);
-    //     return () => window.removeEventListener('resize', handleResize);
-    // }, []);
-
-    // const handleBtnVisibility = () => {
-    //     setShowMore(prevState => ({
-    //         ...prevState,
-    //         btnVisibility: true,
-    //         fetchMoreData: true,
-    //     }));
-    //     console.log(showMore.btnVisibility, showMore.fetchMoreData);
-    //     fetchNextPageRecommendedVdo();
-    // };
-
     const fetchVdoInfo = async (vdoID) => {
         const vdoInfo = await getVideoInfo(vdoID);
         const likeCount = vdoInfo?.data.items[0]?.statistics?.likeCount;
@@ -155,57 +129,47 @@ const Watch = () => {
 
     const fetchNextPageRecommendedVdo = async () => {
         const NEXT_RECOMMENDED_VIDEOS = `${BASE_URL}/activities?part=snippet%2CcontentDetails&channelId=${channelID}&maxResults=20&pageToken=${nxtPgToken}&key=${YOUTUBE_API_KEY}`;
+
+        if (isRecommendedVdoFetched) {
+            try {
+                const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
+                const nextRecommendedVdoItems = nextData?.data?.items;
         
-        // console.log('fetched', showMore.fetchMoreData);
-        // if (showMore.fetchMoreData) {
-            if (isRecommendedVdoFetched) {
-                try {
-                    const nextData = await axios.get(NEXT_RECOMMENDED_VIDEOS);
-                    const nextRecommendedVdoItems = nextData?.data?.items;
-            
-                    const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
-                        try {
-                            const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
-                            const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
-                            return {...item, viewCount}
-                        } catch (error) {
-                            console.error(error);
-                            return item;
-                        }}
-                    ));
+                const updatedRecommendedVdoItems = await Promise.all(nextRecommendedVdoItems.map(async(item) => {
+                    try {
+                        const vdoData = await axios.get(`${BASE_URL}/videos?part=statistics&id=${item?.contentDetails?.upload?.videoId}&key=${YOUTUBE_API_KEY}`);
+                        const viewCount = vdoData?.data?.items[0]?.statistics?.viewCount;
+                        return {...item, viewCount}
+                    } catch (error) {
+                        console.error(error);
+                        return item;
+                    }}
+                ));
 
-                    setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
+                setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
 
-                    setResultCount(prevResultCount => ({
-                        ...prevResultCount,
-                        current: prevResultCount.current + nextRecommendedVdoItems.length
-                    }));
+                setResultCount(prevResultCount => ({
+                    ...prevResultCount,
+                    current: prevResultCount.current + nextRecommendedVdoItems.length
+                }));
 
-                    if (nextData?.data?.nextPageToken) {
-                        dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
-                    }
-                } catch (error) {
-                    console.error(error);
+                if (nextData?.data?.nextPageToken) {
+                    dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
                 }
-            };
-
-        //     if (showMore.btnVisibility) {
-        //         setShowMore({
-        //             btnVisibility: true,
-        //             fetchMoreData: false,
-        //         });
-        //     }
-        // }
+            } catch (error) {
+                console.error(error);
+            }
+        };
     };
 
     useEffect(() => {
-        fetchVdoInfo(id);
-        fetchRecommendedVideos(channelID);
+        // fetchVdoInfo(id);
+        // fetchRecommendedVideos(channelID);
     }, []);
     
     useEffect(() => {
-        fetchRecommendedVideos(channelID);
-        fetchVdoInfo(currentlyPlayingVdoId);
+        // fetchRecommendedVideos(channelID);
+        // fetchVdoInfo(currentlyPlayingVdoId);
     }, [currentlyPlayingVdoId, channelID]);
 
     useEffect(() => {
@@ -468,6 +432,11 @@ const Watch = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* comment part */}
+                <div className=' mt-2 pt-6 border-t-[1px] border-slate-500 w-full'>
+                    <CommentSection vdoId={id}/>
+                </div>
             </div>
 
             {/* recommended video part */}
@@ -482,26 +451,26 @@ const Watch = () => {
 
                 <InfiniteScroll 
                 className=' h-full flex flex-col gap-y-2 pt-3 border-t-2 border-t-slate-600'
-                loader={<>
-                    {[...Array(9)].map((_, indx) => (
-                        <div key={indx} className='hidde n lg: block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
-                            <div className=' flex gap-x-3'>
-                                <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
+                // loader={<>
+                //     {[...Array(9)].map((_, indx) => (
+                //         <div key={indx} className='hidde n lg: block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
+                //             <div className=' flex gap-x-3'>
+                //                 <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
 
-                                <div className=' mt-1 lg:mt-3 w-[27rem] h-full'>
-                                    <p className=' bg-slate-600 w-full h-6 rounded-[3px] animate-pulse'/>
+                //                 <div className=' mt-1 lg:mt-3 w-[27rem] h-full'>
+                //                     <p className=' bg-slate-600 w-full h-6 rounded-[3px] animate-pulse'/>
 
-                                    <div className=' bg-slate-600 w-[70%] h-4 rounded-sm animate-pulse mt-5'/>
+                //                     <div className=' bg-slate-600 w-[70%] h-4 rounded-sm animate-pulse mt-5'/>
 
-                                    <div className=' flex items-center mt-2 gap-x-4'>
-                                        <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
-                                        <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </>}
+                //                     <div className=' flex items-center mt-2 gap-x-4'>
+                //                         <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
+                //                         <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
+                //                     </div>
+                //                 </div>
+                //             </div>
+                //         </div>
+                //     ))}
+                // </>}
                 next={fetchNextPageRecommendedVdo}
                 hasMore={resultCount.current <= resultCount.total}
                 dataLength={recommendedItems.length}>
@@ -515,12 +484,11 @@ const Watch = () => {
                     ))}
                 </InfiniteScroll>
 
-                {/* {resultCount.current <= resultCount.total && (   
-                    <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'
-                    onClick={handleBtnVisibility}>
+                {(resultCount.current <= resultCount.total) && !isLgScr && (   
+                    <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'>
                         Show more
                     </button>
-                )} */}
+                )}
             </div>
         </div>
     );

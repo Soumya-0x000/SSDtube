@@ -19,5 +19,6 @@ export const CommentSlice = createSlice({
 });
 
 export const {
-    setComments, setTotalCommentCount
+    setComments, 
+    setTotalCommentCount
 } = CommentSlice.actions;
