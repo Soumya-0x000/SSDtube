@@ -29,7 +29,7 @@ const CommentSection = ({ vdoId, logoURL }) => {
     const [showOperationPanel, setShowOperationPanel] = useState(false);
     const [openEmojiPanel, setOpenEmojiPanel] = useState(false);
     const [newComment, setNewComment] = useState('');
-    
+
     const [openReplyEmojiPanel, setOpenReplyEmojiPanel] = useState(new Array(comments.length).fill(false));
     const [showReplyOperationPanel, setShowReplyOperationPanel] = useState(new Array(comments.length).fill(false));
     const [showReply, setShowReply] = useState(new Array(comments.length).fill(false));
@@ -121,10 +121,15 @@ const CommentSection = ({ vdoId, logoURL }) => {
         setCustomComment(customComment + emoji);
     };
 
+
     const handleReplyShow = (index) => {
         const tempArr = [...showReply];
         tempArr[index] = !tempArr[index];
         setShowReply(tempArr);
+
+        const tempArr1 = [...showReplyOperationPanel];
+        tempArr1[index] = true;
+        setShowReplyOperationPanel(tempArr1);
     };
 
     const handleReply = (e, index) => {
@@ -133,41 +138,38 @@ const CommentSection = ({ vdoId, logoURL }) => {
         setReplyValue(tempArr);
     };
 
-    const handleReplyOperationPanel = (index) => {
-        const tempArr = [...showReplyOperationPanel];
-        tempArr[index] = true;
-        setShowReplyOperationPanel(tempArr);
-    };
-
     const handleOpenRplyEmojiPanel = (index) => {
         const tempArr = [...openReplyEmojiPanel];
-        tempArr[index] = true;
+        tempArr[index] = !tempArr[index];
         setOpenReplyEmojiPanel(tempArr)
     };
 
     const handleReplyEmojiClick = (e, index) => {
+        const tempArr = [...replyValue];
+
         const sym = e.unified.split("_");
         const codeArray = [];
         sym.forEach((el) => codeArray.push("0x" + el));
         let emoji = String.fromCodePoint(...codeArray);
-        console.log(emoji);
-        // setReplyValue(replyValue[index] + emoji);
+        tempArr[index] = tempArr[index] + emoji;
+        setReplyValue(tempArr);
     };
 
     const handleReplyCancel = (index) => {
         const tempArr1 = [...showReplyOperationPanel];
         const tempArr2 = [...replyValue];
         const tempArr3 = [...openReplyEmojiPanel];
+        const tempArr4 = [...showReply];
         
         tempArr1[index] = false;
         tempArr2[index] = '';
-        tempArr3[index] = true;
+        tempArr3[index] = false;
+        tempArr4[index] = false;
         
         setShowReplyOperationPanel(tempArr1);
         setReplyValue(tempArr2);
         setOpenReplyEmojiPanel(tempArr3)
-
-        setShowReply(new Array(comments.length).fill(false))
+        setShowReply(tempArr4)
     };
 
     const handleThrowNewReply = (index) => {};
@@ -313,7 +315,6 @@ const CommentSection = ({ vdoId, logoURL }) => {
                                     <div className=' w-full'>
                                         <input 
                                             type="text" 
-                                            onFocus={() => handleReplyOperationPanel(indx)}
                                             className=' w-full bg-transparent border-b-[1px] border-b-slate-500 focus:outline-none focus:border-b-white'
                                             placeholder='Add a reply...'
                                             value={replyValue[indx]}
