@@ -517,7 +517,10 @@ const Watch = () => {
 
            {/* comment part */}
             <div className=' mt-2 pt-6 border-t-[1px] border-slate-500 w-full lg:hidden block'>
-                <CommentSection vdoId={id}/>
+                <CommentSection 
+                    vdoId={id}
+                    logoURL={logoURL}
+                />
             </div>
         </div>
     );

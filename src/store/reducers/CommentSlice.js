@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setNextPgToken } from "./PlayListSlice";
+import { comments } from "../../CustomVal";
 
 const initialState = {
-    comments: [],
+    comments,
     totalCommentCount: 0,
     nxtPageToken: '',
+    newCommentToAdd: ''
 };
 
 export const CommentSlice = createSlice({
@@ -21,6 +22,9 @@ export const CommentSlice = createSlice({
         setNxtPgToken(state, action) {
             state.nxtPageToken = action.payload;
         },
+        setNewCommentToAdd(state, action) {
+            state.newCommentToAdd = action.payload;
+        },
     },
 });
 
@@ -28,4 +32,5 @@ export const {
     setComments, 
     setTotalCommentCount,
     setNxtPgToken,
+    setNewCommentToAdd,
 } = CommentSlice.actions;
