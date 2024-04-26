@@ -101,7 +101,7 @@ const Watch = () => {
         const commentCount = vdoInfo?.data.items[0]?.statistics?.commentCount;
         dispatch(setWatchData(vdoInfo?.data.items[0]));
         
-        const { channelData }= await getChannelInfo(channelID);
+        const { channelData } = await getChannelInfo(channelID);
         const channelContent = channelData?.data?.items[0]
         const channelLogoUrl = channelContent?.snippet?.thumbnails?.medium?.url
                             || channelContent?.snippet?.thumbnails?.high?.url
@@ -320,7 +320,7 @@ const Watch = () => {
     };
 
     return (
-        <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt-2 flex flex-col gap-y-4 lg:flex-row  lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
+        <div className=' mx-3 2xl:mx-12 3xl:mx-16 mt-2 flex flex-col gap-y-4 lg:flex-row lg:gap-x-4 xl:gap-x-6 3xl:gap-x-8'>
             {/* video part */}
             <div className=' w-full h-full lg:w-[68%] rounded-lg xl:rounded-xl flex flex-col items-start'>
                 {/* player */}
@@ -457,7 +457,7 @@ const Watch = () => {
                 </div>
 
                 {/* comment part */}
-                <div className=' mt-2 pt-6 border-t-[1px] border-slate-500 w-full'>
+                <div className=' mt-2 pt-6 border-t-[1px] border-slate-500 w-full hidden lg:block'>
                     <CommentSection vdoId={id}/>
                 </div>
             </div>
@@ -513,6 +513,11 @@ const Watch = () => {
                         Show more
                     </button>
                 )}
+            </div>
+
+           {/* comment part */}
+            <div className=' mt-2 pt-6 border-t-[1px] border-slate-500 w-full lg:hidden block'>
+                <CommentSection vdoId={id}/>
             </div>
         </div>
     );
