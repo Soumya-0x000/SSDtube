@@ -55,6 +55,7 @@ const Watch = () => {
         total: 0,
         current: 0,
     });
+
     const [iconTrayLgScreen, setIconTrayLgScreen] = useState([...orgIconTray]);
     // const [iconTrayLessLgScreen, setIconTrayLessLgScreen] = useState([...orgIconTray]);
     const [optionsLgScrn, setOptionsLgScrn] = useState([
@@ -67,12 +68,31 @@ const Watch = () => {
 
     const [truncateText, setTruncateText] = useState(true);
     const [snippetType, setSnippetType] = useState(itemType[0]);
-    const [isLgScr, setIsLgScr] = useState(window.innerWidth >= 1024)
+
+    const [isLgScr, setIsLgScr] = useState(window.innerWidth >= 1024);
+    const [isClicked, setIsClicked] = useState(window.innerWidth >= 1024);
 
     const handleResize = () => {
         if (window.innerWidth >= 1024) {
             setIsLgScr(true);
+            setIsClicked(true);
+        } else {
+            setIsLgScr(false);
+            setIsClicked(false);
         }
+    };
+
+    useEffect(() => {
+        isClicked && fetchNextPageRecommendedVdo();
+    }, [isClicked]);
+
+    useLayoutEffect(() => {
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const handleShowMoreCLick = () => {
+        setIsClicked(true);
     };
     
     const fetchVdoInfo = async (vdoID) => {
@@ -146,16 +166,19 @@ const Watch = () => {
                     }}
                 ));
 
-                setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
-
-                setResultCount(prevResultCount => ({
-                    ...prevResultCount,
-                    current: prevResultCount.current + nextRecommendedVdoItems.length
-                }));
+                if (isClicked) {
+                    setRecommendedItems(prevItems => [...prevItems, ...updatedRecommendedVdoItems]);
+                    
+                    setResultCount(prevResultCount => ({
+                        ...prevResultCount,
+                        current: prevResultCount.current + nextRecommendedVdoItems.length
+                    }));
+                }
+                !isLgScr && setIsClicked(false);
 
                 if (nextData?.data?.nextPageToken) {
-                    dispatch(setNxtPgToken(nextData?.data?.nextPageToken))
-                }
+                    dispatch(setNxtPgToken(nextData?.data?.nextPageToken || false))
+                } else return
             } catch (error) {
                 console.error(error);
             }
@@ -451,26 +474,26 @@ const Watch = () => {
 
                 <InfiniteScroll 
                 className=' h-full flex flex-col gap-y-2 pt-3 border-t-2 border-t-slate-600'
-                // loader={<>
-                //     {[...Array(9)].map((_, indx) => (
-                //         <div key={indx} className='hidde n lg: block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
-                //             <div className=' flex gap-x-3'>
-                //                 <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
+                loader={<>
+                    {[...Array(isLgScr ? 8 : 0)].map((_, indx) => (
+                        <div key={indx} className='hidde n lg: block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
+                            <div className=' flex gap-x-3'>
+                                <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>
 
-                //                 <div className=' mt-1 lg:mt-3 w-[27rem] h-full'>
-                //                     <p className=' bg-slate-600 w-full h-6 rounded-[3px] animate-pulse'/>
+                                <div className=' mt-1 lg:mt-3 w-[27rem] h-full'>
+                                    <p className=' bg-slate-600 w-full h-6 rounded-[3px] animate-pulse'/>
 
-                //                     <div className=' bg-slate-600 w-[70%] h-4 rounded-sm animate-pulse mt-5'/>
+                                    <div className=' bg-slate-600 w-[70%] h-4 rounded-sm animate-pulse mt-5'/>
 
-                //                     <div className=' flex items-center mt-2 gap-x-4'>
-                //                         <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
-                //                         <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
-                //                     </div>
-                //                 </div>
-                //             </div>
-                //         </div>
-                //     ))}
-                // </>}
+                                    <div className=' flex items-center mt-2 gap-x-4'>
+                                        <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
+                                        <p className=' bg-slate-600 animate-pulse h-3 w-[30%] rounded-sm '/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </>}
                 next={fetchNextPageRecommendedVdo}
                 hasMore={resultCount.current <= resultCount.total}
                 dataLength={recommendedItems.length}>
@@ -484,8 +507,9 @@ const Watch = () => {
                     ))}
                 </InfiniteScroll>
 
-                {(resultCount.current <= resultCount.total) && !isLgScr && (   
-                    <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'>
+                {(resultCount.current <= resultCount.total) && (   
+                    <button className=' my-4 w-full py-2 bg-slate-700 hover:bg-slate-600  rounded-full overflow-hidden active:bg-neutral-700 transition-all block lg:hidden'
+                    onClick={handleShowMoreCLick}>
                         Show more
                     </button>
                 )}
