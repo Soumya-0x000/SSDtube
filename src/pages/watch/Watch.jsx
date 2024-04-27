@@ -186,13 +186,13 @@ const Watch = () => {
     };
 
     useEffect(() => {
-        // fetchVdoInfo(id);
-        // fetchRecommendedVideos(channelID);
+        fetchVdoInfo(id);
+        fetchRecommendedVideos(channelID);
     }, []);
     
     useEffect(() => {
-        // fetchRecommendedVideos(channelID);
-        // fetchVdoInfo(currentlyPlayingVdoId);
+        fetchRecommendedVideos(channelID);
+        fetchVdoInfo(currentlyPlayingVdoId);
     }, [currentlyPlayingVdoId, channelID]);
 
     useEffect(() => {
@@ -475,7 +475,7 @@ const Watch = () => {
                 <InfiniteScroll 
                 className=' h-full flex flex-col gap-y-2 pt-3 border-t-2 border-t-slate-600'
                 loader={<>
-                    {[...Array(isLgScr ? 8 : 0)].map((_, indx) => (
+                    {[...Array(isLgScr ? 10 : 0)].map((_, indx) => (
                         <div key={indx} className='hidde n lg: block h-full w-ful lg:min-w-[25rem] lg:max-w-[33rem]'>
                             <div className=' flex gap-x-3'>
                                 <div className='min-w-[11rem] max-w-[11rem] lg:min-w-[10rem] lg:max-w-[10rem] h-[6rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'/>

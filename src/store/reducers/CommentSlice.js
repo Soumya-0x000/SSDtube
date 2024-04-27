@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { comments } from "../../CustomVal";
 
 const initialState = {
-    comments,
+    comments: [],
     totalCommentCount: 0,
     nxtPageToken: '',
     newCommentToAdd: ''
@@ -14,7 +13,6 @@ export const CommentSlice = createSlice({
     reducers: {
         setComments(state, action) {
             state.comments = action.payload;
-            console.log(action.payload)
         },
         setTotalCommentCount(state, action) {
             state.totalCommentCount = action.payload;
@@ -23,7 +21,7 @@ export const CommentSlice = createSlice({
             state.nxtPageToken = action.payload;
         },
         setNewCommentToAdd(state, action) {
-            state.newCommentToAdd = action.payload;
+            state.comments.unshift(action.payload);
         },
     },
 });
