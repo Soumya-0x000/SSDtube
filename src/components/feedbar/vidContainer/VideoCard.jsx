@@ -3,15 +3,17 @@ import Img from '../../lazyLoadImage/Img';
 import { Link } from 'react-router-dom';
 import { GoDotFill } from "react-icons/go";
 import { getChannelInfo } from '../../../utils/Hooks';
-import { convertViews, handleDayCount } from '../../../utils/Constant';
+import { convertViews, formatDuration, handleDayCount } from '../../../utils/Constant';
 import { useDispatch } from 'react-redux';
 import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/reducers/WatchSlice';
+import ReactPlayer from 'react-player';
 
 const VideoCard = ({item, indx}) => {
     const [logoURL, setLogoURL] = useState('');
     const dispatch = useDispatch();
     const [subscriberCount, setSubscriberCount] = useState(0);
-
+    const [isPlaying , setIsPlaying] = useState(false);
+   
     const handleLogoURL = async (id) => {
         const { channelData } = await getChannelInfo(id);
         const channelLogoUrl = channelData?.data?.items[0]?.snippet?.thumbnails?.medium?.url
@@ -30,21 +32,48 @@ const VideoCard = ({item, indx}) => {
         dispatch(setChannelId(item?.snippet?.channelId))
         dispatch(setCurrentlyPlayingVdoId(id));
     };
+
+    const handleMouseHover = async (mode, id) => {
+        if (mode === 'enter') {
+          setIsPlaying(true);
+        } else if (mode === 'leave') {
+          setIsPlaying(false);
+        }
+    };
     
     return (
         <div className=' flex flex-col gap-y-2 mb-1 '
+        onMouseEnter={() => handleMouseHover('enter', item?.id)}
+        onMouseLeave={() => handleMouseHover('leave', item?.id)}
         key={indx}>
             <Link to={`/watch/${item?.id}`}
             onClick={() => handleClick(item?.id)}>
-                <div className=' max-h-[15rem] overflow-hidden rounded-md object-cover object-center'>
-                    <Img
-                        className={` h-full w-full`}
-                        src={
-                            item?.snippet?.thumbnails?.maxres?.url 
-                            || item?.snippet?.thumbnails?.medium?.url
-                            || item?.snippet?.thumbnails?.high?.url
-                        }
-                    />
+                <div className=' max-h-[15rem] overflow-hidden rounded-md object-cover object-center relative'>
+                    {!isPlaying ? (
+                        <Img
+                            className={` h-full w-full`}
+                            src={
+                                item?.snippet?.thumbnails?.maxres?.url 
+                                || item?.snippet?.thumbnails?.medium?.url
+                                || item?.snippet?.thumbnails?.high?.url
+                            }
+                        />
+                    ) : (
+                        <ReactPlayer
+                            url={`https://www.youtube.com/watch?v=${item?.id}`}
+                            width='100%'
+                            height='183px'
+                            controls={true}
+                            muted
+                            playing={isPlaying}
+                            loop
+                            onError={(error) => console.error('Error playing video:', error)}
+                        />
+                    )}
+
+                    <div className=' absolute right-1 bottom-1 bg-neutral-950 rounded-md px-2 py-1 text-sm'>
+                        {formatDuration(item?.contentDetails?.duration)}
+                    </div>
                 </div>
             </Link>
 

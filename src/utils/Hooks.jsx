@@ -106,8 +106,6 @@ export const getComments = async (vdoID) => {
 
     try {
         const commentThreadResults = await axios.get(COMMENT_THREAD_URL);
-        // const commentResults = await axios.get(COMMENT_URL);
-        // console.log(commentResults)
         return commentThreadResults;
     } catch (error) {
         console.error(error);

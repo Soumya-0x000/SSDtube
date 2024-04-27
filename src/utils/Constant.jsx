@@ -38,7 +38,7 @@ export const generateRandomID = () => {
     }
 
     return randomID;
-}
+};
 
 export function extractLinks(text) {
     if (!text) return null;
@@ -63,4 +63,19 @@ export function extractLinks(text) {
             })}
         </>
     );
-}
+};
+
+export const formatDuration = (duration) => {
+    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+
+    const hours = match[1] ? parseInt(match[1]) : '';
+    const minutes = match[2] ? parseInt(match[2]) : '';
+    const seconds = match[3] ? parseInt(match[3]) : '';
+
+    const parts = [];
+    if (hours) parts.push(`${hours}`);
+    if (minutes) parts.push(`${minutes}`);
+    if (seconds) parts.push(`${seconds}`);
+
+    return parts.join(':');
+};
