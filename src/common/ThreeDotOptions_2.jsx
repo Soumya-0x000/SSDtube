@@ -7,6 +7,7 @@ import { setWatchLaterBanner, setWatchLaterData } from '../store/reducers/WatchL
 import { setWatchQueue } from '../store/reducers/WatchQueueSlice';
 import {BASE_URL, YOUTUBE_API_KEY} from '../utils/Constant';
 import { getViews } from '../utils/Hooks';
+import axios from 'axios';
 
 const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index, mode, mouseEnter, data }) => {
     const { watchLaterData } = useSelector(state => state.watchLater);
@@ -59,7 +60,6 @@ const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index
                         }
                     })(); 
                 }
-                console.log(data);
                 break;
             case "addWatchQentry":
                 const isDuplicateWatchQ = watchQueue.some(entry => entry.videoId === videoCode)
@@ -83,8 +83,10 @@ const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index
     };
 
     useEffect(() => {
-        const newBanner = watchLaterData[0].thumbnail
-        dispatch(setWatchLaterBanner(newBanner));
+        if(watchLaterData[0]) {
+            const newBanner = watchLaterData[0].thumbnail
+            dispatch(setWatchLaterBanner(newBanner));
+        }
     }, [watchLaterData]);
 
     const ThreeDotClickOptions = () => {

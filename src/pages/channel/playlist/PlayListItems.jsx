@@ -40,6 +40,7 @@ const PlayListItems = () => {
     const [optionsClicked, setOptionsClicked] = useState(new Array(playListData.length).fill(false));
     const [mouseEnter, setMouseEnter] = useState(false);
     const [totalFetchedItemsCount, setTotalFetchedItemsCount] = useState(0);
+    const [fetchMoreData, setFetchMoreData] = useState(false);
 
     const fetchFullPlayList = async(playListId) => {
         const PLAY_LIST_DATA_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=${playListId}&key=${YOUTUBE_API_KEY}`;
@@ -55,8 +56,6 @@ const PlayListItems = () => {
                 total: getFullPlayList?.data?.pageInfo?.totalResults,
                 current: vdoItems.length,
             })
-            const nextPgToken = getFullPlayList?.data?.nextPageToken;
-            if (!nextPgToken && vdoItems.length === 0) return;
             
             const mainData = await Promise.all(vdoItems.map(async(item, indx) => {
                 const videoId = item?.contentDetails?.videoId;
@@ -80,7 +79,17 @@ const PlayListItems = () => {
                 totalCount: resultCount.total, 
                 currentCount: currentVdoCount
             }));
-            dispatch(setNextPgToken(nextPgToken));
+            
+            const ObjKeys = Object.keys(getFullPlayList?.data);
+            if (ObjKeys.includes('nextPageToken')) {
+                setFetchMoreData(true);
+                const nextPgToken = getFullPlayList?.data?.nextPageToken;
+                if (!nextPgToken && vdoItems.length === 0) return;
+                dispatch(setNextPgToken(nextPgToken));
+            } else {
+                setFetchMoreData(false);
+                return
+            };
         } catch (error) {
             console.error(error);
         }
@@ -89,13 +98,12 @@ const PlayListItems = () => {
     const fetchNxtPgData = async() => {
         const NXT_PG_URL = `${BASE_URL}/playlistItems?part=snippet%2CcontentDetails&maxResults=50&pageToken=${nxtPgToken}&playlistId=${playListID}&key=${YOUTUBE_API_KEY}`;
 
-        if (resultCount.current <= resultCount.total) {
+        if ((resultCount.current <= resultCount.total) && fetchMoreData) {
             try {
+                setFetchMoreData(false);
                 const getNxtPgData = await axios.get(NXT_PG_URL);
                 const vdoItems = getNxtPgData?.data?.items;
-                const nextPgToken = getNxtPgData?.data?.nextPageToken;
-                if (!nextPgToken && vdoItems.length === 0) return;
-
+                
                 const moreItems = await Promise.all(vdoItems.map(async (item, indx) => {
                     const videoId = item?.contentDetails?.videoId;
                     const views = await getViews(videoId)
@@ -110,7 +118,17 @@ const PlayListItems = () => {
                     return {videoId, publishedAt, description, title, thumbnail, views};                  
                 }));
                 setDataToRender(prevData => [...prevData, ...moreItems]);
-                dispatch(setNextPgToken(nextPgToken));
+
+                const ObjKeys = Object.keys(getNxtPgData?.data)
+                if (ObjKeys.includes('nextPageToken')) {
+                    setFetchMoreData(true);
+                    const nextPgToken = getNxtPgData?.data?.nextPageToken;
+                    if (!nextPgToken && vdoItems.length === 0) return;
+                    dispatch(setNextPgToken(nextPgToken));
+                } else {
+                    dispatch(setNextPgToken(''));
+                    setFetchMoreData(false);
+                };
             } catch (error) {
                 console.error(error);
             }

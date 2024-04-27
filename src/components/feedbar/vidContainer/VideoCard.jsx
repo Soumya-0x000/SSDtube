@@ -63,7 +63,6 @@ const VideoCard = ({item, indx}) => {
                             url={`https://www.youtube.com/watch?v=${item?.id}`}
                             width='100%'
                             height='220px'
-                            controls={true}
                             muted
                             playing={isPlaying}
                             loop
