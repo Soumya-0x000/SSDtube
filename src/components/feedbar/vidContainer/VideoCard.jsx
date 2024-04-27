@@ -62,7 +62,7 @@ const VideoCard = ({item, indx}) => {
                         <ReactPlayer
                             url={`https://www.youtube.com/watch?v=${item?.id}`}
                             width='100%'
-                            height='183px'
+                            height='220px'
                             controls={true}
                             muted
                             playing={isPlaying}
