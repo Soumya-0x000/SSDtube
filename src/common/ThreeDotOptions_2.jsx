@@ -100,7 +100,7 @@ const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index
                     </div>
                 )}
                 
-                {mode === 'dedicatedPlayList' && (
+                {mode === 'dedicatedPlayList' || mode ==='searchResult' && (
                     <div className=' flex flex-wrap gap-x-3 pl-3 py-4 hover:bg-slate-900'
                     onClick={() => handleOperations('addToWatchLater')}>
                         <VscTrash className=' text-2xl'/>
@@ -118,8 +118,8 @@ const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index
     };
 
     return (
-        <div className='absolute right-1 top-1/2 -translate-y-1/2 flex items-center group/dot  z-30'>
-            <div className={` bg-neutral-800 items-center justify-center rounded-full w-8 h-8 relative hidden group-hover:flex group-hover/dot:bg-slate-800`}
+        <div className={`absolute ${mode === 'searchResult' ? 'top-5' : 'top-1/2 -translate-y-1/2'} right-1 flex items-center group/dot z-30`}>
+            <div className={` bg-neutral-800 items-center justify-center rounded-full w-8 h-8 relative hidden group-hover:flex group-hover/dot:bg-slate-800 cursor-pointer`}
             onClick={(e) => handleThreeDotClick(e)}>
                 <BsThreeDotsVertical className='text-xl'/>
 
@@ -130,7 +130,7 @@ const ThreeDotOptions_2 = ({ optionsClicked, setOptionsClicked, videoCode, index
                 )}
             </div> 
         </div>
-    )
+    );
 }
 
 export default ThreeDotOptions_2;

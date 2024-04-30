@@ -12,13 +12,6 @@ const LeftSideIconArea = ({ setHoverBG, hoverBG }) => {
     const handleSidebarClick = () => {
         dispatch(sideBarOpen(!isSideBarOpen))
         if (fullSidebarWindow) {
-            // if (!isSidebarFloating) {
-            //     dispatch(sideBarFloat(true));
-            // } else {
-            //     setTimeout(() => {
-            //         dispatch(sideBarFloat(!isSidebarFloating))
-            //     }, 300);
-            // }
             dispatch(sideBarFloat(!isSidebarFloating))
         } else {
             dispatch(sideBarFloat(false))

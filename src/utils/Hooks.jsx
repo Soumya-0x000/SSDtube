@@ -23,7 +23,7 @@ export const getVideoInfo = async (id) => {
 
 export const getChannelInfo = async (id) => {
     const GET_CHANNEL_INFO = `${BASE_URL}/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${id}&maxResults=50&key=${YOUTUBE_API_KEY}`;
-    const GET_BANNER_INFO = `https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&id=${id}&key=${YOUTUBE_API_KEY}`;
+    const GET_BANNER_INFO = `${BASE_URL}/channels?part=brandingSettings&id=${id}&key=${YOUTUBE_API_KEY}`;
 
     try {
         const channelData = await axios.get(GET_CHANNEL_INFO);
@@ -89,7 +89,7 @@ export const getViews = async (videoID) => {
 };
 
 export const getSearchResults = async (query) => {
-    const SEARCH_URL = `${BASE_URL}/search?part=snippet%2CcontentDetails%2Cstatistics&channelId=UCA3-nIYWu4PTWkb6NwhEpzg&channelType=any&forDeveloper=true&maxResults=30&order=relevance&safeSearch=none&videoCaption=any&videoDefinition=any&videoDimension=2d&videoDuration=any&videoEmbeddable=any&videoLicense=any&videoPaidProductPlacement=any&videoSyndicated=any&videoType=any&key=${YOUTUBE_API_KEY}`;
+    const SEARCH_URL = `${BASE_URL}/search?part=snippet&maxResults=20&q=${query}&type=video&key=${YOUTUBE_API_KEY}`;
 
     try {
         const results = await axios.get(SEARCH_URL);

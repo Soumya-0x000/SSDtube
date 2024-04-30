@@ -167,8 +167,8 @@ const Navbar = () => {
                                         <IoNotificationsOutline className={`w-6 h-6`} />
                                     </div>
 
-                                    <div className="absolute top-[.2rem] -right-0 bg-red-700 rounded-full text-white text-[12px] px-1 flex items-center justify-center">
-                                        1+
+                                    <div className="absolute top-[.2rem] -right-2 bg-red-700 rounded-full text-white text-[12px] px-1 flex items-center justify-center">
+                                        99+
                                     </div>
                                 </div>
                             )}

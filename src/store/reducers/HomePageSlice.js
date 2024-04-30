@@ -10,9 +10,10 @@ const initialState = {
     searchResults: [],
     nextPageToken: null,
     recommendedVideos: [],
+    categoryName: 'All',
 };
 
-export const YoutubeSlice = createSlice({
+export const HomePageSlice = createSlice({
     name: 'youtube',
     initialState,
     reducers: {
@@ -26,9 +27,9 @@ export const YoutubeSlice = createSlice({
         countTotalResults: function (state, action) {
             state.totalResults = action.payload
         },
-    },
-    extraReducers: (builder) => {
-
+        setCategoryName: function (state, action) {
+            state.categoryName = action.payload
+        },
     },
 });
 
@@ -36,4 +37,5 @@ export const {
     setHomePageVideo,
     setNxtPageToken,
     countTotalResults,
-} = YoutubeSlice.actions;
+    setCategoryName
+} = HomePageSlice.actions;

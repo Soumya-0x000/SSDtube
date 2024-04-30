@@ -32,6 +32,7 @@ const itemType = ['upload', 'playlistItem'];
 
 const Watch = () => {
     const { id } = useParams();
+    console.log(id)
     const {width} = useWindowDimensions();
     const {
         currentlyPlayingVdoId,

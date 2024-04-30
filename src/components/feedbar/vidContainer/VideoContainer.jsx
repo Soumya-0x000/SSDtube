@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getYoutubeData } from '../../../utils/Hooks';
+import { getSearchResults, getYoutubeData } from '../../../utils/Hooks';
 import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/Constant'
 import { useDispatch, useSelector } from "react-redux";
 import Skeleton from './Skeleton';
@@ -8,16 +8,19 @@ import Spinner from '../../loading/Spinner'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import './videoContainer.css'
 import axios from 'axios';
-import { setHomePageVideo, setNxtPageToken } from "../../../store/reducers/YoutubeSlice";
+import { setHomePageVideo, setNxtPageToken } from "../../../store/reducers/HomePageSlice.js";
 import { setVidIdArr } from '../../../store/reducers/WatchSlice.js';
 import { setPlayListOn } from '../../../store/reducers/PlayListSlice.js';
 import { setIsWatchQueueOn } from '../../../store/reducers/WatchQueueSlice.js';
 
 const VideoContainer = () => {
-    const currentVideos = useSelector((state) => state.youtube.videos);
-    const loading = useSelector((state) => state.youtube.isLoading);
     const isSidebarOpen = useSelector((state) => state.sidebar.isSidebarOpen);
-    const nxtPgToken = useSelector((state) => state.youtube.nextPageToken);
+    const { 
+        videos: currentVideos, 
+        isLoading: loading, 
+        nextPageToken: nxtPgToken, 
+        categoryName 
+    } = useSelector((state) => state.youtube);
     const dispatch = useDispatch();
     const skeletonNumbers = 20;
     const [homePgVids, setHomePgVids] = useState([]);
@@ -42,7 +45,6 @@ const VideoContainer = () => {
             setVideoIDs(ids);
             dispatch(setVidIdArr(ids)); 
             
-            videos.map(vdoData => vdoData)
             setResultCount({
                 total: videoData?.data?.pageInfo?.totalResults,
                 current: videoData?.data?.pageInfo?.resultsPerPage,
@@ -81,11 +83,42 @@ const VideoContainer = () => {
         }
     };
 
+    const fetchCategorySpecificVideos = async (category) => {
+        const SEARCH_URL = `${BASE_URL}/search?part=snippet&maxResults=20&q=${category}&type=video&key=${YOUTUBE_API_KEY}`;
+        try {
+            const videoData = await axios.get(SEARCH_URL);
+            const videos = videoData?.data.items;
+            
+            const ids = videos.map(vdo => vdo?.id?.videoId);
+            setVideoIDs(ids);
+            dispatch(setVidIdArr(ids)); 
+            
+            setResultCount({
+                total: videoData?.data?.pageInfo?.totalResults,
+                current: videoData?.data?.pageInfo?.resultsPerPage,
+            });
+
+            dispatch(setHomePageVideo(videos));
+            setHomePgVids(videos);
+            dispatch(setNxtPageToken(videoData?.data?.nextPageToken));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
         fetchYoutubeVideos();
         dispatch(setPlayListOn(false));
         dispatch(setIsWatchQueueOn(false));
     }, []);
+
+    useEffect(() => {
+        if (categoryName === 'All') {
+            fetchYoutubeVideos();
+        } else {
+            fetchCategorySpecificVideos(categoryName.trim())
+        }
+    }, [categoryName]);
 
     useEffect(() => {
         scrollRef.current && setCurrentHeight(scrollRef.current.clientHeight)

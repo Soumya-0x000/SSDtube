@@ -4,11 +4,14 @@ import { Link } from 'react-router-dom';
 import { GoDotFill } from "react-icons/go";
 import { getChannelInfo } from '../../../utils/Hooks';
 import { convertViews, formatDuration, handleDayCount } from '../../../utils/Constant';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setChannelId, setCurrentlyPlayingVdoId } from '../../../store/reducers/WatchSlice';
 import ReactPlayer from 'react-player';
+import { BASE_URL, YOUTUBE_API_KEY } from '../../../utils/Constant'
+import axios from 'axios';
 
 const VideoCard = ({item, indx}) => {
+    const { categoryName } = useSelector((state) => state.youtube);
     const [logoURL, setLogoURL] = useState('');
     const dispatch = useDispatch();
     const [subscriberCount, setSubscriberCount] = useState(0);
@@ -22,11 +25,12 @@ const VideoCard = ({item, indx}) => {
         const subscribers = channelData?.data?.items[0]?.statistics?.subscriberCount;
         setSubscriberCount(subscribers);
         setLogoURL(channelLogoUrl)
+        
     };
 
     useEffect(() => {
         handleLogoURL(item?.snippet?.channelId);
-    }, [])
+    }, [categoryName])
 
     const handleClick = async (id) => {
         dispatch(setChannelId(item?.snippet?.channelId))
@@ -70,9 +74,11 @@ const VideoCard = ({item, indx}) => {
                         />
                     )}
 
-                    <div className=' absolute right-1 bottom-1 bg-neutral-950 rounded-md px-2 py-1 text-sm'>
-                        {formatDuration(item?.contentDetails?.duration)}
-                    </div>
+                    {item?.contentDetails?.duration && (
+                        <div className=' absolute right-1 bottom-1 bg-neutral-950 rounded-md px-2 py-1 text-sm'>
+                            {formatDuration(item?.contentDetails?.duration)}
+                        </div>
+                    )}
                 </div>
             </Link>
 

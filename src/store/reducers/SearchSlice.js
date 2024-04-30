@@ -4,6 +4,7 @@ const initialState = {
     searchItem: '',
     searchResult: [],
     totalSearchResultCount: 0,
+    nextPgToken: ''
 };
 
 export const SearchSlice = createSlice({
@@ -19,6 +20,9 @@ export const SearchSlice = createSlice({
         setTotalSearchResultCount(state, action) {
             state.totalSearchResultCount = action.payload;
         },
+        setNextPageToken: function (state, action) {
+            state.nextPgToken = action.payload;
+        },
     },
 });
 
@@ -26,4 +30,5 @@ export const {
     setSearchItem,
     setSearchResult,
     setTotalSearchResultCount,
+    setNextPageToken,
 } = SearchSlice.actions;
