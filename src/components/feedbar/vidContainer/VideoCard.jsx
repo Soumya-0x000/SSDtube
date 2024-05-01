@@ -24,8 +24,7 @@ const VideoCard = ({item, indx}) => {
                             || channelData?.data?.items[0]?.snippet?.thumbnails?.default?.url
         const subscribers = channelData?.data?.items[0]?.statistics?.subscriberCount;
         setSubscriberCount(subscribers);
-        setLogoURL(channelLogoUrl)
-        
+        setLogoURL(channelLogoUrl) 
     };
 
     useEffect(() => {

@@ -85,6 +85,7 @@ const VideoContainer = () => {
 
     const fetchCategorySpecificVideos = async (category) => {
         const SEARCH_URL = `${BASE_URL}/search?part=snippet&maxResults=20&q=${category}&type=video&key=${YOUTUBE_API_KEY}`;
+        
         try {
             const videoData = await axios.get(SEARCH_URL);
             const videos = videoData?.data.items;
@@ -105,9 +106,34 @@ const VideoContainer = () => {
             console.error(error);
         }
     };
+    
+    const getNextPageCategoryWiseVideo = async (category) => {
+        const SEARCH_URL = `${BASE_URL}/search?part=snippet&maxResults=20&pageToken=${nxtPgToken}&q=${category}&type=video&key=${YOUTUBE_API_KEY}`;
+
+        try {
+            const nxtPgData = await axios.get(SEARCH_URL);
+            const nxtPgVideos = nxtPgData?.data.items;
+            
+            const nxtPGids = nxtPgVideos.map(vdo => vdo?.id?.videoId);
+            setVideoIDs(prevIDs => [...prevIDs, ...nxtPGids]);
+            dispatch(setVidIdArr(videoIDs)); 
+            
+            setResultCount(prevResultCount => ({
+                total: nxtPgData?.data?.pageInfo?.totalResults, 
+                current: prevResultCount.current + nxtPgData?.data?.pageInfo?.resultsPerPage
+            }));
+            
+            const updatedVideos = [...homePgVids, ...nxtPgVideos];
+            console.log(updatedVideos)
+            dispatch(setHomePageVideo(updatedVideos));
+            setHomePgVids(updatedVideos);
+            dispatch(setNxtPageToken(nxtPgData?.data?.nextPageToken));
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
-        fetchYoutubeVideos();
         dispatch(setPlayListOn(false));
         dispatch(setIsWatchQueueOn(false));
     }, []);
@@ -153,7 +179,7 @@ const VideoContainer = () => {
                 `}
                 hasMore={resultCount.current !== resultCount.total ? true : false }
                 loader={<Spinner/>}
-                next={getNextPageVideo}
+                next={categoryName === 'All' ? getNextPageVideo : getNextPageCategoryWiseVideo}
                 height={currentHeight}>
                     {currentVideos.map((item, indx) => (
                         <VideoCard
