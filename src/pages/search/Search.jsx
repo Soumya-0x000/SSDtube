@@ -106,7 +106,7 @@ const Search = () => {
 
     useEffect(() => {
         fetchAllSearchResults();
-    }, []);
+    }, [searchItem]);
 
     const handleVdoClick = (vdoId, chnlID) => {
         dispatch(setCurrentlyPlayingVdoId(vdoId))

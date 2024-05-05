@@ -1,4 +1,3 @@
-import Spinner from '../loading/Spinner';
 import ButtonList from './buttonList/ButtonList'
 import VideoContainer from './vidContainer/VideoContainer'
 
