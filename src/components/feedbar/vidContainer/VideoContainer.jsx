@@ -138,13 +138,13 @@ const VideoContainer = () => {
         dispatch(setIsWatchQueueOn(false));
     }, []);
 
-    useEffect(() => {
-        if (categoryName === 'All') {
-            fetchYoutubeVideos();
-        } else {
-            fetchCategorySpecificVideos(categoryName.trim())
-        }
-    }, [categoryName]);
+    // useEffect(() => {
+    //     if (categoryName === 'All') {
+    //         fetchYoutubeVideos();
+    //     } else {
+    //         fetchCategorySpecificVideos(categoryName.trim())
+    //     }
+    // }, [categoryName]);
 
     useEffect(() => {
         scrollRef.current && setCurrentHeight(scrollRef.current.clientHeight)

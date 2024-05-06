@@ -128,122 +128,120 @@ const Search = () => {
 
     return (
         <div className=' w-full h-full flex justify-center'>
-            <div className=' '>
-                <InfiniteScroll
-                dataLength={searchResult.length}
-                next={getNextPageVideo}
-                className={` overflow-y-auto w-full`}
-                loader={<>
-                    {[...new Array(3)].map((_, indx) => (
-                        <div className='py-1.5 cursor-pointer hover:bg-neutral-800 hover:rounded-lg px-2 flex gap-x-3'
-                        key={indx}>
-                            <div className='min-w-[25rem] max-w-[25rem] min-h-[14rem] max-h-[14rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'>
-                            </div>
-
-                            <div className=' space-y-3 lg:space-y-5 mt-2 w-full'>
-                                <div>
-                                    <div className='min-w-full min-h-[1.5rem] bg-slate-600 rounded-full animate-pulse'/>
-
-                                    <div className=' flex items-center mt-2'>
-                                        <p className='min-w-12 max-w-24 min-h-[10px] bg-slate-600 rounded-full animate-pulse'/>
-
-                                        <BsDot className=' animate-pulse text-lg text-slate-600'/>
-
-                                        <p className='min-w-[5rem] max-w-[5rem] h-[10px] bg-slate-600 rounded-full animate-pulse'/>
-                                    </div>
-                                </div>
-
-                                <div className='flex gap-x-3 items-center'>
-                                    <div className=' min-w-10 max-w-10 min-h-10 max-h-10 rounded-full overflow-hidden bg-slate-700 animate-pulse'/>
-                                    <div className=' w-32 h-3 rounded-full bg-slate-700 animate-pulse'/>
-                                </div>
-
-                                <div className=' min-w-full min-h-3 rounded-full bg-slate-700 animate-pulse'/>
-                            </div>
+            <InfiniteScroll
+            dataLength={searchResult.length}
+            next={getNextPageVideo}
+            className={` overflow-y-auto w-full`}
+            loader={<>
+                {[...new Array(4)].map((_, indx) => (
+                    <div className='py-1.5 cursor-pointer hover:bg-neutral-800 hover:rounded-lg px-2 flex gap-x-3'
+                    key={indx}>
+                        <div className='min-w-[25rem] max-w-[25rem] min-h-[14rem] max-h-[14rem] rounded-lg overflow-hidden bg-slate-600 animate-pulse'>
                         </div>
-                    ))}
-                </>}
-                hasMore={true}>
-                    <div className=' flex flex-col gap-y-3 w-full max-w-[75rem]'>
-                        {searchResult.map((item, indx) => (
-                            <div 
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={() => handleMouseLeave(indx)}
-                            className='flex gap-x-5 relative group'
-                            key={indx + item.videoId}>
-                                {/* image */}
-                                <Link 
-                                onClick={() => handleVdoClick(item?.videoId, item?.channelId)}
-                                className=' min-w-[25rem] max-w-[25rem] min-h-[15rem] max-h-[15rem]'
-                                to={`/watch/${item.videoId}`}>
-                                    <Img
-                                        className={` h-full w-full rounded-lg `}
-                                        src={item?.thumbnail}
-                                    />
-                                </Link>
 
-                                {/* details */}
-                                <Link className='w-full flex flex-col gap-y-5'
-                                to={`/watch/${item?.videoId}`}
-                                onClick={() => handleVdoClick(item?.videoId, item?.channelId)}>
-                                    {/* title and views */}
-                                    <div className=' space-y-1 mt-2'>
-                                        {/* title */}
-                                        <div className=' line-clamp-1 text-lg max-w-[13rem'>
-                                            <p>{item?.title}</p>
-                                        </div>
+                        <div className=' space-y-3 lg:space-y-5 mt-2 w-full'>
+                            <div>
+                                <div className='min-w-[35rem] min-h-[1.5rem] bg-slate-600 rounded-full animate-pulse'/>
 
-                                        {/* views & publishedAt */}
-                                        <div className=' flex gap-x-1 text-gray-400 text-[.84rem] items-center'>
-                                            <div className=''>
-                                                {convertViews(item.views)} views
-                                            </div>
-                                            
-                                            <BsDot/>
+                                <div className=' flex items-center mt-2'>
+                                    <p className='min-w-12 max-w-24 min-h-[10px] bg-slate-600 rounded-full animate-pulse'/>
 
-                                            <div className=''>
-                                                {handleDayCount(item?.publishedAt)}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <BsDot className=' animate-pulse text-lg text-slate-600'/>
 
-                                    {/* channel logo and channel name */}
-                                    <Link className=' flex gap-x-4 items-center'
-                                    to={`/channel/${item.channelId}`}
-                                    onClick={(e) => handleChannelClick(e)}>
-                                        <div className=' w-8 h-8 rounded-full overflow-hidden'>
-                                            <img 
-                                                src={item?.channelLogoUrl} 
-                                                className=' w-full h-full'
-                                                alt="channel logo" 
-                                            />
-                                        </div>
+                                    <p className='min-w-[5rem] max-w-[5rem] h-[10px] bg-slate-600 rounded-full animate-pulse'/>
+                                </div>
+                            </div>
 
-                                        <div className='text-gray-400 text-[.84rem]'>
-                                            {item?.channelTitle}
-                                        </div>
-                                    </Link>
+                            <div className='flex gap-x-3 items-center'>
+                                <div className=' min-w-10 max-w-10 min-h-10 max-h-10 rounded-full overflow-hidden bg-slate-700 animate-pulse'/>
+                                <div className=' w-32 h-3 rounded-full bg-slate-700 animate-pulse'/>
+                            </div>
 
-                                    {/* description */}
-                                    <div className='text-gray-400 text-[.84rem]'>
-                                        {item?.description}
-                                    </div>
-                                </Link>
-
-                                <ThreeDotOptions_2
-                                    optionsClicked={optionsClicked}
-                                    setOptionsClicked={setOptionsClicked}
-                                    videoCode={item?.videoId}
-                                    index={indx}
-                                    mode={`searchResult`}
-                                    mouseEnter={mouseEnter}
-                                    data={item}
-                                />
-                            </div>    
-                        ))}
+                            <div className=' min-w-full min-h-3 rounded-full bg-slate-700 animate-pulse'/>
+                        </div>
                     </div>
-                </InfiniteScroll>
-            </div>
+                ))}
+            </>}
+            hasMore={true}>
+                <div className=' flex flex-col gap-y-3 w-full max-w-[75rem]'>
+                    {searchResult.map((item, indx) => (
+                        <div 
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={() => handleMouseLeave(indx)}
+                        className='flex gap-x-5 relative group'
+                        key={indx + item.videoId}>
+                            {/* image */}
+                            <Link 
+                            onClick={() => handleVdoClick(item?.videoId, item?.channelId)}
+                            className=' min-w-[25rem] max-w-[25rem] min-h-[15rem] max-h-[15rem]'
+                            to={`/watch/${item.videoId}`}>
+                                <Img
+                                    className={` h-full w-full rounded-lg `}
+                                    src={item?.thumbnail}
+                                />
+                            </Link>
+
+                            {/* details */}
+                            <Link className='w-full flex flex-col gap-y-5'
+                            to={`/watch/${item?.videoId}`}
+                            onClick={() => handleVdoClick(item?.videoId, item?.channelId)}>
+                                {/* title and views */}
+                                <div className=' space-y-1 mt-2'>
+                                    {/* title */}
+                                    <div className=' line-clamp-1 text-lg max-w-[13rem'>
+                                        <p>{item?.title}</p>
+                                    </div>
+
+                                    {/* views & publishedAt */}
+                                    <div className=' flex gap-x-1 text-gray-400 text-[.84rem] items-center'>
+                                        <div className=''>
+                                            {convertViews(item.views)} views
+                                        </div>
+                                        
+                                        <BsDot/>
+
+                                        <div className=''>
+                                            {handleDayCount(item?.publishedAt)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* channel logo and channel name */}
+                                <Link className=' flex gap-x-4 items-center'
+                                to={`/channel/${item.channelId}`}
+                                onClick={(e) => handleChannelClick(e)}>
+                                    <div className=' w-8 h-8 rounded-full overflow-hidden'>
+                                        <img 
+                                            src={item?.channelLogoUrl} 
+                                            className=' w-full h-full'
+                                            alt="channel logo" 
+                                        />
+                                    </div>
+
+                                    <div className='text-gray-400 text-[.84rem]'>
+                                        {item?.channelTitle}
+                                    </div>
+                                </Link>
+
+                                {/* description */}
+                                <div className='text-gray-400 text-[.84rem]'>
+                                    {item?.description}
+                                </div>
+                            </Link>
+
+                            <ThreeDotOptions_2
+                                optionsClicked={optionsClicked}
+                                setOptionsClicked={setOptionsClicked}
+                                videoCode={item?.videoId}
+                                index={indx}
+                                mode={`searchResult`}
+                                mouseEnter={mouseEnter}
+                                data={item}
+                            />
+                        </div>    
+                    ))}
+                </div>
+            </InfiniteScroll>
         </div>
     )
 }

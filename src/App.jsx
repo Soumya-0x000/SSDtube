@@ -37,7 +37,7 @@ const App = () => {
                         {sidebarVisible && <MainSidebar/>}
 
                         {isFullSidebarWindow && isSidebarFloating && (
-                            <div className={`absolute top-0 z-20 bg-[#0f0f0f] overflow-y-auto w-[15rem] h-[100vh] ${isSidebarFloating ? 'openSidebarAnimation-div' : 'closeSidebarAnimation-div'}`}>
+                            <div className={`fixed -top-0 z-20 bg-[#0f0f0f] overflow-y-auto w-[15rem] h-[100vh] ${isSidebarFloating ? 'openSidebarAnimation-div' : 'closeSidebarAnimation-div'}`}>
                                 <DesktopSidebar sidebarVisible={sidebarVisible}/>
                             </div>
                         )}
